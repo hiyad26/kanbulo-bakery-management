@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -58,6 +59,7 @@
     }
 
     .card {
+      display: block;
       background: white;
       border: none;
       border-radius: 15px;
@@ -66,6 +68,7 @@
       text-align: left;
       width: 100%;
       color: #3b2415;
+      text-decoration: none;
       cursor: pointer;
       transition: transform 0.15s;
     }
@@ -120,53 +123,53 @@
 
   <section class="cards">
 
-    <button class="card" onclick="openPage('sales.html')">
+    <a class="card" href="sales.html">
       <div class="icon">🛒</div>
       <h3>Sales</h3>
       <p>Record and manage bakery sales.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('products.html')">
+    <a class="card" href="products.html">
       <div class="icon">🍞</div>
       <h3>Products</h3>
       <p>Manage bakery products and prices.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('reports.html')">
+    <a class="card" href="reports.html">
       <div class="icon">📊</div>
       <h3>Reports</h3>
       <p>View daily and monthly business reports.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('expenses.html')">
+    <a class="card" href="expenses.html">
       <div class="icon">💰</div>
       <h3>Expenses</h3>
       <p>Track bakery expenses and costs.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('inventory.html')">
+    <a class="card" href="inventory.html">
       <div class="icon">📦</div>
       <h3>Inventory</h3>
       <p>Keep track of your stock.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('customers.html')">
+    <a class="card" href="customers.html">
       <div class="icon">👥</div>
       <h3>Customers</h3>
       <p>Manage customer information.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('quotations.html')">
+    <a class="card" href="quotations.html">
       <div class="icon">📝</div>
       <h3>Quotations</h3>
       <p>Create and manage customer quotations.</p>
-    </button>
+    </a>
 
-    <button class="card" onclick="openPage('invoices.html')">
+    <a class="card" href="invoices.html">
       <div class="icon">🧾</div>
       <h3>Invoices</h3>
       <p>Create and manage customer invoices.</p>
-    </button>
+    </a>
 
   </section>
 
@@ -176,14 +179,5 @@
   Kanbulo Bakery Management © 2026
 </footer>
 
-<script>
-
-  function openPage(page) {
-    window.location.href = page;
-  }
-
-</script>
-
 </body>
 </html>
-
