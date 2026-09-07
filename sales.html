@@ -402,7 +402,7 @@
 
 <label for="customerSelect">Customer</label>
 
-<select id="customerSelect" onchange="customerChanged()">
+<select id="customerSelect">
   <option value="">Walk-in Customer</option>
 </select>
 
@@ -593,8 +593,7 @@ let originalSaleItems = [];
 
 function showError(message) {
 
-  const box =
-    document.getElementById("errorBox");
+  const box = document.getElementById("errorBox");
 
   box.textContent = message;
   box.style.display = "block";
@@ -604,8 +603,7 @@ function showError(message) {
 
 function clearError() {
 
-  const box =
-    document.getElementById("errorBox");
+  const box = document.getElementById("errorBox");
 
   box.textContent = "";
   box.style.display = "none";
@@ -827,102 +825,6 @@ function getSelectedCustomer() {
 }
 
 
-function customerChanged() {
-
-  /*
-    Customer prices are applied to newly
-    added items. Existing cart items are
-    not automatically changed.
-  */
-
-  if (cart.length > 0) {
-
-    const change =
-      confirm(
-        "Customer changed.\n\n" +
-        "Do you want to update existing item prices " +
-        "to this customer's saved prices?"
-      );
-
-    if (change) {
-
-      cart.forEach(item => {
-
-        const customer =
-          getSelectedCustomer();
-
-        const savedPrice =
-          getCustomerPrice(
-            customer,
-            item.productId
-          );
-
-        if (savedPrice !== null) {
-
-          item.price =
-            savedPrice;
-
-          item.total =
-            savedPrice *
-            Number(item.quantity);
-
-        }
-
-      });
-
-      renderCart();
-
-    }
-
-  }
-
-}
-
-
-function getCustomerPrice(customer, productId) {
-
-  if (
-    !customer ||
-    !customer.prices ||
-    typeof customer.prices !== "object"
-  ) {
-
-    return null;
-
-  }
-
-
-  if (
-    !Object.prototype.hasOwnProperty.call(
-      customer.prices,
-      productId
-    )
-  ) {
-
-    return null;
-
-  }
-
-
-  const price =
-    Number(customer.prices[productId]);
-
-
-  if (
-    !Number.isFinite(price) ||
-    price < 0
-  ) {
-
-    return null;
-
-  }
-
-
-  return price;
-
-}
-
-
 /* =========================
    ADD ITEMS
 ========================= */
@@ -1014,23 +916,6 @@ function addItem() {
   }
 
 
-  const customer =
-    getSelectedCustomer();
-
-
-  const customerPrice =
-    getCustomerPrice(
-      customer,
-      productId
-    );
-
-
-  const startingPrice =
-    customerPrice !== null
-      ? customerPrice
-      : Number(product.price || 0);
-
-
   if (existing) {
 
     existing.quantity += quantity;
@@ -1050,7 +935,7 @@ function addItem() {
         product.name,
 
       price:
-        startingPrice,
+        Number(product.price || 0),
 
       normalPrice:
         Number(product.price || 0),
@@ -1059,7 +944,7 @@ function addItem() {
         quantity,
 
       total:
-        startingPrice *
+        Number(product.price || 0) *
         quantity
 
     });
@@ -1077,10 +962,15 @@ function addItem() {
 
 
 /* =========================
-   CART
+   EDIT ITEM PRICE
 ========================= */
 
 function updateItemPrice(index, value) {
+
+  if (!cart[index]) {
+    return;
+  }
+
 
   const price =
     Number(value);
@@ -1091,13 +981,12 @@ function updateItemPrice(index, value) {
     price < 0
   ) {
 
+    alert("Please enter a valid price.");
+
+    renderCart();
+
     return;
 
-  }
-
-
-  if (!cart[index]) {
-    return;
   }
 
 
@@ -1123,6 +1012,10 @@ function removeItem(index) {
 
 }
 
+
+/* =========================
+   DISCOUNTS
+========================= */
 
 function getDiscountType() {
 
@@ -1227,20 +1120,7 @@ function renderCart() {
 
               <br>
 
-              ${item.quantity} ×
-              MVR ${Number(item.price || 0).toFixed(2)}
-
-              ${
-                Number(item.normalPrice || 0) !==
-                Number(item.price || 0)
-                  ? `
-                    <div class="price-note">
-                      Normal price:
-                      MVR ${Number(item.normalPrice || 0).toFixed(2)}
-                    </div>
-                  `
-                  : ""
-              }
+              Quantity: ${item.quantity}
 
               <div class="custom-price-box">
 
@@ -1256,6 +1136,18 @@ function renderCart() {
                   value="${Number(item.price || 0).toFixed(2)}"
                   onchange="updateItemPrice(${index}, this.value)"
                 >
+
+                ${
+                  Number(item.normalPrice || 0) !==
+                  Number(item.price || 0)
+                    ? `
+                      <div class="price-note">
+                        Normal product price:
+                        MVR ${Number(item.normalPrice || 0).toFixed(2)}
+                      </div>
+                    `
+                    : ""
+                }
 
               </div>
 
@@ -1644,10 +1536,6 @@ function completeSale() {
       sales[saleIndex];
 
 
-    /*
-      Restore the old quantities.
-    */
-
     if (Array.isArray(oldSale.items)) {
 
       for (const oldItem of oldSale.items) {
@@ -1672,10 +1560,6 @@ function completeSale() {
 
     }
 
-
-    /*
-      Check edited quantities.
-    */
 
     for (const item of cart) {
 
@@ -1728,10 +1612,6 @@ function completeSale() {
 
     }
 
-
-    /*
-      Deduct new quantities.
-    */
 
     cart.forEach(item => {
 
@@ -1962,19 +1842,20 @@ function editSale(id) {
         item.name,
 
       price:
-        Number(item.price),
+        Number(item.price || 0),
 
       normalPrice:
         Number(
           item.normalPrice ||
-          item.price
+          item.price ||
+          0
         ),
 
       quantity:
-        Number(item.quantity),
+        Number(item.quantity || 0),
 
       total:
-        Number(item.total)
+        Number(item.total || 0)
 
     }));
 
@@ -2356,13 +2237,32 @@ function renderHistory() {
                 Number(item.price || 0) *
                 Number(item.quantity || 0);
 
-              return (
-                escapeHTML(item.name) +
-                " × " +
-                item.quantity +
-                " — MVR " +
-                lineTotal.toFixed(2)
-              );
+              const normalPrice =
+                Number(
+                  item.normalPrice ||
+                  item.price ||
+                  0
+                );
+
+              const customPrice =
+                Number(item.price || 0);
+
+              return `
+                ${escapeHTML(item.name)}
+                × ${item.quantity}
+                — MVR ${lineTotal.toFixed(2)}
+                ${
+                  normalPrice !== customPrice
+                    ? `
+                      <br>
+                      <small>
+                        Sale price: MVR ${customPrice.toFixed(2)}
+                        | Normal: MVR ${normalPrice.toFixed(2)}
+                      </small>
+                    `
+                    : ""
+                }
+              `;
 
             }).join("<br>")
           : "";
@@ -2464,10 +2364,8 @@ function escapeHTML(value) {
   const div =
     document.createElement("div");
 
-
   div.textContent =
     String(value);
-
 
   return div.innerHTML;
 
@@ -2498,4 +2396,5 @@ renderHistory();
 
 </body>
 </html>
+
 
