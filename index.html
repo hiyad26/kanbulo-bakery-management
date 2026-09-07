@@ -52,7 +52,7 @@
     }
 
     .welcome {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
     }
 
     .welcome h2 {
@@ -63,6 +63,58 @@
     .welcome p {
       color: #777;
       font-size: 14px;
+    }
+
+    /* LIVE TOTALS */
+    .live-totals {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .total-box {
+      background: white;
+      border: 1px solid #f0dfd2;
+      border-radius: 15px;
+      padding: 17px 12px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+    }
+
+    .total-box .total-icon {
+      font-size: 27px;
+      margin-bottom: 7px;
+    }
+
+    .total-box h3 {
+      font-size: 13px;
+      color: #777;
+      margin-bottom: 7px;
+      font-weight: normal;
+    }
+
+    .total-box .amount {
+      font-size: 19px;
+      font-weight: bold;
+      color: #7B1E2B;
+      word-break: break-word;
+    }
+
+    .total-box.profit .amount {
+      color: #2e7d32;
+    }
+
+    .total-box.expense .amount {
+      color: #c62828;
+    }
+
+    .updated {
+      text-align: center;
+      color: #999;
+      font-size: 11px;
+      margin-top: -14px;
+      margin-bottom: 20px;
     }
 
     .cards {
@@ -118,6 +170,33 @@
       font-size: 13px;
     }
 
+    @media (max-width: 600px) {
+      .live-totals {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .total-box {
+        padding: 15px;
+      }
+
+      .total-box .total-icon {
+        display: inline-block;
+        margin-right: 6px;
+        margin-bottom: 0;
+      }
+
+      .total-box h3 {
+        display: inline;
+      }
+
+      .total-box .amount {
+        display: block;
+        margin-top: 6px;
+        font-size: 20px;
+      }
+    }
+
     @media (max-width: 500px) {
       .cards {
         grid-template-columns: 1fr;
@@ -143,6 +222,33 @@
     <h2>Dashboard</h2>
     <p>Welcome to Kanbulo Bakery Management.</p>
   </section>
+
+  <!-- LIVE BUSINESS TOTALS -->
+  <section class="live-totals">
+
+    <div class="total-box income">
+      <div class="total-icon">💰</div>
+      <h3>Total Income</h3>
+      <div class="amount" id="totalIncome">MVR 0.00</div>
+    </div>
+
+    <div class="total-box expense">
+      <div class="total-icon">💸</div>
+      <h3>Total Expenses</h3>
+      <div class="amount" id="totalExpenses">MVR 0.00</div>
+    </div>
+
+    <div class="total-box profit">
+      <div class="total-icon">📈</div>
+      <h3>Net Profit</h3>
+      <div class="amount" id="totalProfit">MVR 0.00</div>
+    </div>
+
+  </section>
+
+  <div class="updated" id="lastUpdated">
+    Live totals
+  </div>
 
   <section class="cards">
 
@@ -203,6 +309,86 @@
 </footer>
 
 <script>
+  function updateDashboardTotals() {
+
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    /* READ SALES */
+    try {
+      const sales = JSON.parse(
+        localStorage.getItem("kanbulo_sales") || "[]"
+      );
+
+      sales.forEach(sale => {
+        const total = Number(
+          sale.total ??
+          sale.grandTotal ??
+          sale.amount ??
+          0
+        );
+
+        if (Number.isFinite(total)) {
+          totalIncome += total;
+        }
+      });
+
+    } catch (error) {
+      console.error("Could not read sales:", error);
+    }
+
+    /* READ EXPENSES */
+    try {
+      const expenses = JSON.parse(
+        localStorage.getItem("kanbulo_expenses") || "[]"
+      );
+
+      expenses.forEach(expense => {
+        const amount = Number(
+          expense.amount ??
+          expense.total ??
+          expense.cost ??
+          0
+        );
+
+        if (Number.isFinite(amount)) {
+          totalExpenses += amount;
+        }
+      });
+
+    } catch (error) {
+      console.error("Could not read expenses:", error);
+    }
+
+    const profit = totalIncome - totalExpenses;
+
+    document.getElementById("totalIncome").textContent =
+      "MVR " + totalIncome.toFixed(2);
+
+    document.getElementById("totalExpenses").textContent =
+      "MVR " + totalExpenses.toFixed(2);
+
+    document.getElementById("totalProfit").textContent =
+      "MVR " + profit.toFixed(2);
+
+    document.getElementById("lastUpdated").textContent =
+      "Updated: " + new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+  }
+
+  /* Update when dashboard opens */
+  window.addEventListener("load", updateDashboardTotals);
+
+  /* Update whenever user returns to dashboard */
+  window.addEventListener("pageshow", updateDashboardTotals);
+
+  /* Update when another page changes localStorage */
+  window.addEventListener("storage", updateDashboardTotals);
+
+
+  /* SERVICE WORKER */
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
       navigator.serviceWorker.register("./sw.js", {
@@ -227,5 +413,6 @@
 </body>
 </html>
 ```
+
 
 
