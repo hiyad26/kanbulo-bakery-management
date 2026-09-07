@@ -162,10 +162,6 @@
       font-size: 16px;
     }
 
-    .discount-row {
-      color: #9b1c31;
-    }
-
     .final-total {
       display: flex;
       justify-content: space-between;
@@ -176,53 +172,6 @@
       font-size: 23px;
       font-weight: bold;
       color: #7B1E2B;
-    }
-
-    .discount-box {
-      background: #fffaf5;
-      border: 1px solid #ead7c5;
-      border-radius: 12px;
-      padding: 15px;
-      margin-top: 18px;
-    }
-
-    .discount-types {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .discount-type {
-      position: relative;
-    }
-
-    .discount-type input {
-      position: absolute;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .discount-type label {
-      margin: 0;
-      display: block;
-      padding: 11px;
-      text-align: center;
-      background: white;
-      border: 2px solid #ead7c5;
-      border-radius: 9px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .discount-type input:checked + label {
-      background: #f5e0d5;
-      border-color: #7B1E2B;
-      color: #7B1E2B;
-    }
-
-    .discount-input {
-      margin-top: 10px;
     }
 
     .payment-options {
@@ -442,72 +391,10 @@
 <div class="summary">
 
   <div class="summary-row">
-    <span>Subtotal</span>
+    <span>Total</span>
     <strong>
-      MVR <span id="subtotal">0.00</span>
-    </strong>
-  </div>
-
-  <div class="discount-box">
-
-    <strong>💸 Discount</strong>
-
-    <div class="discount-types">
-
-      <div class="discount-type">
-        <input
-          type="radio"
-          id="discountPercent"
-          name="discountType"
-          value="percent"
-          checked
-          onchange="renderCart()"
-        >
-        <label for="discountPercent">
-          Percentage %
-        </label>
-      </div>
-
-      <div class="discount-type">
-        <input
-          type="radio"
-          id="discountFixed"
-          name="discountType"
-          value="fixed"
-          onchange="renderCart()"
-        >
-        <label for="discountFixed">
-          Fixed MVR
-        </label>
-      </div>
-
-    </div>
-
-    <input
-      id="discountValue"
-      class="discount-input"
-      type="number"
-      min="0"
-      step="0.01"
-      value="0"
-      placeholder="Enter discount"
-      oninput="renderCart()"
-    >
-
-  </div>
-
-  <div class="summary-row discount-row">
-    <span>Discount</span>
-    <strong>
-      - MVR <span id="discountAmount">0.00</span>
-    </strong>
-  </div>
-
-  <div class="final-total">
-    <span>Final Total</span>
-    <span>
       MVR <span id="grandTotal">0.00</span>
-    </span>
+    </strong>
   </div>
 
 </div>
@@ -639,12 +526,10 @@ function loadProducts() {
 
   }
 
-
   const select =
     document.getElementById("productSelect");
 
   select.innerHTML = "";
-
 
   if (products.length === 0) {
 
@@ -659,7 +544,6 @@ function loadProducts() {
 
   }
 
-
   const first =
     document.createElement("option");
 
@@ -667,7 +551,6 @@ function loadProducts() {
   first.textContent = "Select product";
 
   select.appendChild(first);
-
 
   products.forEach(product => {
 
@@ -702,10 +585,8 @@ function getAvailableStockForProduct(productId) {
     return 0;
   }
 
-
   let available =
     Number(product.stock || 0);
-
 
   if (editingSaleId !== null) {
 
@@ -724,7 +605,6 @@ function getAvailableStockForProduct(productId) {
     }
 
   }
-
 
   return available;
 
@@ -755,20 +635,16 @@ function loadCustomers() {
 
   }
 
-
   const select =
     document.getElementById("customerSelect");
 
   if (!select) return;
 
-
   const currentValue =
     select.value;
 
-
   select.innerHTML =
     '<option value="">Walk-in Customer</option>';
-
 
   customers.forEach(customer => {
 
@@ -789,7 +665,6 @@ function loadCustomers() {
     select.appendChild(option);
 
   });
-
 
   if (
     currentValue &&
@@ -815,7 +690,6 @@ function getSelectedCustomer() {
     return null;
   }
 
-
   return customers.find(
     customer =>
       Number(customer.id) ===
@@ -833,19 +707,16 @@ function addItem() {
 
   clearError();
 
-
   const select =
     document.getElementById("productSelect");
 
   const productId =
     Number(select.value);
 
-
   const quantity =
     Number(
       document.getElementById("quantity").value
     );
-
 
   if (!productId) {
 
@@ -854,7 +725,6 @@ function addItem() {
     return;
 
   }
-
 
   if (
     !Number.isInteger(quantity) ||
@@ -867,12 +737,10 @@ function addItem() {
 
   }
 
-
   const product =
     products.find(
       p => Number(p.id) === productId
     );
-
 
   if (!product) {
 
@@ -882,7 +750,6 @@ function addItem() {
 
   }
 
-
   const existing =
     cart.find(
       item =>
@@ -890,16 +757,13 @@ function addItem() {
         productId
     );
 
-
   const currentQuantity =
     existing
       ? Number(existing.quantity)
       : 0;
 
-
   const availableStock =
     getAvailableStockForProduct(productId);
-
 
   if (
     currentQuantity + quantity >
@@ -914,7 +778,6 @@ function addItem() {
     return;
 
   }
-
 
   if (existing) {
 
@@ -951,9 +814,7 @@ function addItem() {
 
   }
 
-
   renderCart();
-
 
   document.getElementById("quantity")
     .value = 1;
@@ -971,10 +832,8 @@ function updateItemPrice(index, value) {
     return;
   }
 
-
   const price =
     Number(value);
-
 
   if (
     !Number.isFinite(price) ||
@@ -989,15 +848,12 @@ function updateItemPrice(index, value) {
 
   }
 
-
   cart[index].price =
     price;
-
 
   cart[index].total =
     price *
     Number(cart[index].quantity);
-
 
   renderCart();
 
@@ -1014,75 +870,20 @@ function removeItem(index) {
 
 
 /* =========================
-   DISCOUNTS
+   TOTAL
 ========================= */
 
-function getDiscountType() {
+function calculateTotal() {
 
-  const selected =
-    document.querySelector(
-      'input[name="discountType"]:checked'
-    );
-
-  return selected
-    ? selected.value
-    : "percent";
-
-}
-
-
-function calculateTotals() {
-
-  const subtotal =
-    cart.reduce(
-      (sum, item) =>
-        sum +
-        (
-          Number(item.price || 0) *
-          Number(item.quantity || 0)
-        ),
-      0
-    );
-
-
-  const discountValue =
-    Math.max(
-      0,
-      Number(
-        document.getElementById("discountValue").value
-      ) || 0
-    );
-
-
-  const type =
-    getDiscountType();
-
-
-  let discountAmount =
-    type === "percent"
-      ? subtotal * discountValue / 100
-      : discountValue;
-
-
-  if (discountAmount > subtotal) {
-    discountAmount = subtotal;
-  }
-
-
-  const total =
-    Math.max(
-      0,
-      subtotal - discountAmount
-    );
-
-
-  return {
-    subtotal,
-    discountType: type,
-    discountValue,
-    discountAmount,
-    total
-  };
+  return cart.reduce(
+    (sum, item) =>
+      sum +
+      (
+        Number(item.price || 0) *
+        Number(item.quantity || 0)
+      ),
+    0
+  );
 
 }
 
@@ -1091,7 +892,6 @@ function renderCart() {
 
   const container =
     document.getElementById("currentSale");
-
 
   if (cart.length === 0) {
 
@@ -1106,7 +906,6 @@ function renderCart() {
         const lineTotal =
           Number(item.price || 0) *
           Number(item.quantity || 0);
-
 
         return `
 
@@ -1125,7 +924,7 @@ function renderCart() {
               <div class="custom-price-box">
 
                 <label>
-                  ✏️ Price for this sale
+                  ✏️ Price
                 </label>
 
                 <input
@@ -1142,7 +941,7 @@ function renderCart() {
                   Number(item.price || 0)
                     ? `
                       <div class="price-note">
-                        Normal product price:
+                        Normal price:
                         MVR ${Number(item.normalPrice || 0).toFixed(2)}
                       </div>
                     `
@@ -1177,24 +976,9 @@ function renderCart() {
 
   }
 
-
-  const totals =
-    calculateTotals();
-
-
-  document.getElementById("subtotal")
-    .textContent =
-    totals.subtotal.toFixed(2);
-
-
-  document.getElementById("discountAmount")
-    .textContent =
-    totals.discountAmount.toFixed(2);
-
-
   document.getElementById("grandTotal")
     .textContent =
-    totals.total.toFixed(2);
+    calculateTotal().toFixed(2);
 
 }
 
@@ -1224,22 +1008,18 @@ function setPaymentMethod(method) {
       'input[name="paymentMethod"]'
     );
 
-
   let found = false;
-
 
   radios.forEach(radio => {
 
     radio.checked =
       radio.value === method;
 
-
     if (radio.checked) {
       found = true;
     }
 
   });
-
 
   if (!found) {
 
@@ -1296,7 +1076,6 @@ function completeSale() {
 
   clearError();
 
-
   if (cart.length === 0) {
 
     alert("Please add a product first.");
@@ -1305,17 +1084,13 @@ function completeSale() {
 
   }
 
-
   const paymentMethod =
     getPaymentMethod();
 
-
-  const totals =
-    calculateTotals();
-
+  const total =
+    calculateTotal();
 
   let latestProducts;
-
 
   try {
 
@@ -1332,15 +1107,12 @@ function completeSale() {
 
   }
 
-
   if (!Array.isArray(latestProducts)) {
     latestProducts = [];
   }
 
-
   const sales =
     loadSales();
-
 
   const selectedCustomer =
     getSelectedCustomer();
@@ -1361,7 +1133,6 @@ function completeSale() {
             Number(item.productId)
         );
 
-
       if (!product) {
 
         alert(
@@ -1373,7 +1144,6 @@ function completeSale() {
         return;
 
       }
-
 
       if (
         Number(product.stock) <
@@ -1393,7 +1163,6 @@ function completeSale() {
 
     }
 
-
     cart.forEach(item => {
 
       const product =
@@ -1403,19 +1172,16 @@ function completeSale() {
             Number(item.productId)
         );
 
-
       product.stock =
         Number(product.stock) -
         Number(item.quantity);
 
     });
 
-
     localStorage.setItem(
       PRODUCTS_KEY,
       JSON.stringify(latestProducts)
     );
-
 
     sales.push({
 
@@ -1443,18 +1209,6 @@ function completeSale() {
       paymentMethod:
         paymentMethod,
 
-      subtotal:
-        totals.subtotal,
-
-      discountType:
-        totals.discountType,
-
-      discountValue:
-        totals.discountValue,
-
-      discountAmount:
-        totals.discountAmount,
-
       items:
         cart.map(item => ({
 
@@ -1480,13 +1234,11 @@ function completeSale() {
         })),
 
       total:
-        totals.total
+        total
 
     });
 
-
     saveSales(sales);
-
 
     alert(
       "Sale recorded successfully!\n\n" +
@@ -1499,7 +1251,7 @@ function completeSale() {
       "\nPayment: " +
       paymentMethod +
       "\nTotal: MVR " +
-      totals.total.toFixed(2)
+      total.toFixed(2)
     );
 
   }
@@ -1518,7 +1270,6 @@ function completeSale() {
           Number(editingSaleId)
       );
 
-
     if (saleIndex === -1) {
 
       alert(
@@ -1531,10 +1282,8 @@ function completeSale() {
 
     }
 
-
     const oldSale =
       sales[saleIndex];
-
 
     if (Array.isArray(oldSale.items)) {
 
@@ -1546,7 +1295,6 @@ function completeSale() {
               Number(p.id) ===
               Number(oldItem.productId)
           );
-
 
         if (product) {
 
@@ -1560,7 +1308,6 @@ function completeSale() {
 
     }
 
-
     for (const item of cart) {
 
       const product =
@@ -1569,7 +1316,6 @@ function completeSale() {
             Number(p.id) ===
             Number(item.productId)
         );
-
 
       if (!product) {
 
@@ -1587,7 +1333,6 @@ function completeSale() {
         return;
 
       }
-
 
       if (
         Number(product.stock) <
@@ -1612,7 +1357,6 @@ function completeSale() {
 
     }
 
-
     cart.forEach(item => {
 
       const product =
@@ -1622,19 +1366,16 @@ function completeSale() {
             Number(item.productId)
         );
 
-
       product.stock =
         Number(product.stock) -
         Number(item.quantity);
 
     });
 
-
     localStorage.setItem(
       PRODUCTS_KEY,
       JSON.stringify(latestProducts)
     );
-
 
     sales[saleIndex] = {
 
@@ -1657,18 +1398,6 @@ function completeSale() {
 
       paymentMethod:
         paymentMethod,
-
-      subtotal:
-        totals.subtotal,
-
-      discountType:
-        totals.discountType,
-
-      discountValue:
-        totals.discountValue,
-
-      discountAmount:
-        totals.discountAmount,
 
       items:
         cart.map(item => ({
@@ -1695,13 +1424,11 @@ function completeSale() {
         })),
 
       total:
-        totals.total
+        total
 
     };
 
-
     saveSales(sales);
-
 
     alert(
       "Sale updated successfully!\n\n" +
@@ -1714,7 +1441,7 @@ function completeSale() {
       "\nPayment: " +
       paymentMethod +
       "\nTotal: MVR " +
-      totals.total.toFixed(2)
+      total.toFixed(2)
     );
 
   }
@@ -1722,17 +1449,12 @@ function completeSale() {
 
   resetSaleForm();
 
-
   products =
     latestProducts;
 
-
   loadProducts();
-
   loadCustomers();
-
   renderCart();
-
   renderHistory();
 
 }
@@ -1748,7 +1470,6 @@ function restoreOriginalStock(productsList, oldItems) {
     return;
   }
 
-
   oldItems.forEach(oldItem => {
 
     const product =
@@ -1757,7 +1478,6 @@ function restoreOriginalStock(productsList, oldItems) {
           Number(p.id) ===
           Number(oldItem.productId)
       );
-
 
     if (product) {
 
@@ -1780,10 +1500,8 @@ function editSale(id) {
 
   clearError();
 
-
   const sales =
     loadSales();
-
 
   const sale =
     sales.find(
@@ -1792,7 +1510,6 @@ function editSale(id) {
         Number(id)
     );
 
-
   if (!sale) {
 
     alert("Sale not found.");
@@ -1800,7 +1517,6 @@ function editSale(id) {
     return;
 
   }
-
 
   if (
     !Array.isArray(sale.items) ||
@@ -1815,10 +1531,8 @@ function editSale(id) {
 
   }
 
-
   editingSaleId =
     sale.id;
-
 
   originalSaleItems =
     sale.items.map(item => ({
@@ -1830,7 +1544,6 @@ function editSale(id) {
         Number(item.quantity || 0)
 
     }));
-
 
   cart =
     sale.items.map(item => ({
@@ -1859,13 +1572,10 @@ function editSale(id) {
 
     }));
 
-
   loadCustomers();
-
 
   const customerSelect =
     document.getElementById("customerSelect");
-
 
   if (
     sale.customerId &&
@@ -1885,65 +1595,27 @@ function editSale(id) {
 
   }
 
-
   document.getElementById("saleFormTitle")
     .textContent =
     "✏️ Edit Sale";
 
-
   document.getElementById("editingBanner")
     .classList.add("show");
-
 
   document.getElementById("recordButton")
     .textContent =
     "✓ Update Sale";
 
-
   document.getElementById("cancelEditButton")
     .style.display =
     "block";
-
 
   setPaymentMethod(
     sale.paymentMethod || "Cash"
   );
 
-
-  const discountType =
-    sale.discountType || "percent";
-
-
-  const percentRadio =
-    document.getElementById("discountPercent");
-
-
-  const fixedRadio =
-    document.getElementById("discountFixed");
-
-
-  if (discountType === "fixed") {
-
-    fixedRadio.checked = true;
-    percentRadio.checked = false;
-
-  } else {
-
-    percentRadio.checked = true;
-    fixedRadio.checked = false;
-
-  }
-
-
-  document.getElementById("discountValue")
-    .value =
-    Number(sale.discountValue || 0);
-
-
   loadProducts();
-
   renderCart();
-
 
   window.scrollTo({
     top: 0,
@@ -1962,9 +1634,7 @@ function cancelEdit() {
   resetSaleForm();
 
   loadProducts();
-
   loadCustomers();
-
   renderCart();
 
 }
@@ -1979,53 +1649,34 @@ function resetSaleForm() {
   editingSaleId =
     null;
 
-
   originalSaleItems =
     [];
 
-
   cart =
     [];
-
 
   document.getElementById("saleFormTitle")
     .textContent =
     "Make a Sale";
 
-
   document.getElementById("editingBanner")
     .classList.remove("show");
-
 
   document.getElementById("recordButton")
     .textContent =
     "✓ Record Sale";
 
-
   document.getElementById("cancelEditButton")
     .style.display =
     "none";
-
 
   document.getElementById("quantity")
     .value =
     1;
 
-
   document.getElementById("customerSelect")
     .value =
     "";
-
-
-  document.getElementById("discountValue")
-    .value =
-    0;
-
-
-  document.getElementById("discountPercent")
-    .checked =
-    true;
-
 
   setPaymentMethod("Cash");
 
@@ -2040,10 +1691,8 @@ function deleteSale(id) {
 
   clearError();
 
-
   const sales =
     loadSales();
-
 
   const index =
     sales.findIndex(
@@ -2051,7 +1700,6 @@ function deleteSale(id) {
         Number(sale.id) ===
         Number(id)
     );
-
 
   if (index === -1) {
 
@@ -2061,10 +1709,8 @@ function deleteSale(id) {
 
   }
 
-
   const sale =
     sales[index];
-
 
   const confirmed =
     confirm(
@@ -2075,14 +1721,11 @@ function deleteSale(id) {
       "The sold quantities will be returned to inventory."
     );
 
-
   if (!confirmed) {
     return;
   }
 
-
   let latestProducts;
-
 
   try {
 
@@ -2097,14 +1740,11 @@ function deleteSale(id) {
 
   }
 
-
   if (!Array.isArray(latestProducts)) {
     latestProducts = [];
   }
 
-
   let missingProducts = [];
-
 
   if (Array.isArray(sale.items)) {
 
@@ -2116,7 +1756,6 @@ function deleteSale(id) {
             Number(p.id) ===
             Number(item.productId)
         );
-
 
       if (product) {
 
@@ -2136,17 +1775,14 @@ function deleteSale(id) {
 
   }
 
-
   sales.splice(index, 1);
 
   saveSales(sales);
-
 
   localStorage.setItem(
     PRODUCTS_KEY,
     JSON.stringify(latestProducts)
   );
-
 
   if (
     Number(editingSaleId) ===
@@ -2157,19 +1793,13 @@ function deleteSale(id) {
 
   }
 
-
   products =
     latestProducts;
 
-
   loadProducts();
-
   loadCustomers();
-
   renderCart();
-
   renderHistory();
-
 
   if (missingProducts.length > 0) {
 
@@ -2200,10 +1830,8 @@ function renderHistory() {
   const container =
     document.getElementById("history");
 
-
   const sales =
     loadSales();
-
 
   if (sales.length === 0) {
 
@@ -2214,12 +1842,10 @@ function renderHistory() {
 
   }
 
-
   const recent =
     [...sales]
       .reverse()
       .slice(0, 10);
-
 
   container.innerHTML =
     recent.map(sale => {
@@ -2227,7 +1853,6 @@ function renderHistory() {
       const date =
         new Date(sale.date)
           .toLocaleString();
-
 
       const items =
         Array.isArray(sale.items)
@@ -2267,16 +1892,13 @@ function renderHistory() {
             }).join("<br>")
           : "";
 
-
       const payment =
         sale.paymentMethod ||
         "Previous Sale";
 
-
       const customer =
         sale.customerName ||
         "Walk-in Customer";
-
 
       return `
 
@@ -2305,28 +1927,6 @@ function renderHistory() {
           </span>
 
           <br><br>
-
-          ${
-            sale.subtotal !== undefined
-              ? `
-                <small>
-                  Subtotal: MVR
-                  ${Number(sale.subtotal).toFixed(2)}
-                  ${
-                    Number(sale.discountAmount || 0) > 0
-                      ? `
-                        <br>
-                        Discount: - MVR
-                        ${Number(sale.discountAmount).toFixed(2)}
-                      `
-                      : ""
-                  }
-                </small>
-
-                <br><br>
-              `
-              : ""
-          }
 
           ${items}
 
@@ -2385,16 +1985,14 @@ function goDashboard() {
 ========================= */
 
 loadCustomers();
-
 loadProducts();
-
 renderCart();
-
 renderHistory();
 
 </script>
 
 </body>
 </html>
+
 
 
