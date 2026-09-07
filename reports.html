@@ -81,6 +81,105 @@
       font-size: 16px;
     }
 
+    .quick-total-box {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      border-top: 4px solid #7B1E2B;
+    }
+
+    .quick-total-box h3 {
+      margin-top: 0;
+      color: #7B1E2B;
+    }
+
+    .quick-help {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .quick-field label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .quick-field input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 17px;
+    }
+
+    .quick-total-display {
+      margin-top: 18px;
+      background: #fff8f0;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .quick-total-display span {
+      display: block;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .quick-total-display strong {
+      display: block;
+      color: #7B1E2B;
+      font-size: 27px;
+      margin-top: 5px;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .quick-save {
+      background: #7B1E2B;
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .quick-clear {
+      background: #ddd;
+      color: #333;
+      border: none;
+      padding: 13px;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .quick-status {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 13px;
+      color: #777;
+    }
+
     .report-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -198,6 +297,11 @@
       margin-top: 6px;
     }
 
+    .manual-badge {
+      background: #f8ead7;
+      color: #7B1E2B;
+    }
+
     .empty {
       color: #777;
       text-align: center;
@@ -267,6 +371,14 @@
         grid-template-columns: 1fr;
       }
 
+      .quick-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
       .report-actions {
         grid-template-columns: 1fr;
       }
@@ -302,6 +414,7 @@
 
       .back,
       .filter-box,
+      .quick-total-box,
       .report-actions {
         display: none !important;
       }
@@ -363,6 +476,114 @@
       id="reportDate"
       onchange="loadReports()"
     >
+
+  </div>
+
+
+  <!-- QUICK DAILY TOTALS -->
+
+  <div class="quick-total-box">
+
+    <h3>⚡ Quick Daily Totals</h3>
+
+    <div class="quick-help">
+      Busy today? You don't need to enter every product.
+      Just enter the total amount received by Cash, Card and Bank Transfer.
+      This will be used as the sales total for the selected date.
+    </div>
+
+    <div class="quick-grid">
+
+      <div class="quick-field">
+
+        <label for="quickCash">
+          💵 Cash
+        </label>
+
+        <input
+          type="number"
+          id="quickCash"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          oninput="updateQuickTotal()"
+        >
+
+      </div>
+
+
+      <div class="quick-field">
+
+        <label for="quickCard">
+          💳 Card
+        </label>
+
+        <input
+          type="number"
+          id="quickCard"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          oninput="updateQuickTotal()"
+        >
+
+      </div>
+
+
+      <div class="quick-field">
+
+        <label for="quickTransfer">
+          🏦 Bank Transfer
+        </label>
+
+        <input
+          type="number"
+          id="quickTransfer"
+          min="0"
+          step="0.01"
+          placeholder="0.00"
+          oninput="updateQuickTotal()"
+        >
+
+      </div>
+
+    </div>
+
+
+    <div class="quick-total-display">
+
+      <span>Daily Total</span>
+
+      <strong>
+        MVR <span id="quickTotal">0.00</span>
+      </strong>
+
+    </div>
+
+
+    <div class="quick-actions">
+
+      <button
+        class="quick-save"
+        onclick="saveQuickDailyTotal()"
+      >
+        💾 Save Daily Totals
+      </button>
+
+      <button
+        class="quick-clear"
+        onclick="clearQuickDailyTotal()"
+      >
+        🗑️ Clear Saved Total
+      </button>
+
+    </div>
+
+
+    <div
+      class="quick-status"
+      id="quickStatus"
+    ></div>
 
   </div>
 
@@ -498,6 +719,7 @@
       <table class="daily-table">
 
         <thead>
+
           <tr>
             <th>Date</th>
             <th>Sales</th>
@@ -508,6 +730,7 @@
             <th>Bank</th>
             <th>Other</th>
           </tr>
+
         </thead>
 
         <tbody id="dailyBreakdown"></tbody>
@@ -584,7 +807,12 @@
 
 const SALES_KEY = "kanbulo_sales";
 const EXPENSES_KEY = "kanbulo_expenses";
+const QUICK_TOTALS_KEY = "kanbulo_quick_daily_totals";
 
+
+/*
+  GET LOCAL STORAGE DATA
+*/
 
 function getData(key) {
 
@@ -605,18 +833,35 @@ function getData(key) {
 
 
 /*
+  SAVE LOCAL STORAGE DATA
+*/
+
+function saveData(key, data) {
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(data)
+  );
+
+}
+
+
+/*
   Converts a Date object into YYYY-MM-DD
 */
 
 function dateKey(date) {
 
-  const year = date.getFullYear();
+  const year =
+    date.getFullYear();
 
   const month =
-    String(date.getMonth() + 1).padStart(2, "0");
+    String(date.getMonth() + 1)
+      .padStart(2, "0");
 
   const day =
-    String(date.getDate()).padStart(2, "0");
+    String(date.getDate())
+      .padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 
@@ -632,7 +877,8 @@ function saleDateKey(dateString) {
 
   if (!dateString) return "";
 
-  const date = new Date(dateString);
+  const date =
+    new Date(dateString);
 
   if (isNaN(date.getTime())) return "";
 
@@ -647,7 +893,9 @@ function saleDateKey(dateString) {
 
 function getSelectedDate() {
 
-  return document.getElementById("reportDate").value;
+  return document.getElementById(
+    "reportDate"
+  ).value;
 
 }
 
@@ -663,14 +911,17 @@ function getPaymentTotals(sales) {
   let transfer = 0;
   let other = 0;
 
+
   sales.forEach(sale => {
 
     const amount =
       Number(sale.total || 0);
 
     const method =
-      String(sale.paymentMethod || "")
-        .toLowerCase();
+      String(
+        sale.paymentMethod || ""
+      ).toLowerCase();
+
 
     if (method === "cash") {
 
@@ -695,6 +946,7 @@ function getPaymentTotals(sales) {
 
   });
 
+
   return {
     cash,
     card,
@@ -706,22 +958,407 @@ function getPaymentTotals(sales) {
 
 
 /*
+  GET QUICK DAILY TOTAL
+*/
+
+function getQuickTotals() {
+
+  return getData(
+    QUICK_TOTALS_KEY
+  );
+
+}
+
+
+/*
+  FIND QUICK TOTAL FOR A DATE
+*/
+
+function getQuickTotalForDate(date) {
+
+  const totals =
+    getQuickTotals();
+
+  return totals.find(
+    item => item.date === date
+  ) || null;
+
+}
+
+
+/*
+  QUICK TOTAL CALCULATION
+*/
+
+function getEnteredQuickAmounts() {
+
+  const cash =
+    Number(
+      document.getElementById("quickCash").value || 0
+    );
+
+  const card =
+    Number(
+      document.getElementById("quickCard").value || 0
+    );
+
+  const transfer =
+    Number(
+      document.getElementById("quickTransfer").value || 0
+    );
+
+
+  return {
+    cash: cash >= 0 ? cash : 0,
+    card: card >= 0 ? card : 0,
+    transfer: transfer >= 0 ? transfer : 0
+  };
+
+}
+
+
+/*
+  UPDATE QUICK TOTAL DISPLAY
+*/
+
+function updateQuickTotal() {
+
+  const amounts =
+    getEnteredQuickAmounts();
+
+
+  const total =
+    amounts.cash +
+    amounts.card +
+    amounts.transfer;
+
+
+  document.getElementById(
+    "quickTotal"
+  ).textContent =
+    total.toFixed(2);
+
+}
+
+
+/*
+  LOAD QUICK TOTAL FOR SELECTED DATE
+*/
+
+function loadQuickDailyTotal() {
+
+  const selectedDate =
+    getSelectedDate();
+
+  const saved =
+    getQuickTotalForDate(
+      selectedDate
+    );
+
+
+  const cashInput =
+    document.getElementById("quickCash");
+
+  const cardInput =
+    document.getElementById("quickCard");
+
+  const transferInput =
+    document.getElementById("quickTransfer");
+
+  const status =
+    document.getElementById("quickStatus");
+
+
+  if (saved) {
+
+    cashInput.value =
+      Number(saved.cash || 0).toFixed(2);
+
+    cardInput.value =
+      Number(saved.card || 0).toFixed(2);
+
+    transferInput.value =
+      Number(saved.transfer || 0).toFixed(2);
+
+
+    status.textContent =
+      "✅ Quick daily total saved for this date.";
+
+  } else {
+
+    cashInput.value = "";
+    cardInput.value = "";
+    transferInput.value = "";
+
+    status.textContent =
+      "No quick total saved for this date.";
+
+  }
+
+
+  updateQuickTotal();
+
+}
+
+
+/*
+  SAVE QUICK DAILY TOTAL
+*/
+
+function saveQuickDailyTotal() {
+
+  const selectedDate =
+    getSelectedDate();
+
+
+  if (!selectedDate) {
+
+    alert(
+      "Please select a date first."
+    );
+
+    return;
+
+  }
+
+
+  const amounts =
+    getEnteredQuickAmounts();
+
+
+  const total =
+    amounts.cash +
+    amounts.card +
+    amounts.transfer;
+
+
+  if (total <= 0) {
+
+    alert(
+      "Please enter at least one payment amount."
+    );
+
+    return;
+
+  }
+
+
+  const totals =
+    getQuickTotals();
+
+
+  const existingIndex =
+    totals.findIndex(
+      item =>
+        item.date === selectedDate
+    );
+
+
+  const record = {
+
+    date: selectedDate,
+
+    cash: amounts.cash,
+
+    card: amounts.card,
+
+    transfer: amounts.transfer,
+
+    total: total,
+
+    savedAt:
+      new Date().toISOString()
+
+  };
+
+
+  if (existingIndex >= 0) {
+
+    totals[existingIndex] =
+      record;
+
+  } else {
+
+    totals.push(record);
+
+  }
+
+
+  saveData(
+    QUICK_TOTALS_KEY,
+    totals
+  );
+
+
+  document.getElementById(
+    "quickStatus"
+  ).textContent =
+    "✅ Saved! This quick total is now included in your reports.";
+
+
+  loadReports();
+
+}
+
+
+/*
+  CLEAR QUICK DAILY TOTAL
+*/
+
+function clearQuickDailyTotal() {
+
+  const selectedDate =
+    getSelectedDate();
+
+
+  const totals =
+    getQuickTotals();
+
+
+  const exists =
+    totals.some(
+      item =>
+        item.date === selectedDate
+    );
+
+
+  if (!exists) {
+
+    document.getElementById(
+      "quickStatus"
+    ).textContent =
+      "There is no saved quick total for this date.";
+
+    return;
+
+  }
+
+
+  const confirmed =
+    confirm(
+      "Delete the quick daily total for " +
+      selectedDate +
+      "?"
+    );
+
+
+  if (!confirmed) return;
+
+
+  const filtered =
+    totals.filter(
+      item =>
+        item.date !== selectedDate
+    );
+
+
+  saveData(
+    QUICK_TOTALS_KEY,
+    filtered
+  );
+
+
+  loadQuickDailyTotal();
+
+  loadReports();
+
+}
+
+
+/*
+  BUILD REPORT SALES
+  Quick totals replace detailed sales
+  for the same date.
+*/
+
+function getReportSales() {
+
+  const sales =
+    getData(SALES_KEY);
+
+  const quickTotals =
+    getQuickTotals();
+
+
+  const quickDates =
+    new Set(
+      quickTotals.map(
+        item => item.date
+      )
+    );
+
+
+  const normalSales =
+    sales.filter(sale => {
+
+      const date =
+        saleDateKey(sale.date);
+
+      return !quickDates.has(date);
+
+    });
+
+
+  const quickSales =
+    quickTotals.map(item => {
+
+      return {
+
+        id:
+          "quick-" + item.date,
+
+        date:
+          item.date + "T23:59:59",
+
+        total:
+          Number(item.total || 0),
+
+        paymentMethod:
+          "Quick Daily Total",
+
+        isQuickTotal:
+          true,
+
+        items: []
+
+      };
+
+    });
+
+
+  return normalSales.concat(
+    quickSales
+  );
+
+}
+
+
+/*
   DAY-BY-DAY BREAKDOWN
 */
 
-function displayDailyBreakdown(sales, selectedMonth) {
+function displayDailyBreakdown(
+  sales,
+  selectedMonth
+) {
 
   const tbody =
-    document.getElementById("dailyBreakdown");
+    document.getElementById(
+      "dailyBreakdown"
+    );
+
 
   const monthlySales =
     sales.filter(sale =>
-      saleDateKey(sale.date).substring(0, 7)
+      saleDateKey(sale.date)
+        .substring(0, 7)
       === selectedMonth
     );
 
 
-  if (monthlySales.length === 0) {
+  if (
+    monthlySales.length === 0
+  ) {
 
     tbody.innerHTML = `
       <tr>
@@ -744,11 +1381,16 @@ function displayDailyBreakdown(sales, selectedMonth) {
     const day =
       saleDateKey(sale.date);
 
+
     if (!day) return;
 
+
     if (!days[day]) {
+
       days[day] = [];
+
     }
+
 
     days[day].push(sale);
 
@@ -775,8 +1417,10 @@ function displayDailyBreakdown(sales, selectedMonth) {
     const daySales =
       days[day];
 
+
     let total = 0;
     let products = 0;
+    let hasQuickTotal = false;
 
 
     daySales.forEach(sale => {
@@ -784,12 +1428,24 @@ function displayDailyBreakdown(sales, selectedMonth) {
       total +=
         Number(sale.total || 0);
 
-      if (Array.isArray(sale.items)) {
+
+      if (sale.isQuickTotal) {
+
+        hasQuickTotal = true;
+
+      }
+
+
+      if (
+        Array.isArray(sale.items)
+      ) {
 
         sale.items.forEach(item => {
 
           products +=
-            Number(item.quantity || 0);
+            Number(
+              item.quantity || 0
+            );
 
         });
 
@@ -799,7 +1455,37 @@ function displayDailyBreakdown(sales, selectedMonth) {
 
 
     const payments =
-      getPaymentTotals(daySales);
+      hasQuickTotal
+        ? {
+            cash:
+              Number(
+                daySales.find(
+                  sale =>
+                    sale.isQuickTotal
+                )?.cash || 0
+              ),
+
+            card:
+              Number(
+                daySales.find(
+                  sale =>
+                    sale.isQuickTotal
+                )?.card || 0
+              ),
+
+            transfer:
+              Number(
+                daySales.find(
+                  sale =>
+                    sale.isQuickTotal
+                )?.transfer || 0
+              ),
+
+            other: 0
+          }
+        : getPaymentTotals(
+            daySales
+          );
 
 
     grandSales += total;
@@ -811,15 +1497,26 @@ function displayDailyBreakdown(sales, selectedMonth) {
 
 
     const date =
-      new Date(day + "T00:00:00");
+      new Date(
+        day + "T00:00:00"
+      );
 
 
     const formattedDate =
-      date.toLocaleDateString(undefined, {
-        day: "2-digit",
-        month: "short",
-        year: "numeric"
-      });
+      date.toLocaleDateString(
+        undefined,
+        {
+          day: "2-digit",
+          month: "short",
+          year: "numeric"
+        }
+      );
+
+
+    const salesLabel =
+      hasQuickTotal
+        ? "Quick"
+        : daySales.length;
 
 
     rows += `
@@ -830,7 +1527,7 @@ function displayDailyBreakdown(sales, selectedMonth) {
         </td>
 
         <td>
-          ${daySales.length}
+          ${salesLabel}
         </td>
 
         <td>
@@ -871,7 +1568,7 @@ function displayDailyBreakdown(sales, selectedMonth) {
       </td>
 
       <td>
-        ${monthlySales.length}
+        ${dates.length} days
       </td>
 
       <td>
@@ -902,7 +1599,8 @@ function displayDailyBreakdown(sales, selectedMonth) {
   `;
 
 
-  tbody.innerHTML = rows;
+  tbody.innerHTML =
+    rows;
 
 }
 
@@ -914,13 +1612,22 @@ function displayDailyBreakdown(sales, selectedMonth) {
 function loadReports() {
 
   const sales =
-    getData(SALES_KEY);
+    getReportSales();
+
 
   const expenses =
     getData(EXPENSES_KEY);
 
+
   const selectedDate =
     getSelectedDate();
+
+
+  /*
+    LOAD QUICK TOTAL INPUTS
+  */
+
+  loadQuickDailyTotal();
 
 
   /*
@@ -929,7 +1636,8 @@ function loadReports() {
 
   const dailySalesList =
     sales.filter(sale =>
-      saleDateKey(sale.date) === selectedDate
+      saleDateKey(sale.date)
+      === selectedDate
     );
 
 
@@ -940,15 +1648,21 @@ function loadReports() {
   dailySalesList.forEach(sale => {
 
     dailySales +=
-      Number(sale.total || 0);
+      Number(
+        sale.total || 0
+      );
 
 
-    if (Array.isArray(sale.items)) {
+    if (
+      Array.isArray(sale.items)
+    ) {
 
       sale.items.forEach(item => {
 
         dailyProducts +=
-          Number(item.quantity || 0);
+          Number(
+            item.quantity || 0
+          );
 
       });
 
@@ -957,18 +1671,29 @@ function loadReports() {
   });
 
 
-  document.getElementById("dailySales")
-    .textContent =
+  document.getElementById(
+    "dailySales"
+  ).textContent =
     dailySales.toFixed(2);
 
 
-  document.getElementById("dailyCount")
-    .textContent =
-    dailySalesList.length;
+  const quickForDate =
+    getQuickTotalForDate(
+      selectedDate
+    );
 
 
-  document.getElementById("dailyProducts")
-    .textContent =
+  document.getElementById(
+    "dailyCount"
+  ).textContent =
+    quickForDate
+      ? "Quick Total"
+      : dailySalesList.length;
+
+
+  document.getElementById(
+    "dailyProducts"
+  ).textContent =
     dailyProducts;
 
 
@@ -977,26 +1702,32 @@ function loadReports() {
   */
 
   const paymentTotals =
-    getPaymentTotals(dailySalesList);
+    getPaymentTotals(
+      dailySalesList
+    );
 
 
-  document.getElementById("cashTotal")
-    .textContent =
+  document.getElementById(
+    "cashTotal"
+  ).textContent =
     paymentTotals.cash.toFixed(2);
 
 
-  document.getElementById("cardTotal")
-    .textContent =
+  document.getElementById(
+    "cardTotal"
+  ).textContent =
     paymentTotals.card.toFixed(2);
 
 
-  document.getElementById("transferTotal")
-    .textContent =
+  document.getElementById(
+    "transferTotal"
+  ).textContent =
     paymentTotals.transfer.toFixed(2);
 
 
-  document.getElementById("otherTotal")
-    .textContent =
+  document.getElementById(
+    "otherTotal"
+  ).textContent =
     paymentTotals.other.toFixed(2);
 
 
@@ -1010,7 +1741,8 @@ function loadReports() {
 
   const monthlySalesList =
     sales.filter(sale =>
-      saleDateKey(sale.date).substring(0, 7)
+      saleDateKey(sale.date)
+        .substring(0, 7)
       === selectedMonth
     );
 
@@ -1022,15 +1754,21 @@ function loadReports() {
   monthlySalesList.forEach(sale => {
 
     monthlySales +=
-      Number(sale.total || 0);
+      Number(
+        sale.total || 0
+      );
 
 
-    if (Array.isArray(sale.items)) {
+    if (
+      Array.isArray(sale.items)
+    ) {
 
       sale.items.forEach(item => {
 
         monthlyProducts +=
-          Number(item.quantity || 0);
+          Number(
+            item.quantity || 0
+          );
 
       });
 
@@ -1039,18 +1777,21 @@ function loadReports() {
   });
 
 
-  document.getElementById("monthlySales")
-    .textContent =
+  document.getElementById(
+    "monthlySales"
+  ).textContent =
     monthlySales.toFixed(2);
 
 
-  document.getElementById("monthlyCount")
-    .textContent =
+  document.getElementById(
+    "monthlyCount"
+  ).textContent =
     monthlySalesList.length;
 
 
-  document.getElementById("monthlyProducts")
-    .textContent =
+  document.getElementById(
+    "monthlyProducts"
+  ).textContent =
     monthlyProducts;
 
 
@@ -1075,7 +1816,9 @@ function loadReports() {
   sales.forEach(sale => {
 
     salesTotal +=
-      Number(sale.total || 0);
+      Number(
+        sale.total || 0
+      );
 
   });
 
@@ -1083,33 +1826,48 @@ function loadReports() {
   expenses.forEach(expense => {
 
     expenseTotal +=
-      Number(expense.amount || 0);
+      Number(
+        expense.amount || 0
+      );
 
   });
 
 
   const profit =
-    salesTotal - expenseTotal;
+    salesTotal -
+    expenseTotal;
 
 
-  document.getElementById("salesTotal")
-    .textContent =
+  document.getElementById(
+    "salesTotal"
+  ).textContent =
     salesTotal.toFixed(2);
 
 
-  document.getElementById("expenseTotal")
-    .textContent =
+  document.getElementById(
+    "expenseTotal"
+  ).textContent =
     expenseTotal.toFixed(2);
 
 
-  document.getElementById("profitTotal")
-    .textContent =
+  document.getElementById(
+    "profitTotal"
+  ).textContent =
     profit.toFixed(2);
 
 
-  displaySales(dailySalesList);
+  /*
+    DISPLAY SELECTED DATE SALES
+  */
 
-  displayExpenses(expenses);
+  displaySales(
+    dailySalesList
+  );
+
+
+  displayExpenses(
+    expenses
+  );
 
 }
 
@@ -1121,10 +1879,14 @@ function loadReports() {
 function displaySales(sales) {
 
   const list =
-    document.getElementById("salesList");
+    document.getElementById(
+      "salesList"
+    );
 
 
-  if (sales.length === 0) {
+  if (
+    sales.length === 0
+  ) {
 
     list.innerHTML =
       '<div class="empty">No sales recorded for this date.</div>';
@@ -1135,67 +1897,151 @@ function displaySales(sales) {
 
 
   list.innerHTML =
-    sales.slice().reverse().map(sale => {
+    sales
+      .slice()
+      .reverse()
+      .map(sale => {
 
-      const date =
-        sale.date
-          ? new Date(sale.date).toLocaleString()
-          : "";
-
-
-      let itemsText = "";
-
-
-      if (Array.isArray(sale.items)) {
-
-        itemsText =
-          sale.items.map(item => {
-
-            return (
-              escapeHTML(item.name) +
-              " × " +
-              Number(item.quantity || 0) +
-              " — MVR " +
-              Number(item.total || 0).toFixed(2)
-            );
-
-          }).join("<br>");
-
-      }
+        const date =
+          sale.date
+            ? new Date(
+                sale.date
+              ).toLocaleString()
+            : "";
 
 
-      const method =
-        sale.paymentMethod ||
-        "Previous / Unspecified";
+        /*
+          QUICK TOTAL DISPLAY
+        */
+
+        if (
+          sale.isQuickTotal
+        ) {
+
+          return `
+            <div class="sale-row">
+
+              <strong>
+                MVR ${Number(
+                  sale.total || 0
+                ).toFixed(2)}
+              </strong>
+
+              <br>
+
+              <span class="payment-badge manual-badge">
+                ⚡ Quick Daily Total
+              </span>
+
+              <br>
+
+              <small>
+                ${escapeHTML(date)}
+              </small>
+
+              <br><br>
+
+              💵 Cash:
+              <strong>
+                MVR ${Number(
+                  sale.cash || 0
+                ).toFixed(2)}
+              </strong>
+
+              <br>
+
+              💳 Card:
+              <strong>
+                MVR ${Number(
+                  sale.card || 0
+                ).toFixed(2)}
+              </strong>
+
+              <br>
+
+              🏦 Bank Transfer:
+              <strong>
+                MVR ${Number(
+                  sale.transfer || 0
+                ).toFixed(2)}
+              </strong>
+
+            </div>
+          `;
+
+        }
 
 
-      return `
-        <div class="sale-row">
+        /*
+          NORMAL DETAILED SALE
+        */
 
-          <strong>
-            MVR ${Number(sale.total || 0).toFixed(2)}
-          </strong>
+        let itemsText = "";
 
-          <br>
 
-          <span class="payment-badge">
-            ${escapeHTML(method)}
-          </span>
+        if (
+          Array.isArray(sale.items)
+        ) {
 
-          <br>
+          itemsText =
+            sale.items
+              .map(item => {
 
-          <small>
-            ${escapeHTML(date)}
-          </small>
+                return (
+                  escapeHTML(
+                    item.name
+                  ) +
+                  " × " +
+                  Number(
+                    item.quantity || 0
+                  ) +
+                  " — MVR " +
+                  Number(
+                    item.total || 0
+                  ).toFixed(2)
+                );
 
-          <br><br>
+              })
+              .join("<br>");
 
-          ${itemsText}
+        }
 
-        </div>
-      `;
 
-    }).join("");
+        const method =
+          sale.paymentMethod ||
+          "Previous / Unspecified";
+
+
+        return `
+          <div class="sale-row">
+
+            <strong>
+              MVR ${Number(
+                sale.total || 0
+              ).toFixed(2)}
+            </strong>
+
+            <br>
+
+            <span class="payment-badge">
+              ${escapeHTML(method)}
+            </span>
+
+            <br>
+
+            <small>
+              ${escapeHTML(date)}
+            </small>
+
+            <br><br>
+
+            ${itemsText}
+
+          </div>
+        `;
+
+      })
+      .join("");
 
 }
 
@@ -1207,10 +2053,14 @@ function displaySales(sales) {
 function displayExpenses(expenses) {
 
   const list =
-    document.getElementById("expenseList");
+    document.getElementById(
+      "expenseList"
+    );
 
 
-  if (expenses.length === 0) {
+  if (
+    expenses.length === 0
+  ) {
 
     list.innerHTML =
       '<div class="empty">No expenses recorded yet.</div>';
@@ -1221,29 +2071,39 @@ function displayExpenses(expenses) {
 
 
   list.innerHTML =
-    expenses.slice().reverse().map(expense => {
+    expenses
+      .slice()
+      .reverse()
+      .map(expense => {
 
-      return `
-        <div class="expense-row">
+        return `
+          <div class="expense-row">
 
-          <strong>
-            ${escapeHTML(expense.name)}
-          </strong>
+            <strong>
+              ${escapeHTML(
+                expense.name
+              )}
+            </strong>
 
-          <br>
+            <br>
 
-          ${escapeHTML(expense.date || "")}
+            ${escapeHTML(
+              expense.date || ""
+            )}
 
-          <br>
+            <br>
 
-          <strong>
-            MVR ${Number(expense.amount || 0).toFixed(2)}
-          </strong>
+            <strong>
+              MVR ${Number(
+                expense.amount || 0
+              ).toFixed(2)}
+            </strong>
 
-        </div>
-      `;
+          </div>
+        `;
 
-    }).join("");
+      })
+      .join("");
 
 }
 
@@ -1255,7 +2115,9 @@ function displayExpenses(expenses) {
 function escapeHTML(value) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.textContent =
     String(value);
@@ -1272,10 +2134,14 @@ function escapeHTML(value) {
 function setToday() {
 
   const input =
-    document.getElementById("reportDate");
+    document.getElementById(
+      "reportDate"
+    );
 
   input.value =
-    dateKey(new Date());
+    dateKey(
+      new Date()
+    );
 
 }
 
@@ -1300,6 +2166,7 @@ function saveReport() {
   const reportDate =
     getSelectedDate();
 
+
   const filename =
     "Kanbulo-Bakery-Report-" +
     reportDate +
@@ -1315,7 +2182,9 @@ function saveReport() {
 
 <meta charset="UTF-8">
 
-<title>Kanbulo Bakery Report - ${reportDate}</title>
+<title>
+Kanbulo Bakery Report - ${reportDate}
+</title>
 
 <style>
 
@@ -1400,11 +2269,19 @@ td {
 
 <h1>🥐 KANBULO BAKERY</h1>
 
-<p><strong>Freshly baked with love</strong></p>
+<p>
+<strong>
+Freshly baked with love
+</strong>
+</p>
 
-<p>Daisymaage, N. Velidhoo</p>
+<p>
+Daisymaage, N. Velidhoo
+</p>
 
-<p>Phone: +960 7653140</p>
+<p>
+Phone: +960 7653140
+</p>
 
 <h2>📊 Business Report</h2>
 
@@ -1413,29 +2290,53 @@ td {
 ${escapeHTML(reportDate)}
 </p>
 
+
 <h2>📅 Daily Sales</h2>
 
 <div class="summary">
 
 <div class="box">
+
 Total Sales
+
 <strong>
-MVR ${document.getElementById("dailySales").textContent}
+MVR ${
+  document.getElementById(
+    "dailySales"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Number of Sales
+
 <strong>
-${document.getElementById("dailyCount").textContent}
+${
+  document.getElementById(
+    "dailyCount"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Products Sold
+
 <strong>
-${document.getElementById("dailyProducts").textContent}
+${
+  document.getElementById(
+    "dailyProducts"
+  ).textContent
+}
 </strong>
+
 </div>
 
 </div>
@@ -1452,22 +2353,46 @@ ${document.getElementById("dailyProducts").textContent}
 
 <tr>
 <td>💵 Cash</td>
-<td>MVR ${document.getElementById("cashTotal").textContent}</td>
+<td>
+MVR ${
+  document.getElementById(
+    "cashTotal"
+  ).textContent
+}
+</td>
 </tr>
 
 <tr>
 <td>💳 Card</td>
-<td>MVR ${document.getElementById("cardTotal").textContent}</td>
+<td>
+MVR ${
+  document.getElementById(
+    "cardTotal"
+  ).textContent
+}
+</td>
 </tr>
 
 <tr>
 <td>🏦 Bank Transfer</td>
-<td>MVR ${document.getElementById("transferTotal").textContent}</td>
+<td>
+MVR ${
+  document.getElementById(
+    "transferTotal"
+  ).textContent
+}
+</td>
 </tr>
 
 <tr>
 <td>❓ Previous / Unspecified</td>
-<td>MVR ${document.getElementById("otherTotal").textContent}</td>
+<td>
+MVR ${
+  document.getElementById(
+    "otherTotal"
+  ).textContent
+}
+</td>
 </tr>
 
 </table>
@@ -1478,24 +2403,47 @@ ${document.getElementById("dailyProducts").textContent}
 <div class="summary">
 
 <div class="box">
+
 Monthly Sales
+
 <strong>
-MVR ${document.getElementById("monthlySales").textContent}
+MVR ${
+  document.getElementById(
+    "monthlySales"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Number of Sales
+
 <strong>
-${document.getElementById("monthlyCount").textContent}
+${
+  document.getElementById(
+    "monthlyCount"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Products Sold
+
 <strong>
-${document.getElementById("monthlyProducts").textContent}
+${
+  document.getElementById(
+    "monthlyProducts"
+  ).textContent
+}
 </strong>
+
 </div>
 
 </div>
@@ -1503,7 +2451,9 @@ ${document.getElementById("monthlyProducts").textContent}
 
 <h2>📊 Day-by-Day Sales</h2>
 
-${document.querySelector(".daily-table").outerHTML}
+${document.querySelector(
+  ".daily-table"
+).outerHTML}
 
 
 <h2>💰 Financial Summary</h2>
@@ -1511,24 +2461,47 @@ ${document.querySelector(".daily-table").outerHTML}
 <div class="summary">
 
 <div class="box">
+
 Total Sales
+
 <strong>
-MVR ${document.getElementById("salesTotal").textContent}
+MVR ${
+  document.getElementById(
+    "salesTotal"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Total Expenses
+
 <strong>
-MVR ${document.getElementById("expenseTotal").textContent}
+MVR ${
+  document.getElementById(
+    "expenseTotal"
+  ).textContent
+}
 </strong>
+
 </div>
 
+
 <div class="box">
+
 Profit / Loss
+
 <strong>
-MVR ${document.getElementById("profitTotal").textContent}
+MVR ${
+  document.getElementById(
+    "profitTotal"
+  ).textContent
+}
 </strong>
+
 </div>
 
 </div>
@@ -1536,11 +2509,19 @@ MVR ${document.getElementById("profitTotal").textContent}
 
 <div class="footer">
 
-<strong>KANBULO BAKERY</strong><br>
+<strong>
+KANBULO BAKERY
+</strong>
 
-Freshly baked with love<br>
+<br>
 
-Daisymaage, N. Velidhoo<br>
+Freshly baked with love
+
+<br>
+
+Daisymaage, N. Velidhoo
+
+<br>
 
 +960 7653140
 
@@ -1555,28 +2536,44 @@ Daisymaage, N. Velidhoo<br>
   const blob =
     new Blob(
       [reportHTML],
-      { type: "text/html" }
+      {
+        type: "text/html"
+      }
     );
 
 
   const url =
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
 
   const link =
-    document.createElement("a");
+    document.createElement(
+      "a"
+    );
+
 
   link.href = url;
 
-  link.download = filename;
+  link.download =
+    filename;
 
-  document.body.appendChild(link);
+
+  document.body.appendChild(
+    link
+  );
 
   link.click();
 
-  document.body.removeChild(link);
+  document.body.removeChild(
+    link
+  );
 
-  URL.revokeObjectURL(url);
+
+  URL.revokeObjectURL(
+    url
+  );
 
 }
 
@@ -1594,4 +2591,5 @@ loadReports();
 </body>
 </html>
 ```
+
 
