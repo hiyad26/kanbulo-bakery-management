@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#8B4513">
+  <meta name="theme-color" content="#7B1E2B">
   <title>Sales - Kanbulo Bakery</title>
 
   <style>
@@ -16,14 +17,24 @@
     body {
       font-family: Arial, sans-serif;
       background: #fff8f0;
-      color: #3b2415;
+      color: #4b1f1f;
     }
 
     header {
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
       padding: 20px;
       text-align: center;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.92;
     }
 
     main {
@@ -83,7 +94,7 @@
 
     .add {
       width: 100%;
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
       margin-top: 18px;
     }
@@ -108,11 +119,47 @@
       font-size: 22px;
       font-weight: bold;
       margin-top: 20px;
+      color: #7B1E2B;
+    }
+
+    .payment-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .payment-option {
+      position: relative;
+    }
+
+    .payment-option input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .payment-option label {
+      margin: 0;
+      display: block;
+      padding: 14px 8px;
+      text-align: center;
+      background: #fff8f0;
+      border: 2px solid #ead7c5;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .payment-option input:checked + label {
+      background: #f5e0d5;
+      border-color: #7B1E2B;
+      color: #7B1E2B;
     }
 
     .record {
       width: 100%;
-      background: #228B22;
+      background: #3d7655;
       color: white;
       margin-top: 15px;
     }
@@ -131,6 +178,17 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
+    .payment-badge {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      background: #f5e6d8;
+      color: #7B1E2B;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
     .error {
       background: #ffe5e5;
       color: #900;
@@ -138,6 +196,12 @@
       border-radius: 10px;
       margin-bottom: 15px;
       display: none;
+    }
+
+    @media (max-width: 600px) {
+      .payment-options {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 500px) {
@@ -203,6 +267,43 @@
       Total: MVR <span id="grandTotal">0.00</span>
     </div>
 
+    <label>Payment Method</label>
+
+    <div class="payment-options">
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="cash"
+          name="paymentMethod"
+          value="Cash"
+          checked
+        >
+        <label for="cash">💵 Cash</label>
+      </div>
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="card"
+          name="paymentMethod"
+          value="Card"
+        >
+        <label for="card">💳 Card</label>
+      </div>
+
+      <div class="payment-option">
+        <input
+          type="radio"
+          id="transfer"
+          name="paymentMethod"
+          value="Bank Transfer"
+        >
+        <label for="transfer">🏦 Transfer</label>
+      </div>
+
+    </div>
+
     <button class="record" onclick="completeSale()">
       ✓ Record Sale
     </button>
@@ -229,8 +330,12 @@ let cart = [];
 
 
 function showError(message) {
-  const box = document.getElementById("errorBox");
+
+  const box =
+    document.getElementById("errorBox");
+
   box.textContent = message;
+
   box.style.display = "block";
 }
 
@@ -239,7 +344,8 @@ function loadProducts() {
 
   try {
 
-    const saved = localStorage.getItem(PRODUCTS_KEY);
+    const saved =
+      localStorage.getItem(PRODUCTS_KEY);
 
     if (!saved) {
       products = [];
@@ -282,7 +388,9 @@ function loadProducts() {
     document.createElement("option");
 
   first.value = "";
-  first.textContent = "Select product";
+
+  first.textContent =
+    "Select product";
 
   select.appendChild(first);
 
@@ -291,7 +399,8 @@ function loadProducts() {
     const option =
       document.createElement("option");
 
-    option.value = String(product.id);
+    option.value =
+      String(product.id);
 
     option.textContent =
       product.name +
@@ -303,6 +412,7 @@ function loadProducts() {
     select.appendChild(option);
 
   });
+
 }
 
 
@@ -315,40 +425,67 @@ function addItem() {
     Number(select.value);
 
   const quantity =
-    Number(document.getElementById("quantity").value);
+    Number(
+      document.getElementById("quantity").value
+    );
 
   if (!productId) {
-    alert("Please select a product.");
+
+    alert(
+      "Please select a product."
+    );
+
     return;
   }
 
-  if (!Number.isInteger(quantity) || quantity < 1) {
-    alert("Please enter a valid quantity.");
+  if (
+    !Number.isInteger(quantity) ||
+    quantity < 1
+  ) {
+
+    alert(
+      "Please enter a valid quantity."
+    );
+
     return;
   }
 
   const product =
-    products.find(p => Number(p.id) === productId);
+    products.find(
+      p => Number(p.id) === productId
+    );
 
   if (!product) {
-    alert("Product not found.");
+
+    alert(
+      "Product not found."
+    );
+
     return;
   }
 
   const existing =
-    cart.find(item => Number(item.productId) === productId);
+    cart.find(
+      item =>
+        Number(item.productId) ===
+        productId
+    );
 
   const currentQuantity =
-    existing ? existing.quantity : 0;
+    existing
+      ? existing.quantity
+      : 0;
 
   if (
     currentQuantity + quantity >
     Number(product.stock)
   ) {
+
     alert(
       "Not enough stock. Available stock: " +
       product.stock
     );
+
     return;
   }
 
@@ -363,19 +500,32 @@ function addItem() {
   } else {
 
     cart.push({
-      productId: product.id,
-      name: product.name,
-      price: Number(product.price),
-      quantity: quantity,
+
+      productId:
+        product.id,
+
+      name:
+        product.name,
+
+      price:
+        Number(product.price),
+
+      quantity:
+        quantity,
+
       total:
-        Number(product.price) * quantity
+        Number(product.price) *
+        quantity
+
     });
 
   }
 
   renderCart();
 
-  document.getElementById("quantity").value = 1;
+  document.getElementById("quantity")
+    .value = 1;
+
 }
 
 
@@ -384,6 +534,7 @@ function removeItem(index) {
   cart.splice(index, 1);
 
   renderCart();
+
 }
 
 
@@ -408,47 +559,84 @@ function renderCart() {
   container.innerHTML =
     cart.map((item, index) => {
 
-      total += item.total;
+      total += Number(item.total);
 
       return `
+
         <div class="sale-row">
 
           <div>
-            <strong>${escapeHTML(item.name)}</strong>
+
+            <strong>
+              ${escapeHTML(item.name)}
+            </strong>
+
             <br>
+
             ${item.quantity} ×
-            MVR ${item.price.toFixed(2)}
+            MVR ${Number(item.price).toFixed(2)}
+
           </div>
 
           <div>
+
             <strong>
-              MVR ${item.total.toFixed(2)}
+              MVR ${Number(item.total).toFixed(2)}
             </strong>
+
             <br>
 
             <button
               class="remove"
               onclick="removeItem(${index})">
+
               Remove
+
             </button>
+
           </div>
 
         </div>
+
       `;
 
     }).join("");
 
   document.getElementById("grandTotal")
-    .textContent = total.toFixed(2);
+    .textContent =
+    total.toFixed(2);
+
+}
+
+
+function getPaymentMethod() {
+
+  const selected =
+    document.querySelector(
+      'input[name="paymentMethod"]:checked'
+    );
+
+  return selected
+    ? selected.value
+    : "Cash";
+
 }
 
 
 function completeSale() {
 
   if (cart.length === 0) {
-    alert("Please add a product first.");
+
+    alert(
+      "Please add a product first."
+    );
+
     return;
   }
+
+  const paymentMethod =
+    getPaymentMethod();
+
 
   /*
     Reload products directly from localStorage
@@ -466,9 +654,13 @@ function completeSale() {
 
   } catch {
 
-    alert("Could not read your products.");
+    alert(
+      "Could not read your products."
+    );
+
     return;
   }
+
 
   /*
     Check stock one final time.
@@ -478,28 +670,39 @@ function completeSale() {
 
     const product =
       latestProducts.find(
-        p => Number(p.id) === Number(item.productId)
+        p =>
+          Number(p.id) ===
+          Number(item.productId)
       );
 
     if (!product) {
+
       alert(
-        "Product " + item.name +
+        "Product " +
+        item.name +
         " could not be found."
       );
+
       return;
     }
 
-    if (Number(product.stock) < item.quantity) {
+    if (
+      Number(product.stock) <
+      item.quantity
+    ) {
+
       alert(
         "Not enough stock for " +
         item.name +
         ". Available: " +
         product.stock
       );
+
       return;
     }
 
   }
+
 
   /*
     Reduce stock.
@@ -509,7 +712,9 @@ function completeSale() {
 
     const product =
       latestProducts.find(
-        p => Number(p.id) === Number(item.productId)
+        p =>
+          Number(p.id) ===
+          Number(item.productId)
       );
 
     product.stock =
@@ -517,6 +722,7 @@ function completeSale() {
       Number(item.quantity);
 
   });
+
 
   /*
     Save updated products.
@@ -527,18 +733,21 @@ function completeSale() {
     JSON.stringify(latestProducts)
   );
 
+
   /*
     Calculate total.
   */
 
   const total =
     cart.reduce(
-      (sum, item) => sum + item.total,
+      (sum, item) =>
+        sum + Number(item.total),
       0
     );
 
+
   /*
-    Save sale.
+    Load existing sales.
   */
 
   let sales = [];
@@ -560,42 +769,70 @@ function completeSale() {
 
   }
 
+
+  /*
+    Save sale with payment method.
+  */
+
   sales.push({
 
-    id: Date.now(),
+    id:
+      Date.now(),
 
     date:
       new Date().toISOString(),
 
+    paymentMethod:
+      paymentMethod,
+
     items:
       cart.map(item => ({
-        productId: item.productId,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        total: item.total
+
+        productId:
+          item.productId,
+
+        name:
+          item.name,
+
+        price:
+          item.price,
+
+        quantity:
+          item.quantity,
+
+        total:
+          item.total
+
       })),
 
-    total: total
+    total:
+      total
 
   });
+
 
   localStorage.setItem(
     SALES_KEY,
     JSON.stringify(sales)
   );
 
+
   alert(
     "Sale recorded successfully!\n\n" +
+    "Payment: " +
+    paymentMethod +
+    "\n" +
     "Total: MVR " +
     total.toFixed(2)
   );
+
 
   /*
     Reset page.
   */
 
-  products = latestProducts;
+  products =
+    latestProducts;
 
   cart = [];
 
@@ -604,6 +841,7 @@ function completeSale() {
   renderCart();
 
   renderHistory();
+
 }
 
 
@@ -627,7 +865,10 @@ function renderHistory() {
 
   }
 
-  if (!Array.isArray(sales) || sales.length === 0) {
+  if (
+    !Array.isArray(sales) ||
+    sales.length === 0
+  ) {
 
     container.innerHTML =
       '<div class="empty">No sales recorded yet.</div>';
@@ -635,8 +876,12 @@ function renderHistory() {
     return;
   }
 
+
   const recent =
-    [...sales].reverse().slice(0, 10);
+    [...sales]
+      .reverse()
+      .slice(0, 10);
+
 
   container.innerHTML =
     recent.map(sale => {
@@ -646,13 +891,27 @@ function renderHistory() {
           .toLocaleString();
 
       const items =
-        sale.items.map(item =>
-          escapeHTML(item.name) +
-          " × " +
-          item.quantity
-        ).join("<br>");
+        Array.isArray(sale.items)
+          ? sale.items.map(item =>
+              escapeHTML(item.name) +
+              " × " +
+              item.quantity
+            ).join("<br>")
+          : "";
+
+
+      /*
+        Old sales without a payment method
+        are labelled as Previous Sale.
+      */
+
+      const payment =
+        sale.paymentMethod ||
+        "Previous Sale";
+
 
       return `
+
         <div class="history-item">
 
           <strong>
@@ -661,16 +920,26 @@ function renderHistory() {
 
           <br>
 
-          <small>${date}</small>
+          <small>
+            ${date}
+          </small>
+
+          <br>
+
+          <span class="payment-badge">
+            ${escapeHTML(payment)}
+          </span>
 
           <br><br>
 
           ${items}
 
         </div>
+
       `;
 
     }).join("");
+
 }
 
 
@@ -683,11 +952,15 @@ function escapeHTML(value) {
     String(value);
 
   return div.innerHTML;
+
 }
 
 
 function goDashboard() {
-  window.location.href = "index.html";
+
+  window.location.href =
+    "index.html";
+
 }
 
 
@@ -705,3 +978,5 @@ renderHistory();
 
 </body>
 </html>
+```
+
