@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8B4513">
+
+  <title>Kanbulo Bakery - Quotations</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #3b2415;
+    }
+
+    header {
+      background: #8B4513;
+      color: white;
+      padding: 22px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .back {
+      background: #eee;
+      color: #333;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 7px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+      background: white;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 120px;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .add {
+      width: 100%;
+      background: #8B4513;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .quotation-header {
+      border-bottom: 2px solid #eee;
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+
+    .quotation-number {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .date {
+      color: #777;
+      font-size: 14px;
+    }
+
+    .customer-info {
+      background: #fff8f0;
+      padding: 12px;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .item {
+      display: grid;
+      grid-template-columns: 1fr 70px 90px 35px;
+      gap: 8px;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .item-name {
+      font-weight: bold;
+    }
+
+    .item-price,
+    .item-total {
+      text-align: right;
+    }
+
+    .remove {
+      background: #f3d6d6;
+      color: #900;
+      border: none;
+      border-radius: 7px;
+      padding: 7px;
+      cursor: pointer;
+    }
+
+    .total {
+      text-align: right;
+      font-size: 21px;
+      font-weight: bold;
+      margin-top: 18px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .save {
+      background: #2e7d32;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .print {
+      background: #555;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .empty {
+      background: white;
+      text-align: center;
+      color: #777;
+      padding: 30px 15px;
+      border-radius: 15px;
+    }
+
+    @media (max-width: 600px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+
+      .item {
+        grid-template-columns: 1fr 60px 80px 35px;
+        font-size: 14px;
+      }
+    }
+
+    @media print {
+      .back,
+      .form-box,
+      .actions {
+        display: none !important;
+      }
+
+      body {
+        background: white;
+      }
+
+      .box {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🥐 Kanbulo Bakery</h1>
+  <p>Quotation</p>
+</header>
+
+<main>
+
+  <button class="back" onclick="goDashboard()">
+    ← Dashboard
+  </button>
+
+  <h2>📝 Create Quotation</h2>
+
+  <div class="box form-box">
+
+    <label for="customer">
+      Customer
+    </label>
+
+    <select id="customer">
+      <option value="">Walk-in / Select Customer</option>
+    </select>
+
+    <div class="row">
+
+      <div>
+        <label for="product">
+          Product
+        </label>
+
+        <select id="product">
+          <option value="">Select Product</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="quantity">
+          Quantity
+        </label>
+
+        <input
+          id="quantity"
+          type="number"
+          min="1"
+          value="1"
+        >
+      </div>
+
+    </div>
+
+    <button class="add" onclick="addItem()">
+      ＋ Add Product
+    </button>
+
+  </div>
+
+  <div class="box">
+
+    <div class="quotation-header">
+
+      <div class="quotation-number">
+        Quotation No:
+        <span id="quotationNumber"></span>
+      </div>
+
+      <div class="date" id="quotationDate"></div>
+
+    </div>
+
+    <div class="customer-info">
+      <strong>Customer:</strong>
+      <span id="selectedCustomer">
+        Walk-in Customer
+      </span>
+    </div>
+
+    <div id="itemsList">
+      <div class="empty">
+        No products added yet.
+      </div>
+    </div>
+
+    <div class="total">
+      Total:
+      MVR <span id="grandTotal">0.00</span>
+    </div>
+
+    <div class="actions">
+
+      <button class="save" onclick="saveQuotation()">
+        💾 Save Quotation
+      </button>
+
+      <button class="print" onclick="window.print()">
+        🖨️ Print
+      </button>
+
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+
+const PRODUCTS_KEY = "kanbulo_products";
+const CUSTOMERS_KEY = "kanbulo_customers";
+const QUOTATIONS_KEY = "kanbulo_quotations";
+
+let items = [];
+
+
+function getData(key) {
+
+  try {
+
+    const saved = localStorage.getItem(key);
+
+    const data = saved
+      ? JSON.parse(saved)
+      : [];
+
+    return Array.isArray(data) ? data : [];
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+function loadCustomers() {
+
+  const customers =
+    getData(CUSTOMERS_KEY);
+
+  const select =
+    document.getElementById("customer");
+
+  customers.forEach(customer => {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      customer.id;
+
+    option.textContent =
+      customer.name +
+      (customer.phone
+        ? " - " + customer.phone
+        : "");
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+function loadProducts() {
+
+  const products =
+    getData(PRODUCTS_KEY);
+
+  const select =
+    document.getElementById("product");
+
+  products.forEach(product => {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      product.id;
+
+    option.textContent =
+      product.name +
+      " — MVR " +
+      Number(product.price).toFixed(2);
+
+    select.appendChild(option);
+
+  });
+
+}
+
+
+function generateQuotationNumber() {
+
+  const number =
+    Date.now().toString().slice(-6);
+
+  document.getElementById(
+    "quotationNumber"
+  ).textContent =
+    "QT-" + number;
+
+}
+
+
+function setDate() {
+
+  const now =
+    new Date();
+
+  document.getElementById(
+    "quotationDate"
+  ).textContent =
+    now.toLocaleString();
+
+}
+
+
+function addItem() {
+
+  const productId =
+    document.getElementById("product").value;
+
+  const quantity =
+    Number(
+      document.getElementById("quantity").value
+    );
+
+  if (!productId) {
+
+    alert("Please select a product.");
+
+    return;
+
+  }
+
+  if (!quantity || quantity < 1) {
+
+    alert("Please enter a valid quantity.");
+
+    return;
+
+  }
+
+  const products =
+    getData(PRODUCTS_KEY);
+
+  const product =
+    products.find(
+      p => Number(p.id) === Number(productId)
+    );
+
+  if (!product) {
+
+    alert("Product not found.");
+
+    return;
+
+  }
+
+  const existing =
+    items.find(
+      item =>
+        Number(item.productId) ===
+        Number(productId)
+    );
+
+  if (existing) {
+
+    existing.quantity += quantity;
+
+    existing.total =
+      existing.quantity *
+      Number(existing.price);
+
+  } else {
+
+    items.push({
+
+      productId:
+        product.id,
+
+      name:
+        product.name,
+
+      price:
+        Number(product.price),
+
+      quantity:
+        quantity,
+
+      total:
+        Number(product.price) *
+        quantity
+
+    });
+
+  }
+
+  document.getElementById("quantity")
+    .value = 1;
+
+  renderItems();
+
+}
+
+
+function removeItem(index) {
+
+  items.splice(index, 1);
+
+  renderItems();
+
+}
+
+
+function renderItems() {
+
+  const list =
+    document.getElementById("itemsList");
+
+  if (items.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No products added yet.</div>';
+
+    document.getElementById(
+      "grandTotal"
+    ).textContent = "0.00";
+
+    return;
+
+  }
+
+
+  let total = 0;
+
+
+  list.innerHTML =
+    items.map((item, index) => {
+
+      total += Number(item.total);
+
+      return `
+        <div class="item">
+
+          <div class="item-name">
+            ${escapeHTML(item.name)}
+          </div>
+
+          <div>
+            × ${item.quantity}
+          </div>
+
+          <div class="item-total">
+            MVR ${Number(item.total).toFixed(2)}
+          </div>
+
+          <button
+            class="remove"
+            onclick="removeItem(${index})">
+            ×
+          </button>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  document.getElementById(
+    "grandTotal"
+  ).textContent =
+    total.toFixed(2);
+
+}
+
+
+function updateCustomerDisplay() {
+
+  const customerId =
+    document.getElementById("customer").value;
+
+  const customers =
+    getData(CUSTOMERS_KEY);
+
+  const customer =
+    customers.find(
+      c =>
+        Number(c.id) ===
+        Number(customerId)
+    );
+
+  document.getElementById(
+    "selectedCustomer"
+  ).textContent =
+    customer
+      ? customer.name +
+        (customer.phone
+          ? " — " + customer.phone
+          : "")
+      : "Walk-in Customer";
+
+}
+
+
+function saveQuotation() {
+
+  if (items.length === 0) {
+
+    alert("Please add at least one product.");
+
+    return;
+
+  }
+
+  const quotations =
+    getData(QUOTATIONS_KEY);
+
+  const customerId =
+    document.getElementById("customer").value;
+
+  const customers =
+    getData(CUSTOMERS_KEY);
+
+  const customer =
+    customers.find(
+      c =>
+        Number(c.id) ===
+        Number(customerId)
+    );
+
+  const total =
+    items.reduce(
+      (sum, item) =>
+        sum + Number(item.total),
+      0
+    );
+
+
+  const quotation = {
+
+    id:
+      Date.now(),
+
+    quotationNumber:
+      document.getElementById(
+        "quotationNumber"
+      ).textContent,
+
+    date:
+      new Date().toISOString(),
+
+    customerId:
+      customer
+        ? customer.id
+        : null,
+
+    customerName:
+      customer
+        ? customer.name
+        : "Walk-in Customer",
+
+    customerPhone:
+      customer
+        ? customer.phone
+        : "",
+
+    items:
+      items.map(item => ({
+        productId:
+          item.productId,
+
+        name:
+          item.name,
+
+        price:
+          item.price,
+
+        quantity:
+          item.quantity,
+
+        total:
+          item.total
+      })),
+
+    total:
+      total
+
+  };
+
+
+  quotations.push(quotation);
+
+  localStorage.setItem(
+    QUOTATIONS_KEY,
+    JSON.stringify(quotations)
+  );
+
+
+  alert(
+    "Quotation " +
+    quotation.quotationNumber +
+    " saved successfully!"
+  );
+
+}
+
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    String(value);
+
+  return div.innerHTML;
+
+}
+
+
+function goDashboard() {
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+document.getElementById("customer")
+  .addEventListener(
+    "change",
+    updateCustomerDisplay
+  );
+
+
+loadCustomers();
+loadProducts();
+generateQuotationNumber();
+setDate();
+renderItems();
+
+</script>
+
+</body>
+</html>
