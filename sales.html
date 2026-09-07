@@ -164,6 +164,14 @@
       margin-top: 15px;
     }
 
+    .cancel-edit {
+      width: 100%;
+      background: #eee;
+      color: #333;
+      margin-top: 10px;
+      display: none;
+    }
+
     .empty {
       text-align: center;
       color: #888;
@@ -189,6 +197,44 @@
       font-weight: bold;
     }
 
+    .history-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .edit-sale,
+    .delete-sale {
+      flex: 1;
+      padding: 9px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .edit-sale {
+      background: #f1e2d8;
+      color: #7B1E2B;
+    }
+
+    .delete-sale {
+      background: #fbe3e3;
+      color: #b00020;
+    }
+
+    .editing-banner {
+      display: none;
+      background: #f5e0d5;
+      color: #7B1E2B;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .editing-banner.show {
+      display: block;
+    }
+
     .error {
       background: #ffe5e5;
       color: #900;
@@ -201,6 +247,10 @@
     @media (max-width: 600px) {
       .payment-options {
         grid-template-columns: 1fr;
+      }
+
+      .history-actions {
+        flex-direction: column;
       }
     }
 
@@ -230,7 +280,11 @@
 
   <div class="box">
 
-    <h2>Make a Sale</h2>
+    <h2 id="saleFormTitle">Make a Sale</h2>
+
+    <div id="editingBanner" class="editing-banner">
+      ✏️ Editing an existing sale
+    </div>
 
     <label for="productSelect">Product</label>
 
@@ -304,8 +358,16 @@
 
     </div>
 
-    <button class="record" onclick="completeSale()">
+    <button id="recordButton" class="record" onclick="completeSale()">
       ✓ Record Sale
+    </button>
+
+    <button
+      id="cancelEditButton"
+      class="cancel-edit"
+      onclick="cancelEdit()"
+    >
+      Cancel Edit
     </button>
 
   </div>
@@ -327,6 +389,8 @@ const SALES_KEY = "kanbulo_sales";
 
 let products = [];
 let cart = [];
+let editingSaleId = null;
+let originalSaleItems = [];
 
 
 function showError(message) {
@@ -337,6 +401,17 @@ function showError(message) {
   box.textContent = message;
 
   box.style.display = "block";
+}
+
+
+function clearError() {
+
+  const box =
+    document.getElementById("errorBox");
+
+  box.textContent = "";
+
+  box.style.display = "none";
 }
 
 
@@ -378,7 +453,7 @@ function loadProducts() {
       '<option value="">No products found</option>';
 
     showError(
-      "No products were found. Open Products and make sure your Bun is saved."
+      "No products were found. Open Products and make sure your products are saved."
     );
 
     return;
@@ -405,9 +480,9 @@ function loadProducts() {
     option.textContent =
       product.name +
       " — MVR " +
-      Number(product.price).toFixed(2) +
+      Number(product.price || 0).toFixed(2) +
       " — Stock: " +
-      Number(product.stock);
+      getAvailableStockForProduct(product.id);
 
     select.appendChild(option);
 
@@ -416,7 +491,52 @@ function loadProducts() {
 }
 
 
+function getAvailableStockForProduct(productId) {
+
+  const product =
+    products.find(
+      p => Number(p.id) === Number(productId)
+    );
+
+  if (!product) {
+    return 0;
+  }
+
+  let available =
+    Number(product.stock || 0);
+
+  /*
+    When editing a sale, add the original
+    quantity back temporarily. This means
+    the user can edit the sale correctly.
+  */
+
+  if (editingSaleId !== null) {
+
+    const original =
+      originalSaleItems.find(
+        item =>
+          Number(item.productId) ===
+          Number(productId)
+      );
+
+    if (original) {
+
+      available +=
+        Number(original.quantity || 0);
+
+    }
+
+  }
+
+  return available;
+
+}
+
+
 function addItem() {
+
+  clearError();
 
   const select =
     document.getElementById("productSelect");
@@ -473,17 +593,20 @@ function addItem() {
 
   const currentQuantity =
     existing
-      ? existing.quantity
+      ? Number(existing.quantity)
       : 0;
+
+  const availableStock =
+    getAvailableStockForProduct(productId);
 
   if (
     currentQuantity + quantity >
-    Number(product.stock)
+    availableStock
   ) {
 
     alert(
       "Not enough stock. Available stock: " +
-      product.stock
+      availableStock
     );
 
     return;
@@ -623,7 +746,72 @@ function getPaymentMethod() {
 }
 
 
+function setPaymentMethod(method) {
+
+  const radios =
+    document.querySelectorAll(
+      'input[name="paymentMethod"]'
+    );
+
+  let found = false;
+
+  radios.forEach(radio => {
+
+    radio.checked =
+      radio.value === method;
+
+    if (radio.checked) {
+      found = true;
+    }
+
+  });
+
+  if (!found) {
+
+    document.getElementById("cash")
+      .checked = true;
+
+  }
+
+}
+
+
+function loadSales() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(SALES_KEY);
+
+    const sales =
+      saved ? JSON.parse(saved) : [];
+
+    return Array.isArray(sales)
+      ? sales
+      : [];
+
+  } catch {
+
+    return [];
+
+  }
+
+}
+
+
+function saveSales(sales) {
+
+  localStorage.setItem(
+    SALES_KEY,
+    JSON.stringify(sales)
+  );
+
+}
+
+
 function completeSale() {
+
+  clearError();
 
   if (cart.length === 0) {
 
@@ -639,8 +827,7 @@ function completeSale() {
 
 
   /*
-    Reload products directly from localStorage
-    so we always use the newest stock.
+    Reload the newest products.
   */
 
   let latestProducts;
@@ -661,180 +848,358 @@ function completeSale() {
     return;
   }
 
-
-  /*
-    Check stock one final time.
-  */
-
-  for (const item of cart) {
-
-    const product =
-      latestProducts.find(
-        p =>
-          Number(p.id) ===
-          Number(item.productId)
-      );
-
-    if (!product) {
-
-      alert(
-        "Product " +
-        item.name +
-        " could not be found."
-      );
-
-      return;
-    }
-
-    if (
-      Number(product.stock) <
-      item.quantity
-    ) {
-
-      alert(
-        "Not enough stock for " +
-        item.name +
-        ". Available: " +
-        product.stock
-      );
-
-      return;
-    }
-
+  if (!Array.isArray(latestProducts)) {
+    latestProducts = [];
   }
 
 
   /*
-    Reduce stock.
+    Load sales.
   */
 
-  cart.forEach(item => {
-
-    const product =
-      latestProducts.find(
-        p =>
-          Number(p.id) ===
-          Number(item.productId)
-      );
-
-    product.stock =
-      Number(product.stock) -
-      Number(item.quantity);
-
-  });
+  const sales =
+    loadSales();
 
 
   /*
-    Save updated products.
+    NEW SALE
   */
 
-  localStorage.setItem(
-    PRODUCTS_KEY,
-    JSON.stringify(latestProducts)
-  );
+  if (editingSaleId === null) {
+
+    /*
+      Check stock.
+    */
+
+    for (const item of cart) {
+
+      const product =
+        latestProducts.find(
+          p =>
+            Number(p.id) ===
+            Number(item.productId)
+        );
+
+      if (!product) {
+
+        alert(
+          "Product " +
+          item.name +
+          " could not be found."
+        );
+
+        return;
+      }
+
+      if (
+        Number(product.stock) <
+        Number(item.quantity)
+      ) {
+
+        alert(
+          "Not enough stock for " +
+          item.name +
+          ". Available: " +
+          product.stock
+        );
+
+        return;
+      }
+
+    }
 
 
-  /*
-    Calculate total.
-  */
+    /*
+      Reduce stock.
+    */
 
-  const total =
-    cart.reduce(
-      (sum, item) =>
-        sum + Number(item.total),
-      0
+    cart.forEach(item => {
+
+      const product =
+        latestProducts.find(
+          p =>
+            Number(p.id) ===
+            Number(item.productId)
+        );
+
+      product.stock =
+        Number(product.stock) -
+        Number(item.quantity);
+
+    });
+
+
+    localStorage.setItem(
+      PRODUCTS_KEY,
+      JSON.stringify(latestProducts)
     );
 
 
-  /*
-    Load existing sales.
-  */
+    const total =
+      cart.reduce(
+        (sum, item) =>
+          sum + Number(item.total),
+        0
+      );
 
-  let sales = [];
 
-  try {
+    sales.push({
 
-    sales =
-      JSON.parse(
-        localStorage.getItem(SALES_KEY)
-      ) || [];
+      id:
+        Date.now(),
 
-    if (!Array.isArray(sales)) {
-      sales = [];
-    }
+      date:
+        new Date().toISOString(),
 
-  } catch {
+      paymentMethod:
+        paymentMethod,
 
-    sales = [];
+      items:
+        cart.map(item => ({
+
+          productId:
+            item.productId,
+
+          name:
+            item.name,
+
+          price:
+            Number(item.price),
+
+          quantity:
+            Number(item.quantity),
+
+          total:
+            Number(item.total)
+
+        })),
+
+      total:
+        total
+
+    });
+
+
+    saveSales(sales);
+
+
+    alert(
+      "Sale recorded successfully!\n\n" +
+      "Payment: " +
+      paymentMethod +
+      "\n" +
+      "Total: MVR " +
+      total.toFixed(2)
+    );
 
   }
 
 
   /*
-    Save sale with payment method.
+    EDIT EXISTING SALE
   */
 
-  sales.push({
+  else {
 
-    id:
-      Date.now(),
+    const saleIndex =
+      sales.findIndex(
+        sale =>
+          Number(sale.id) ===
+          Number(editingSaleId)
+      );
 
-    date:
-      new Date().toISOString(),
+    if (saleIndex === -1) {
 
-    paymentMethod:
-      paymentMethod,
+      alert(
+        "The sale could not be found."
+      );
 
-    items:
-      cart.map(item => ({
+      cancelEdit();
 
-        productId:
-          item.productId,
-
-        name:
-          item.name,
-
-        price:
-          item.price,
-
-        quantity:
-          item.quantity,
-
-        total:
-          item.total
-
-      })),
-
-    total:
-      total
-
-  });
+      return;
+    }
 
 
-  localStorage.setItem(
-    SALES_KEY,
-    JSON.stringify(sales)
-  );
+    const oldSale =
+      sales[saleIndex];
 
 
-  alert(
-    "Sale recorded successfully!\n\n" +
-    "Payment: " +
-    paymentMethod +
-    "\n" +
-    "Total: MVR " +
-    total.toFixed(2)
-  );
+    /*
+      Start from the newest real stock.
+    */
+
+    /*
+      Restore the old sale quantities first.
+    */
+
+    if (Array.isArray(oldSale.items)) {
+
+      for (const oldItem of oldSale.items) {
+
+        const product =
+          latestProducts.find(
+            p =>
+              Number(p.id) ===
+              Number(oldItem.productId)
+          );
+
+        if (product) {
+
+          product.stock =
+            Number(product.stock || 0) +
+            Number(oldItem.quantity || 0);
+
+        }
+
+      }
+
+    }
 
 
-  /*
-    Reset page.
-  */
+    /*
+      Now check whether the edited sale
+      can be fulfilled.
+    */
+
+    for (const item of cart) {
+
+      const product =
+        latestProducts.find(
+          p =>
+            Number(p.id) ===
+            Number(item.productId)
+        );
+
+      if (!product) {
+
+        alert(
+          "Product " +
+          item.name +
+          " could not be found."
+        );
+
+        return;
+      }
+
+      if (
+        Number(product.stock) <
+        Number(item.quantity)
+      ) {
+
+        /*
+          Put stock back to its original
+          state before stopping.
+        */
+
+        restoreOriginalStock(
+          latestProducts,
+          oldSale.items
+        );
+
+        alert(
+          "Not enough stock for " +
+          item.name +
+          ". Available: " +
+          product.stock
+        );
+
+        return;
+      }
+
+    }
+
+
+    /*
+      Deduct the new edited quantities.
+    */
+
+    cart.forEach(item => {
+
+      const product =
+        latestProducts.find(
+          p =>
+            Number(p.id) ===
+            Number(item.productId)
+        );
+
+      product.stock =
+        Number(product.stock) -
+        Number(item.quantity);
+
+    });
+
+
+    localStorage.setItem(
+      PRODUCTS_KEY,
+      JSON.stringify(latestProducts)
+    );
+
+
+    const total =
+      cart.reduce(
+        (sum, item) =>
+          sum + Number(item.total),
+        0
+      );
+
+
+    /*
+      Update the sale but keep its
+      original date and ID.
+    */
+
+    sales[saleIndex] = {
+
+      ...oldSale,
+
+      paymentMethod:
+        paymentMethod,
+
+      items:
+        cart.map(item => ({
+
+          productId:
+            item.productId,
+
+          name:
+            item.name,
+
+          price:
+            Number(item.price),
+
+          quantity:
+            Number(item.quantity),
+
+          total:
+            Number(item.total)
+
+        })),
+
+      total:
+        total
+
+    };
+
+
+    saveSales(sales);
+
+
+    alert(
+      "Sale updated successfully!\n\n" +
+      "Payment: " +
+      paymentMethod +
+      "\n" +
+      "Total: MVR " +
+      total.toFixed(2)
+    );
+
+  }
+
+
+  resetSaleForm();
 
   products =
     latestProducts;
-
-  cart = [];
 
   loadProducts();
 
@@ -845,28 +1210,369 @@ function completeSale() {
 }
 
 
+function restoreOriginalStock(productsList, oldItems) {
+
+  if (!Array.isArray(oldItems)) {
+    return;
+  }
+
+  oldItems.forEach(oldItem => {
+
+    const product =
+      productsList.find(
+        p =>
+          Number(p.id) ===
+          Number(oldItem.productId)
+      );
+
+    if (product) {
+
+      product.stock =
+        Number(product.stock || 0) +
+        Number(oldItem.quantity || 0);
+
+    }
+
+  });
+
+}
+
+
+function editSale(id) {
+
+  clearError();
+
+  const sales =
+    loadSales();
+
+  const sale =
+    sales.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+  if (!sale) {
+
+    alert(
+      "Sale not found."
+    );
+
+    return;
+  }
+
+
+  if (
+    !Array.isArray(sale.items) ||
+    sale.items.length === 0
+  ) {
+
+    alert(
+      "This sale cannot be edited because it has no items."
+    );
+
+    return;
+  }
+
+
+  editingSaleId =
+    sale.id;
+
+  originalSaleItems =
+    sale.items.map(item => ({
+
+      productId:
+        item.productId,
+
+      quantity:
+        Number(item.quantity || 0)
+
+    }));
+
+
+  /*
+    Copy the sale into the current cart.
+    Stock is NOT changed yet.
+  */
+
+  cart =
+    sale.items.map(item => ({
+
+      productId:
+        item.productId,
+
+      name:
+        item.name,
+
+      price:
+        Number(item.price),
+
+      quantity:
+        Number(item.quantity),
+
+      total:
+        Number(item.total)
+
+    }));
+
+
+  document.getElementById("saleFormTitle")
+    .textContent =
+    "✏️ Edit Sale";
+
+
+  document.getElementById("editingBanner")
+    .classList.add("show");
+
+
+  document.getElementById("recordButton")
+    .textContent =
+    "✓ Update Sale";
+
+
+  document.getElementById("cancelEditButton")
+    .style.display =
+    "block";
+
+
+  setPaymentMethod(
+    sale.paymentMethod || "Cash"
+  );
+
+
+  loadProducts();
+
+  renderCart();
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+function cancelEdit() {
+
+  resetSaleForm();
+
+  loadProducts();
+
+  renderCart();
+
+}
+
+
+function resetSaleForm() {
+
+  editingSaleId =
+    null;
+
+  originalSaleItems =
+    [];
+
+  cart =
+    [];
+
+  document.getElementById("saleFormTitle")
+    .textContent =
+    "Make a Sale";
+
+  document.getElementById("editingBanner")
+    .classList.remove("show");
+
+  document.getElementById("recordButton")
+    .textContent =
+    "✓ Record Sale";
+
+  document.getElementById("cancelEditButton")
+    .style.display =
+    "none";
+
+  document.getElementById("quantity")
+    .value =
+    1;
+
+  setPaymentMethod("Cash");
+
+}
+
+
+function deleteSale(id) {
+
+  clearError();
+
+  const sales =
+    loadSales();
+
+  const index =
+    sales.findIndex(
+      sale =>
+        Number(sale.id) ===
+        Number(id)
+    );
+
+  if (index === -1) {
+
+    alert(
+      "Sale not found."
+    );
+
+    return;
+  }
+
+
+  const sale =
+    sales[index];
+
+
+  const confirmed =
+    confirm(
+      "Delete this sale?\n\n" +
+      "Total: MVR " +
+      Number(sale.total || 0).toFixed(2) +
+      "\n\n" +
+      "The sold quantities will be returned to inventory."
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  /*
+    Restore stock from the deleted sale.
+  */
+
+  let latestProducts;
+
+  try {
+
+    latestProducts =
+      JSON.parse(
+        localStorage.getItem(PRODUCTS_KEY)
+      ) || [];
+
+  } catch {
+
+    latestProducts = [];
+
+  }
+
+  if (!Array.isArray(latestProducts)) {
+    latestProducts = [];
+  }
+
+
+  let missingProducts = [];
+
+
+  if (Array.isArray(sale.items)) {
+
+    sale.items.forEach(item => {
+
+      const product =
+        latestProducts.find(
+          p =>
+            Number(p.id) ===
+            Number(item.productId)
+        );
+
+      if (product) {
+
+        product.stock =
+          Number(product.stock || 0) +
+          Number(item.quantity || 0);
+
+      } else {
+
+        missingProducts.push(
+          item.name
+        );
+
+      }
+
+    });
+
+  }
+
+
+  /*
+    Remove the sale.
+  */
+
+  sales.splice(index, 1);
+
+  saveSales(sales);
+
+
+  /*
+    Save restored inventory.
+  */
+
+  localStorage.setItem(
+    PRODUCTS_KEY,
+    JSON.stringify(latestProducts)
+  );
+
+
+  /*
+    If the deleted sale was currently
+    being edited, cancel editing.
+  */
+
+  if (
+    Number(editingSaleId) ===
+    Number(id)
+  ) {
+
+    resetSaleForm();
+
+  }
+
+
+  products =
+    latestProducts;
+
+  loadProducts();
+
+  renderCart();
+
+  renderHistory();
+
+
+  if (missingProducts.length > 0) {
+
+    alert(
+      "Sale deleted.\n\n" +
+      "Some products could not be returned to stock because they no longer exist in Inventory:\n" +
+      missingProducts.join(", ")
+    );
+
+  } else {
+
+    alert(
+      "Sale deleted successfully.\n\n" +
+      "Stock has been returned to Inventory."
+    );
+
+  }
+
+}
+
+
 function renderHistory() {
 
   const container =
     document.getElementById("history");
 
-  let sales = [];
+  const sales =
+    loadSales();
 
-  try {
-
-    sales =
-      JSON.parse(
-        localStorage.getItem(SALES_KEY)
-      ) || [];
-
-  } catch {
-
-    sales = [];
-
-  }
 
   if (
-    !Array.isArray(sales) ||
     sales.length === 0
   ) {
 
@@ -933,6 +1639,24 @@ function renderHistory() {
           <br><br>
 
           ${items}
+
+          <div class="history-actions">
+
+            <button
+              class="edit-sale"
+              onclick="editSale(${sale.id})"
+            >
+              ✏️ Edit
+            </button>
+
+            <button
+              class="delete-sale"
+              onclick="deleteSale(${sale.id})"
+            >
+              🗑️ Delete
+            </button>
+
+          </div>
 
         </div>
 
