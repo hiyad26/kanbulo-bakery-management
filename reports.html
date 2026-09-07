@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8B4513">
+
+  <title>Kanbulo Bakery - Reports</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #3b2415;
+      margin: 0;
+    }
+
+    header {
+      background: #8B4513;
+      color: white;
+      padding: 22px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 5px;
+      font-size: 25px;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .back {
+      background: #ddd;
+      color: #333;
+      border: none;
+      padding: 11px 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 15px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: #777;
+    }
+
+    .value {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .profit {
+      grid-column: 1 / -1;
+    }
+
+    .profit .value {
+      font-size: 30px;
+    }
+
+    .section {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .sale-row,
+    .expense-row {
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .sale-row:last-child,
+    .expense-row:last-child {
+      border-bottom: none;
+    }
+
+    .empty {
+      color: #777;
+      text-align: center;
+      padding: 15px;
+    }
+
+    @media (max-width: 500px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .profit {
+        grid-column: auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🥐 Kanbulo Bakery</h1>
+  <p>Business Reports</p>
+</header>
+
+<main>
+
+  <button class="back" onclick="location.href='index.html'">
+    ← Dashboard
+  </button>
+
+  <h2>📊 Reports</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Total Sales</h3>
+      <div class="value">
+        MVR <span id="salesTotal">0.00</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Total Expenses</h3>
+      <div class="value">
+        MVR <span id="expenseTotal">0.00</span>
+      </div>
+    </div>
+
+    <div class="card profit">
+      <h3>Profit / Loss</h3>
+      <div class="value">
+        MVR <span id="profitTotal">0.00</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section">
+
+    <h3>🛒 Sales</h3>
+
+    <div id="salesList"></div>
+
+  </div>
+
+  <div class="section">
+
+    <h3>💰 Expenses</h3>
+
+    <div id="expenseList"></div>
+
+  </div>
+
+</main>
+
+<script>
+
+const SALES_KEY = "kanbulo_sales";
+const EXPENSES_KEY = "kanbulo_expenses";
+
+function getData(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key)) || [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function loadReports() {
+
+  const sales = getData(SALES_KEY);
+  const expenses = getData(EXPENSES_KEY);
+
+  let salesTotal = 0;
+  let expenseTotal = 0;
+
+  sales.forEach(sale => {
+    salesTotal += Number(sale.total || sale.amount || 0);
+  });
+
+  expenses.forEach(expense => {
+    expenseTotal += Number(expense.amount || 0);
+  });
+
+  const profit = salesTotal - expenseTotal;
+
+  document.getElementById("salesTotal").textContent =
+    salesTotal.toFixed(2);
+
+  document.getElementById("expenseTotal").textContent =
+    expenseTotal.toFixed(2);
+
+  document.getElementById("profitTotal").textContent =
+    profit.toFixed(2);
+
+  displaySales(sales);
+  displayExpenses(expenses);
+}
+
+function displaySales(sales) {
+
+  const list = document.getElementById("salesList");
+
+  if (sales.length === 0) {
+    list.innerHTML =
+      '<div class="empty">No sales recorded yet.</div>';
+    return;
+  }
+
+  list.innerHTML = sales.slice().reverse().map(sale => {
+
+    const amount = Number(sale.total || sale.amount || 0);
+
+    return `
+      <div class="sale-row">
+        <strong>${escapeHtml(sale.productName || "Sale")}</strong>
+        <br>
+        Quantity: ${Number(sale.quantity || 1)}
+        <br>
+        <strong>MVR ${amount.toFixed(2)}</strong>
+      </div>
+    `;
+
+  }).join("");
+}
+
+function displayExpenses(expenses) {
+
+  const list = document.getElementById("expenseList");
+
+  if (expenses.length === 0) {
+    list.innerHTML =
+      '<div class="empty">No expenses recorded yet.</div>';
+    return;
+  }
+
+  list.innerHTML = expenses.slice().reverse().map(expense => {
+
+    return `
+      <div class="expense-row">
+        <strong>${escapeHtml(expense.name)}</strong>
+        <br>
+        ${expense.date || ""}
+        <br>
+        <strong>MVR ${Number(expense.amount).toFixed(2)}</strong>
+      </div>
+    `;
+
+  }).join("");
+}
+
+function escapeHtml(text) {
+
+  const div = document.createElement("div");
+  div.textContent = text || "";
+  return div.innerHTML;
+
+}
+
+loadReports();
+
+</script>
+
+</body>
+</html>
