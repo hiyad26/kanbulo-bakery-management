@@ -1,0 +1,410 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8B4513">
+
+  <title>Kanbulo Bakery - Customers</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #3b2415;
+    }
+
+    header {
+      background: #8B4513;
+      color: white;
+      padding: 22px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .back {
+      background: #eee;
+      color: #333;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .box {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ddd;
+      border-radius: 9px;
+      font-size: 16px;
+    }
+
+    .add {
+      width: 100%;
+      background: #8B4513;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .customer {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .customer-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .customer-name {
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .phone {
+      color: #777;
+      margin-top: 7px;
+    }
+
+    .delete {
+      background: #f3d6d6;
+      color: #900;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .empty {
+      background: white;
+      text-align: center;
+      color: #777;
+      padding: 30px 15px;
+      border-radius: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .summary {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      font-size: 17px;
+    }
+
+    @media (max-width: 500px) {
+      .customer-top {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🥐 Kanbulo Bakery</h1>
+  <p>Customers</p>
+</header>
+
+<main>
+
+  <button class="back" onclick="goDashboard()">
+    ← Dashboard
+  </button>
+
+  <h2>👥 Customers</h2>
+
+  <div class="box">
+
+    <h3>Add Customer</h3>
+
+    <label for="customerName">
+      Customer Name
+    </label>
+
+    <input
+      id="customerName"
+      type="text"
+      placeholder="Enter customer name"
+    >
+
+    <label for="customerPhone">
+      Phone Number
+    </label>
+
+    <input
+      id="customerPhone"
+      type="tel"
+      placeholder="Enter phone number"
+    >
+
+    <button class="add" onclick="addCustomer()">
+      ＋ Add Customer
+    </button>
+
+  </div>
+
+  <div class="summary">
+    👥 Total Customers:
+    <strong id="customerCount">0</strong>
+  </div>
+
+  <div id="customerList"></div>
+
+</main>
+
+<script>
+
+const CUSTOMERS_KEY = "kanbulo_customers";
+
+
+function getCustomers() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(CUSTOMERS_KEY);
+
+    const customers =
+      saved ? JSON.parse(saved) : [];
+
+    return Array.isArray(customers)
+      ? customers
+      : [];
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+function saveCustomers(customers) {
+
+  localStorage.setItem(
+    CUSTOMERS_KEY,
+    JSON.stringify(customers)
+  );
+
+}
+
+
+function addCustomer() {
+
+  const name =
+    document.getElementById("customerName")
+      .value.trim();
+
+  const phone =
+    document.getElementById("customerPhone")
+      .value.trim();
+
+
+  if (!name) {
+
+    alert("Please enter the customer name.");
+
+    return;
+
+  }
+
+
+  const customers =
+    getCustomers();
+
+
+  customers.push({
+
+    id: Date.now(),
+
+    name: name,
+
+    phone: phone,
+
+    date:
+      new Date().toISOString()
+
+  });
+
+
+  saveCustomers(customers);
+
+
+  document.getElementById("customerName")
+    .value = "";
+
+  document.getElementById("customerPhone")
+    .value = "";
+
+
+  renderCustomers();
+
+}
+
+
+function deleteCustomer(id) {
+
+  const customers =
+    getCustomers();
+
+  const updated =
+    customers.filter(
+      customer =>
+        Number(customer.id) !== Number(id)
+    );
+
+
+  saveCustomers(updated);
+
+  renderCustomers();
+
+}
+
+
+function renderCustomers() {
+
+  const customers =
+    getCustomers();
+
+  const list =
+    document.getElementById("customerList");
+
+
+  document.getElementById("customerCount")
+    .textContent = customers.length;
+
+
+  if (customers.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No customers added yet.</div>';
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    customers.slice().reverse().map(customer => {
+
+      return `
+        <div class="customer">
+
+          <div class="customer-top">
+
+            <div>
+
+              <div class="customer-name">
+                👤 ${escapeHTML(customer.name)}
+              </div>
+
+              ${
+                customer.phone
+                  ? `<div class="phone">
+                       📞 ${escapeHTML(customer.phone)}
+                     </div>`
+                  : ""
+              }
+
+            </div>
+
+            <button
+              class="delete"
+              onclick="deleteCustomer(${customer.id})">
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    String(value);
+
+  return div.innerHTML;
+
+}
+
+
+function goDashboard() {
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+renderCustomers();
+
+</script>
+
+</body>
+</html>
+```
