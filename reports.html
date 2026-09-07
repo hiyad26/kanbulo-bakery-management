@@ -81,6 +81,32 @@
       font-size: 16px;
     }
 
+    .report-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .action-btn {
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .print-btn {
+      background: #7B1E2B;
+      color: white;
+    }
+
+    .save-btn {
+      background: #3b2415;
+      color: white;
+    }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -183,8 +209,6 @@
       margin-top: 0;
     }
 
-    /* DAY-BY-DAY TABLE */
-
     .table-wrapper {
       overflow-x: auto;
       margin-top: 15px;
@@ -213,10 +237,6 @@
       white-space: nowrap;
     }
 
-    .daily-table tr:last-child td {
-      border-bottom: none;
-    }
-
     .daily-table .date-cell {
       text-align: left;
       font-weight: bold;
@@ -233,11 +253,8 @@
       border-top: 2px solid #7B1E2B;
     }
 
-    .daily-table .total-row .total-cell {
-      font-size: 14px;
-    }
-
     @media (max-width: 650px) {
+
       .cards {
         grid-template-columns: 1fr;
       }
@@ -250,12 +267,69 @@
         grid-template-columns: 1fr;
       }
 
+      .report-actions {
+        grid-template-columns: 1fr;
+      }
+
       main {
         padding: 15px;
       }
 
       .section {
         padding: 15px;
+      }
+    }
+
+    /* PRINT VERSION */
+
+    @media print {
+
+      body {
+        background: white;
+        color: black;
+      }
+
+      header {
+        background: white;
+        color: #7B1E2B;
+        border-bottom: 3px solid #7B1E2B;
+      }
+
+      main {
+        max-width: none;
+        padding: 10px;
+      }
+
+      .back,
+      .filter-box,
+      .report-actions {
+        display: none !important;
+      }
+
+      .section,
+      .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+      }
+
+      .section {
+        break-inside: avoid;
+      }
+
+      .daily-table th {
+        background: #7B1E2B !important;
+        color: white !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+      }
+
+      .daily-table {
+        min-width: 0;
+      }
+
+      .sale-row,
+      .expense-row {
+        break-inside: avoid;
       }
     }
   </style>
@@ -289,6 +363,27 @@
       id="reportDate"
       onchange="loadReports()"
     >
+
+  </div>
+
+
+  <!-- REPORT ACTIONS -->
+
+  <div class="report-actions">
+
+    <button
+      class="action-btn print-btn"
+      onclick="printReport()"
+    >
+      🖨️ Print Report
+    </button>
+
+    <button
+      class="action-btn save-btn"
+      onclick="saveReport()"
+    >
+      💾 Save Report
+    </button>
 
   </div>
 
@@ -328,46 +423,31 @@
   <div class="cards">
 
     <div class="card payment-card">
-
       <h3>💵 Cash Sales</h3>
-
       <div class="value">
         MVR <span id="cashTotal">0.00</span>
       </div>
-
     </div>
 
-
     <div class="card payment-card">
-
       <h3>💳 Card Sales</h3>
-
       <div class="value">
         MVR <span id="cardTotal">0.00</span>
       </div>
-
     </div>
 
-
     <div class="card payment-card">
-
       <h3>🏦 Bank Transfer</h3>
-
       <div class="value">
         MVR <span id="transferTotal">0.00</span>
       </div>
-
     </div>
 
-
     <div class="card payment-card">
-
       <h3>❓ Previous / Unspecified</h3>
-
       <div class="value">
         MVR <span id="otherTotal">0.00</span>
       </div>
-
     </div>
 
   </div>
@@ -418,7 +498,6 @@
       <table class="daily-table">
 
         <thead>
-
           <tr>
             <th>Date</th>
             <th>Sales</th>
@@ -429,7 +508,6 @@
             <th>Bank</th>
             <th>Other</th>
           </tr>
-
         </thead>
 
         <tbody id="dailyBreakdown"></tbody>
@@ -455,7 +533,6 @@
 
     </div>
 
-
     <div class="card">
 
       <h3>Total Expenses</h3>
@@ -465,7 +542,6 @@
       </div>
 
     </div>
-
 
     <div class="card profit">
 
@@ -571,16 +647,13 @@ function saleDateKey(dateString) {
 
 function getSelectedDate() {
 
-  const input =
-    document.getElementById("reportDate");
-
-  return input.value;
+  return document.getElementById("reportDate").value;
 
 }
 
 
 /*
-  Get payment totals for a group of sales.
+  Get payment totals.
 */
 
 function getPaymentTotals(sales) {
@@ -663,10 +736,6 @@ function displayDailyBreakdown(sales, selectedMonth) {
   }
 
 
-  /*
-    Group sales by date.
-  */
-
   const days = {};
 
 
@@ -678,9 +747,7 @@ function displayDailyBreakdown(sales, selectedMonth) {
     if (!day) return;
 
     if (!days[day]) {
-
       days[day] = [];
-
     }
 
     days[day].push(sale);
@@ -708,15 +775,14 @@ function displayDailyBreakdown(sales, selectedMonth) {
     const daySales =
       days[day];
 
-
     let total = 0;
     let products = 0;
 
 
     daySales.forEach(sale => {
 
-      total += Number(sale.total || 0);
-
+      total +=
+        Number(sale.total || 0);
 
       if (Array.isArray(sale.items)) {
 
@@ -797,10 +863,6 @@ function displayDailyBreakdown(sales, selectedMonth) {
   });
 
 
-  /*
-    Monthly total row.
-  */
-
   rows += `
     <tr class="total-row">
 
@@ -846,13 +908,16 @@ function displayDailyBreakdown(sales, selectedMonth) {
 
 
 /*
-  Main report loader.
+  MAIN REPORT LOADER
 */
 
 function loadReports() {
 
-  const sales = getData(SALES_KEY);
-  const expenses = getData(EXPENSES_KEY);
+  const sales =
+    getData(SALES_KEY);
+
+  const expenses =
+    getData(EXPENSES_KEY);
 
   const selectedDate =
     getSelectedDate();
@@ -874,7 +939,8 @@ function loadReports() {
 
   dailySalesList.forEach(sale => {
 
-    dailySales += Number(sale.total || 0);
+    dailySales +=
+      Number(sale.total || 0);
 
 
     if (Array.isArray(sale.items)) {
@@ -907,7 +973,7 @@ function loadReports() {
 
 
   /*
-    PAYMENT METHODS FOR SELECTED DAY
+    PAYMENT METHODS
   */
 
   const paymentTotals =
@@ -989,7 +1055,7 @@ function loadReports() {
 
 
   /*
-    DAY-BY-DAY TABLE
+    DAY-BY-DAY
   */
 
   displayDailyBreakdown(
@@ -1041,16 +1107,7 @@ function loadReports() {
     profit.toFixed(2);
 
 
-  /*
-    DISPLAY SELECTED DAY SALES
-  */
-
   displaySales(dailySalesList);
-
-
-  /*
-    DISPLAY EXPENSES
-  */
 
   displayExpenses(expenses);
 
@@ -1058,7 +1115,7 @@ function loadReports() {
 
 
 /*
-  Display sales for selected day.
+  DISPLAY SALES
 */
 
 function displaySales(sales) {
@@ -1127,7 +1184,9 @@ function displaySales(sales) {
 
           <br>
 
-          <small>${escapeHTML(date)}</small>
+          <small>
+            ${escapeHTML(date)}
+          </small>
 
           <br><br>
 
@@ -1142,7 +1201,7 @@ function displaySales(sales) {
 
 
 /*
-  Display expenses.
+  DISPLAY EXPENSES
 */
 
 function displayExpenses(expenses) {
@@ -1190,7 +1249,7 @@ function displayExpenses(expenses) {
 
 
 /*
-  Prevent HTML injection.
+  ESCAPE HTML
 */
 
 function escapeHTML(value) {
@@ -1207,7 +1266,7 @@ function escapeHTML(value) {
 
 
 /*
-  Set today's date automatically.
+  TODAY
 */
 
 function setToday() {
@@ -1222,7 +1281,308 @@ function setToday() {
 
 
 /*
-  Start report.
+  PRINT REPORT
+*/
+
+function printReport() {
+
+  window.print();
+
+}
+
+
+/*
+  SAVE REPORT
+*/
+
+function saveReport() {
+
+  const reportDate =
+    getSelectedDate();
+
+  const filename =
+    "Kanbulo-Bakery-Report-" +
+    reportDate +
+    ".html";
+
+
+  const reportHTML = `
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>Kanbulo Bakery Report - ${reportDate}</title>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fff8f0;
+  color: #3b2415;
+  padding: 30px;
+}
+
+h1 {
+  color: #7B1E2B;
+  margin-bottom: 5px;
+}
+
+h2 {
+  color: #7B1E2B;
+  border-bottom: 2px solid #7B1E2B;
+  padding-bottom: 8px;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.box {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.box strong {
+  display: block;
+  font-size: 22px;
+  color: #7B1E2B;
+  margin-top: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: white;
+}
+
+th {
+  background: #7B1E2B;
+  color: white;
+  padding: 10px;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.footer {
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 2px solid #7B1E2B;
+  font-size: 13px;
+}
+
+@media print {
+
+  body {
+    padding: 10px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🥐 KANBULO BAKERY</h1>
+
+<p><strong>Freshly baked with love</strong></p>
+
+<p>Daisymaage, N. Velidhoo</p>
+
+<p>Phone: +960 7653140</p>
+
+<h2>📊 Business Report</h2>
+
+<p>
+<strong>Selected Date:</strong>
+${escapeHTML(reportDate)}
+</p>
+
+<h2>📅 Daily Sales</h2>
+
+<div class="summary">
+
+<div class="box">
+Total Sales
+<strong>
+MVR ${document.getElementById("dailySales").textContent}
+</strong>
+</div>
+
+<div class="box">
+Number of Sales
+<strong>
+${document.getElementById("dailyCount").textContent}
+</strong>
+</div>
+
+<div class="box">
+Products Sold
+<strong>
+${document.getElementById("dailyProducts").textContent}
+</strong>
+</div>
+
+</div>
+
+
+<h2>💳 Payment Breakdown</h2>
+
+<table>
+
+<tr>
+<th>Payment Method</th>
+<th>Amount</th>
+</tr>
+
+<tr>
+<td>💵 Cash</td>
+<td>MVR ${document.getElementById("cashTotal").textContent}</td>
+</tr>
+
+<tr>
+<td>💳 Card</td>
+<td>MVR ${document.getElementById("cardTotal").textContent}</td>
+</tr>
+
+<tr>
+<td>🏦 Bank Transfer</td>
+<td>MVR ${document.getElementById("transferTotal").textContent}</td>
+</tr>
+
+<tr>
+<td>❓ Previous / Unspecified</td>
+<td>MVR ${document.getElementById("otherTotal").textContent}</td>
+</tr>
+
+</table>
+
+
+<h2>📆 Monthly Sales</h2>
+
+<div class="summary">
+
+<div class="box">
+Monthly Sales
+<strong>
+MVR ${document.getElementById("monthlySales").textContent}
+</strong>
+</div>
+
+<div class="box">
+Number of Sales
+<strong>
+${document.getElementById("monthlyCount").textContent}
+</strong>
+</div>
+
+<div class="box">
+Products Sold
+<strong>
+${document.getElementById("monthlyProducts").textContent}
+</strong>
+</div>
+
+</div>
+
+
+<h2>📊 Day-by-Day Sales</h2>
+
+${document.querySelector(".daily-table").outerHTML}
+
+
+<h2>💰 Financial Summary</h2>
+
+<div class="summary">
+
+<div class="box">
+Total Sales
+<strong>
+MVR ${document.getElementById("salesTotal").textContent}
+</strong>
+</div>
+
+<div class="box">
+Total Expenses
+<strong>
+MVR ${document.getElementById("expenseTotal").textContent}
+</strong>
+</div>
+
+<div class="box">
+Profit / Loss
+<strong>
+MVR ${document.getElementById("profitTotal").textContent}
+</strong>
+</div>
+
+</div>
+
+
+<div class="footer">
+
+<strong>KANBULO BAKERY</strong><br>
+
+Freshly baked with love<br>
+
+Daisymaage, N. Velidhoo<br>
+
++960 7653140
+
+</div>
+
+</body>
+
+</html>
+`;
+
+
+  const blob =
+    new Blob(
+      [reportHTML],
+      { type: "text/html" }
+    );
+
+
+  const url =
+    URL.createObjectURL(blob);
+
+
+  const link =
+    document.createElement("a");
+
+  link.href = url;
+
+  link.download = filename;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+  URL.revokeObjectURL(url);
+
+}
+
+
+/*
+  START
 */
 
 setToday();
