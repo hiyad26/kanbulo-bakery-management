@@ -183,6 +183,60 @@
       margin-top: 0;
     }
 
+    /* DAY-BY-DAY TABLE */
+
+    .table-wrapper {
+      overflow-x: auto;
+      margin-top: 15px;
+    }
+
+    .daily-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 720px;
+    }
+
+    .daily-table th {
+      background: #7B1E2B;
+      color: white;
+      padding: 11px 8px;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .daily-table td {
+      padding: 11px 8px;
+      border-bottom: 1px solid #eee;
+      text-align: center;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .daily-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .daily-table .date-cell {
+      text-align: left;
+      font-weight: bold;
+    }
+
+    .daily-table .total-cell {
+      font-weight: bold;
+      color: #7B1E2B;
+    }
+
+    .daily-table .total-row td {
+      background: #fff8f0;
+      font-weight: bold;
+      border-top: 2px solid #7B1E2B;
+    }
+
+    .daily-table .total-row .total-cell {
+      font-size: 14px;
+    }
+
     @media (max-width: 650px) {
       .cards {
         grid-template-columns: 1fr;
@@ -194,6 +248,14 @@
 
       .summary-grid {
         grid-template-columns: 1fr;
+      }
+
+      main {
+        padding: 15px;
+      }
+
+      .section {
+        padding: 15px;
       }
     }
   </style>
@@ -343,6 +405,42 @@
   </div>
 
 
+  <!-- DAY-BY-DAY SALES -->
+
+  <div class="section">
+
+    <h3 class="month-title">
+      📊 Day-by-Day Sales
+    </h3>
+
+    <div class="table-wrapper">
+
+      <table class="daily-table">
+
+        <thead>
+
+          <tr>
+            <th>Date</th>
+            <th>Sales</th>
+            <th>Products</th>
+            <th>Total</th>
+            <th>Cash</th>
+            <th>Card</th>
+            <th>Bank</th>
+            <th>Other</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dailyBreakdown"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
   <!-- MAIN FINANCIAL SUMMARY -->
 
   <div class="cards">
@@ -482,6 +580,272 @@ function getSelectedDate() {
 
 
 /*
+  Get payment totals for a group of sales.
+*/
+
+function getPaymentTotals(sales) {
+
+  let cash = 0;
+  let card = 0;
+  let transfer = 0;
+  let other = 0;
+
+  sales.forEach(sale => {
+
+    const amount =
+      Number(sale.total || 0);
+
+    const method =
+      String(sale.paymentMethod || "")
+        .toLowerCase();
+
+    if (method === "cash") {
+
+      cash += amount;
+
+    } else if (method === "card") {
+
+      card += amount;
+
+    } else if (
+      method === "bank transfer" ||
+      method === "transfer"
+    ) {
+
+      transfer += amount;
+
+    } else {
+
+      other += amount;
+
+    }
+
+  });
+
+  return {
+    cash,
+    card,
+    transfer,
+    other
+  };
+
+}
+
+
+/*
+  DAY-BY-DAY BREAKDOWN
+*/
+
+function displayDailyBreakdown(sales, selectedMonth) {
+
+  const tbody =
+    document.getElementById("dailyBreakdown");
+
+  const monthlySales =
+    sales.filter(sale =>
+      saleDateKey(sale.date).substring(0, 7)
+      === selectedMonth
+    );
+
+
+  if (monthlySales.length === 0) {
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="empty">
+          No sales recorded for this month.
+        </td>
+      </tr>
+    `;
+
+    return;
+
+  }
+
+
+  /*
+    Group sales by date.
+  */
+
+  const days = {};
+
+
+  monthlySales.forEach(sale => {
+
+    const day =
+      saleDateKey(sale.date);
+
+    if (!day) return;
+
+    if (!days[day]) {
+
+      days[day] = [];
+
+    }
+
+    days[day].push(sale);
+
+  });
+
+
+  const dates =
+    Object.keys(days).sort();
+
+
+  let grandSales = 0;
+  let grandProducts = 0;
+  let grandCash = 0;
+  let grandCard = 0;
+  let grandTransfer = 0;
+  let grandOther = 0;
+
+
+  let rows = "";
+
+
+  dates.forEach(day => {
+
+    const daySales =
+      days[day];
+
+
+    let total = 0;
+    let products = 0;
+
+
+    daySales.forEach(sale => {
+
+      total += Number(sale.total || 0);
+
+
+      if (Array.isArray(sale.items)) {
+
+        sale.items.forEach(item => {
+
+          products +=
+            Number(item.quantity || 0);
+
+        });
+
+      }
+
+    });
+
+
+    const payments =
+      getPaymentTotals(daySales);
+
+
+    grandSales += total;
+    grandProducts += products;
+    grandCash += payments.cash;
+    grandCard += payments.card;
+    grandTransfer += payments.transfer;
+    grandOther += payments.other;
+
+
+    const date =
+      new Date(day + "T00:00:00");
+
+
+    const formattedDate =
+      date.toLocaleDateString(undefined, {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+
+
+    rows += `
+      <tr>
+
+        <td class="date-cell">
+          ${formattedDate}
+        </td>
+
+        <td>
+          ${daySales.length}
+        </td>
+
+        <td>
+          ${products}
+        </td>
+
+        <td class="total-cell">
+          MVR ${total.toFixed(2)}
+        </td>
+
+        <td>
+          MVR ${payments.cash.toFixed(2)}
+        </td>
+
+        <td>
+          MVR ${payments.card.toFixed(2)}
+        </td>
+
+        <td>
+          MVR ${payments.transfer.toFixed(2)}
+        </td>
+
+        <td>
+          MVR ${payments.other.toFixed(2)}
+        </td>
+
+      </tr>
+    `;
+
+  });
+
+
+  /*
+    Monthly total row.
+  */
+
+  rows += `
+    <tr class="total-row">
+
+      <td class="date-cell">
+        MONTH TOTAL
+      </td>
+
+      <td>
+        ${monthlySales.length}
+      </td>
+
+      <td>
+        ${grandProducts}
+      </td>
+
+      <td class="total-cell">
+        MVR ${grandSales.toFixed(2)}
+      </td>
+
+      <td>
+        MVR ${grandCash.toFixed(2)}
+      </td>
+
+      <td>
+        MVR ${grandCard.toFixed(2)}
+      </td>
+
+      <td>
+        MVR ${grandTransfer.toFixed(2)}
+      </td>
+
+      <td>
+        MVR ${grandOther.toFixed(2)}
+      </td>
+
+    </tr>
+  `;
+
+
+  tbody.innerHTML = rows;
+
+}
+
+
+/*
   Main report loader.
 */
 
@@ -546,69 +910,28 @@ function loadReports() {
     PAYMENT METHODS FOR SELECTED DAY
   */
 
-  let cashTotal = 0;
-  let cardTotal = 0;
-  let transferTotal = 0;
-  let otherTotal = 0;
-
-
-  dailySalesList.forEach(sale => {
-
-    const amount =
-      Number(sale.total || 0);
-
-    const method =
-      String(sale.paymentMethod || "")
-        .toLowerCase();
-
-
-    if (method === "cash") {
-
-      cashTotal += amount;
-
-    } else if (method === "card") {
-
-      cardTotal += amount;
-
-    } else if (
-      method === "bank transfer" ||
-      method === "transfer"
-    ) {
-
-      transferTotal += amount;
-
-    } else {
-
-      /*
-        Old sales created before
-        payment method was added.
-      */
-
-      otherTotal += amount;
-
-    }
-
-  });
+  const paymentTotals =
+    getPaymentTotals(dailySalesList);
 
 
   document.getElementById("cashTotal")
     .textContent =
-    cashTotal.toFixed(2);
+    paymentTotals.cash.toFixed(2);
 
 
   document.getElementById("cardTotal")
     .textContent =
-    cardTotal.toFixed(2);
+    paymentTotals.card.toFixed(2);
 
 
   document.getElementById("transferTotal")
     .textContent =
-    transferTotal.toFixed(2);
+    paymentTotals.transfer.toFixed(2);
 
 
   document.getElementById("otherTotal")
     .textContent =
-    otherTotal.toFixed(2);
+    paymentTotals.other.toFixed(2);
 
 
   /*
@@ -663,6 +986,16 @@ function loadReports() {
   document.getElementById("monthlyProducts")
     .textContent =
     monthlyProducts;
+
+
+  /*
+    DAY-BY-DAY TABLE
+  */
+
+  displayDailyBreakdown(
+    sales,
+    selectedMonth
+  );
 
 
   /*
@@ -901,5 +1234,4 @@ loadReports();
 </body>
 </html>
 ```
-
 
