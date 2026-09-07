@@ -8,9 +8,7 @@
 <title>Kanbulo Bakery - Invoices</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
   margin:0;
@@ -82,33 +80,13 @@ button{
   cursor:pointer;
 }
 
-.primary{
-  background:#7b1e2b;
-  color:white;
-}
+.primary{background:#7b1e2b;color:white;}
+.secondary{background:#ead7c5;color:#4b1f1f;}
+.success{background:#3d7655;color:white;}
+.danger{background:#a83232;color:white;}
+.full{width:100%;}
 
-.secondary{
-  background:#ead7c5;
-  color:#4b1f1f;
-}
-
-.success{
-  background:#3d7655;
-  color:white;
-}
-
-.danger{
-  background:#a83232;
-  color:white;
-}
-
-.full{
-  width:100%;
-}
-
-.table-wrap{
-  overflow-x:auto;
-}
+.table-wrap{overflow-x:auto;}
 
 table{
   width:100%;
@@ -116,8 +94,7 @@ table{
   margin-top:15px;
 }
 
-th,
-td{
+th,td{
   padding:10px;
   border-bottom:1px solid #eaded5;
   text-align:left;
@@ -142,6 +119,19 @@ th{
   font-size:12px;
 }
 
+.price-input{
+  width:110px;
+  padding:8px;
+  font-weight:bold;
+}
+
+.normal-price{
+  display:block;
+  font-size:11px;
+  color:#777;
+  margin-top:4px;
+}
+
 .saved-invoice{
   border:1px solid #ead7c5;
   border-radius:10px;
@@ -150,13 +140,9 @@ th{
   background:#fffaf5;
 }
 
-.saved-invoice strong{
-  color:#7b1e2b;
-}
+.saved-invoice strong{color:#7b1e2b;}
 
-.saved-actions button{
-  margin-right:5px;
-}
+.saved-actions button{margin-right:5px;}
 
 .payment-box{
   background:#fff4e8;
@@ -228,23 +214,16 @@ th{
 
 @media(max-width:600px){
 
-  .container{
-    padding:10px;
-  }
+  .container{padding:10px;}
 
-  header h1{
-    font-size:21px;
-  }
+  header h1{font-size:21px;}
 
-  th,
-  td{
+  th,td{
     font-size:13px;
     padding:8px;
   }
 
-  button{
-    width:100%;
-  }
+  button{width:100%;}
 
   .invoice-item-buttons button,
   .saved-actions button{
@@ -253,6 +232,10 @@ th{
 
   .payment-options{
     grid-template-columns:1fr;
+  }
+
+  .price-input{
+    width:95px;
   }
 }
 </style>
@@ -269,7 +252,6 @@ th{
 
 <div class="container">
 
-  <!-- CREATE INVOICE -->
   <div class="card">
 
     <h2>🧾 Create New Invoice</h2>
@@ -280,13 +262,11 @@ th{
       <option value="">Walk-in Customer</option>
     </select>
 
-
     <label>Product</label>
 
     <select id="productSelect">
       <option value="">Select Product</option>
     </select>
-
 
     <label>Quantity</label>
 
@@ -297,7 +277,6 @@ th{
       value="1"
     >
 
-
     <button class="primary full" onclick="addItem()">
       ➕ Add Product
     </button>
@@ -305,13 +284,11 @@ th{
   </div>
 
 
-  <!-- CURRENT INVOICE -->
   <div class="card">
 
     <h2>Current Invoice</h2>
 
     <div id="invoiceInfo"></div>
-
 
     <div class="table-wrap">
 
@@ -335,13 +312,10 @@ th{
 
     </div>
 
-
     <div class="total-box">
       Grand Total: MVR <span id="grandTotal">0.00</span>
     </div>
 
-
-    <!-- PAYMENT METHOD -->
 
     <div class="payment-method-box">
 
@@ -350,50 +324,37 @@ th{
       <div class="payment-options">
 
         <label class="payment-option">
-
           <input
             type="radio"
             name="paymentMethod"
             value="Cash"
             checked
           >
-
           💵 Cash
-
         </label>
 
-
         <label class="payment-option">
-
           <input
             type="radio"
             name="paymentMethod"
             value="Card"
           >
-
           💳 Card
-
         </label>
 
-
         <label class="payment-option">
-
           <input
             type="radio"
             name="paymentMethod"
             value="Bank Transfer"
           >
-
           🏦 Bank Transfer
-
         </label>
 
       </div>
 
     </div>
 
-
-    <!-- BANK PAYMENT DETAILS -->
 
     <div class="payment-box">
 
@@ -433,11 +394,9 @@ th{
       💾 Save Invoice
     </button>
 
-
     <button class="secondary full" onclick="printCurrentInvoice()">
       🖨️ Print Invoice
     </button>
-
 
     <button class="secondary full" onclick="downloadCurrentInvoice()">
       📥 Save Invoice to Device
@@ -445,8 +404,6 @@ th{
 
   </div>
 
-
-  <!-- SAVED INVOICES -->
 
   <div class="card">
 
@@ -468,26 +425,17 @@ const SALES_KEY = "kanbulo_sales";
 
 
 const PAYMENT = {
-
   bank: "Bank of Maldives",
-
   accountName: "KANBULO BAKERY",
-
   accountNumber: "7770000049905",
-
   slip: "Customer will send via Viber/WhatsApp",
-
   slipContacts: "7653140 / 7359040"
-
 };
 
 
 let products = read(PRODUCTS_KEY, []);
-
 let customers = read(CUSTOMERS_KEY, []);
-
 let invoices = read(INVOICES_KEY, []);
-
 let items = [];
 
 
@@ -553,7 +501,6 @@ function loadCustomers(){
   select.innerHTML =
     `<option value="">Walk-in Customer</option>`;
 
-
   customers.forEach(customer => {
 
     const option =
@@ -586,7 +533,6 @@ function loadProducts(){
 
   select.innerHTML =
     `<option value="">Select Product</option>`;
-
 
   products.forEach(product => {
 
@@ -709,6 +655,9 @@ function addItem(){
       price:
         Number(product.price),
 
+      normalPrice:
+        Number(product.price),
+
       quantity:
         quantity,
 
@@ -719,6 +668,46 @@ function addItem(){
     });
 
   }
+
+
+  renderCurrentInvoice();
+
+}
+
+
+/* -------------------------
+   UPDATE ITEM PRICE
+------------------------- */
+
+function updateItemPrice(index, value){
+
+  if(!items[index]){
+    return;
+  }
+
+
+  const price =
+    Number(value);
+
+
+  if(!Number.isFinite(price) || price < 0){
+
+    alert("Please enter a valid price.");
+
+    renderCurrentInvoice();
+
+    return;
+
+  }
+
+
+  items[index].price =
+    price;
+
+
+  items[index].total =
+    price *
+    Number(items[index].quantity);
 
 
   renderCurrentInvoice();
@@ -757,11 +746,27 @@ function renderCurrentInvoice(){
   items.forEach((item,index) => {
 
     total +=
-      Number(item.total);
+      Number(item.price || 0) *
+      Number(item.quantity || 0);
+
+
+    item.total =
+      Number(item.price || 0) *
+      Number(item.quantity || 0);
 
 
     const row =
       document.createElement("tr");
+
+
+    const normalPrice =
+      Number(
+        item.normalPrice ?? item.price ?? 0
+      );
+
+
+    const changed =
+      Number(item.price) !== normalPrice;
 
 
     row.innerHTML = `
@@ -775,7 +780,26 @@ function renderCurrentInvoice(){
       </td>
 
       <td>
-        MVR ${Number(item.price).toFixed(2)}
+
+        <input
+          class="price-input"
+          type="number"
+          min="0"
+          step="0.01"
+          value="${Number(item.price).toFixed(2)}"
+          onchange="updateItemPrice(${index}, this.value)"
+        >
+
+        ${
+          changed
+          ?
+          `<span class="normal-price">
+            Normal price: MVR ${normalPrice.toFixed(2)}
+          </span>`
+          :
+          ""
+        }
+
       </td>
 
       <td>
@@ -911,8 +935,18 @@ function saveInvoice(){
 
   items.forEach(item => {
 
+    item.price =
+      Number(item.price || 0);
+
+    item.quantity =
+      Number(item.quantity || 0);
+
+    item.total =
+      item.price *
+      item.quantity;
+
     total +=
-      Number(item.total);
+      item.total;
 
   });
 
@@ -1014,6 +1048,12 @@ function saveInvoice(){
         price:
           Number(item.price),
 
+        normalPrice:
+          Number(
+            item.normalPrice ??
+            item.price
+          ),
+
         quantity:
           Number(item.quantity),
 
@@ -1099,6 +1139,9 @@ function saveInvoice(){
 
         price:
           item.price,
+
+        normalPrice:
+          item.normalPrice,
 
         quantity:
           item.quantity,
@@ -1344,7 +1387,11 @@ function viewInvoice(id){
 
       `${item.name} × ${item.quantity} — ` +
 
-      `MVR ${Number(
+      `Price: MVR ${Number(
+        item.price
+      ).toFixed(2)} — ` +
+
+      `Total: MVR ${Number(
         item.total
       ).toFixed(2)}\n`;
 
@@ -1480,7 +1527,7 @@ function printCurrentInvoice(){
     total:
       items.reduce(
         (sum,item) =>
-          sum + Number(item.total),
+          sum + Number(item.price) * Number(item.quantity),
         0
       )
 
@@ -1533,6 +1580,16 @@ function openPrintWindow(invoice){
 
   invoice.items.forEach(item => {
 
+    const price =
+      Number(item.price || 0);
+
+    const quantity =
+      Number(item.quantity || 0);
+
+    const total =
+      price * quantity;
+
+
     rows += `
 
       <tr>
@@ -1542,19 +1599,15 @@ function openPrintWindow(invoice){
         </td>
 
         <td>
-          ${item.quantity}
+          ${quantity}
         </td>
 
         <td>
-          MVR ${Number(
-            item.price
-          ).toFixed(2)}
+          MVR ${price.toFixed(2)}
         </td>
 
         <td>
-          MVR ${Number(
-            item.total
-          ).toFixed(2)}
+          MVR ${total.toFixed(2)}
         </td>
 
       </tr>
@@ -1577,7 +1630,6 @@ function openPrintWindow(invoice){
 <title>
 ${escapeHTML(invoice.invoiceNumber)}
 </title>
-
 
 <style>
 
@@ -1670,9 +1722,7 @@ th{
 
 </head>
 
-
 <body>
-
 
 <div class="header">
 
@@ -1691,42 +1741,23 @@ th{
 
 <div class="info">
 
-
 <div class="box">
 
 <h3>Invoice Details</h3>
 
 <p>
-
 <strong>Invoice No:</strong>
-
-${escapeHTML(
-  invoice.invoiceNumber
-)}
-
+${escapeHTML(invoice.invoiceNumber)}
 </p>
 
-
 <p>
-
 <strong>Date:</strong>
-
-${new Date(
-  invoice.date
-).toLocaleString()}
-
+${new Date(invoice.date).toLocaleString()}
 </p>
 
-
 <p>
-
 <strong>Payment Method:</strong>
-
-${escapeHTML(
-  invoice.paymentMethod ||
-  "Previous / Unspecified"
-)}
-
+${escapeHTML(invoice.paymentMethod || "Previous / Unspecified")}
 </p>
 
 </div>
@@ -1737,28 +1768,17 @@ ${escapeHTML(
 <h3>Customer Details</h3>
 
 <p>
-
 <strong>Name:</strong>
-
-${escapeHTML(
-  invoice.customerName
-)}
-
+${escapeHTML(invoice.customerName)}
 </p>
-
 
 ${
 invoice.customerPhone
 ?
 `
 <p>
-
 <strong>Phone:</strong>
-
-${escapeHTML(
-  invoice.customerPhone
-)}
-
+${escapeHTML(invoice.customerPhone)}
 </p>
 `
 :
@@ -1775,19 +1795,13 @@ ${escapeHTML(
 <thead>
 
 <tr>
-
 <th>Product</th>
-
 <th>Qty</th>
-
 <th>Price</th>
-
 <th>Total</th>
-
 </tr>
 
 </thead>
-
 
 <tbody>
 
@@ -1801,10 +1815,7 @@ ${rows}
 <div class="total">
 
 Grand Total:
-
-MVR ${Number(
-  invoice.total
-).toFixed(2)}
+MVR ${Number(invoice.total).toFixed(2)}
 
 </div>
 
@@ -1812,11 +1823,7 @@ MVR ${Number(
 <div class="payment-method">
 
 <strong>💳 Payment Method:</strong>
-
-${escapeHTML(
-  invoice.paymentMethod ||
-  "Previous / Unspecified"
-)}
+${escapeHTML(invoice.paymentMethod || "Previous / Unspecified")}
 
 </div>
 
@@ -1826,51 +1833,31 @@ ${escapeHTML(
 <h3>Payment Details</h3>
 
 <p>
-
 <strong>Bank:</strong>
-
 ${PAYMENT.bank}
-
 </p>
 
-
 <p>
-
 <strong>Account Name:</strong>
-
 ${PAYMENT.accountName}
-
 </p>
 
-
 <p>
-
 <strong>Account Number:</strong>
-
 ${PAYMENT.accountNumber}
-
 </p>
 
-
 <p>
-
 <strong>Payment Slip:</strong>
-
 ${PAYMENT.slip}
-
 </p>
 
-
 <p>
-
 <strong>Contact:</strong>
-
 ${PAYMENT.slipContacts}
-
 </p>
 
 </div>
-
 
 </body>
 
@@ -1979,7 +1966,7 @@ function downloadCurrentInvoice(){
     total:
       items.reduce(
         (sum,item) =>
-          sum + Number(item.total),
+          sum + Number(item.price) * Number(item.quantity),
         0
       )
 
@@ -2069,6 +2056,16 @@ function createInvoiceHTML(invoice){
 
   invoice.items.forEach(item => {
 
+    const price =
+      Number(item.price || 0);
+
+    const quantity =
+      Number(item.quantity || 0);
+
+    const total =
+      price * quantity;
+
+
     rows += `
 
       <tr>
@@ -2078,19 +2075,15 @@ function createInvoiceHTML(invoice){
         </td>
 
         <td>
-          ${item.quantity}
+          ${quantity}
         </td>
 
         <td>
-          MVR ${Number(
-            item.price
-          ).toFixed(2)}
+          MVR ${price.toFixed(2)}
         </td>
 
         <td>
-          MVR ${Number(
-            item.total
-          ).toFixed(2)}
+          MVR ${total.toFixed(2)}
         </td>
 
       </tr>
@@ -2109,11 +2102,8 @@ function createInvoiceHTML(invoice){
 <meta charset="UTF-8">
 
 <title>
-${escapeHTML(
-  invoice.invoiceNumber
-)}
+${escapeHTML(invoice.invoiceNumber)}
 </title>
-
 
 <style>
 
@@ -2195,9 +2185,7 @@ border-left:5px solid #7b1e2b;
 
 </head>
 
-
 <body>
-
 
 <div class="header">
 
@@ -2216,42 +2204,23 @@ border-left:5px solid #7b1e2b;
 
 <div class="info">
 
-
 <div class="box">
 
 <h3>Invoice Details</h3>
 
 <p>
-
 <strong>Invoice No:</strong>
-
-${escapeHTML(
-  invoice.invoiceNumber
-)}
-
+${escapeHTML(invoice.invoiceNumber)}
 </p>
 
-
 <p>
-
 <strong>Date:</strong>
-
-${new Date(
-  invoice.date
-).toLocaleString()}
-
+${new Date(invoice.date).toLocaleString()}
 </p>
 
-
 <p>
-
 <strong>Payment Method:</strong>
-
-${escapeHTML(
-  invoice.paymentMethod ||
-  "Previous / Unspecified"
-)}
-
+${escapeHTML(invoice.paymentMethod || "Previous / Unspecified")}
 </p>
 
 </div>
@@ -2262,28 +2231,17 @@ ${escapeHTML(
 <h3>Customer Details</h3>
 
 <p>
-
 <strong>Name:</strong>
-
-${escapeHTML(
-  invoice.customerName
-)}
-
+${escapeHTML(invoice.customerName)}
 </p>
-
 
 ${
 invoice.customerPhone
 ?
 `
 <p>
-
 <strong>Phone:</strong>
-
-${escapeHTML(
-  invoice.customerPhone
-)}
-
+${escapeHTML(invoice.customerPhone)}
 </p>
 `
 :
@@ -2302,11 +2260,8 @@ ${escapeHTML(
 <tr>
 
 <th>Product</th>
-
 <th>Qty</th>
-
 <th>Price</th>
-
 <th>Total</th>
 
 </tr>
@@ -2326,10 +2281,7 @@ ${rows}
 <div class="total">
 
 Grand Total:
-
-MVR ${Number(
-  invoice.total
-).toFixed(2)}
+MVR ${Number(invoice.total).toFixed(2)}
 
 </div>
 
@@ -2351,47 +2303,28 @@ ${escapeHTML(
 <h3>Payment Details</h3>
 
 <p>
-
 <strong>Bank:</strong>
-
 ${PAYMENT.bank}
-
 </p>
 
-
 <p>
-
 <strong>Account Name:</strong>
-
 ${PAYMENT.accountName}
-
 </p>
 
-
 <p>
-
 <strong>Account Number:</strong>
-
 ${PAYMENT.accountNumber}
-
 </p>
 
-
 <p>
-
 <strong>Payment Slip:</strong>
-
 ${PAYMENT.slip}
-
 </p>
 
-
 <p>
-
 <strong>Contact:</strong>
-
 ${PAYMENT.slipContacts}
-
 </p>
 
 </div>
@@ -2442,4 +2375,6 @@ renderSavedInvoices();
 </body>
 </html>
 ```
+
+
 
