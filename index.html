@@ -156,6 +156,18 @@
       <p>Manage customer information.</p>
     </button>
 
+    <button class="card" onclick="openPage('quotations.html')">
+      <div class="icon">📝</div>
+      <h3>Quotations</h3>
+      <p>Create and manage customer quotations.</p>
+    </button>
+
+    <button class="card" onclick="openPage('invoices.html')">
+      <div class="icon">🧾</div>
+      <h3>Invoices</h3>
+      <p>Create and manage customer invoices.</p>
+    </button>
+
   </section>
 
 </main>
@@ -168,10 +180,6 @@
 
   function openPage(page) {
     window.location.href = page;
-  }
-
-  function comingSoon(feature) {
-    alert(feature + " section is coming next.");
   }
 
 </script>
