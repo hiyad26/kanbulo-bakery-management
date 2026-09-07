@@ -1,0 +1,332 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8B4513">
+
+  <title>Kanbulo Bakery - Inventory</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #3b2415;
+    }
+
+    header {
+      background: #8B4513;
+      color: white;
+      padding: 22px 15px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .back {
+      background: #eee;
+      color: #333;
+      border: none;
+      border-radius: 9px;
+      padding: 11px 15px;
+      font-size: 15px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .summary-card h3 {
+      color: #777;
+      font-size: 15px;
+      margin-bottom: 8px;
+    }
+
+    .summary-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .product {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .product-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .product-name {
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .stock {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .price {
+      color: #777;
+      margin-top: 7px;
+    }
+
+    .low {
+      color: #c0392b;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .ok {
+      color: #228B22;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .empty {
+      background: white;
+      text-align: center;
+      padding: 30px 15px;
+      border-radius: 15px;
+      color: #777;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    @media (max-width: 500px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .product-top {
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🥐 Kanbulo Bakery</h1>
+  <p>Inventory</p>
+</header>
+
+<main>
+
+  <button class="back" onclick="goDashboard()">
+    ← Dashboard
+  </button>
+
+  <h2>📦 Inventory</h2>
+
+  <div class="summary">
+
+    <div class="summary-card">
+      <h3>Total Products</h3>
+      <div class="summary-value" id="productCount">
+        0
+      </div>
+    </div>
+
+    <div class="summary-card">
+      <h3>Total Stock</h3>
+      <div class="summary-value" id="stockCount">
+        0
+      </div>
+    </div>
+
+  </div>
+
+  <div id="inventoryList"></div>
+
+</main>
+
+<script>
+
+const PRODUCTS_KEY = "kanbulo_products";
+
+
+function getProducts() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(PRODUCTS_KEY);
+
+    const products =
+      saved ? JSON.parse(saved) : [];
+
+    return Array.isArray(products)
+      ? products
+      : [];
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+function loadInventory() {
+
+  const products =
+    getProducts();
+
+  let totalStock = 0;
+
+  products.forEach(product => {
+
+    totalStock +=
+      Number(product.stock || 0);
+
+  });
+
+
+  document.getElementById("productCount")
+    .textContent = products.length;
+
+  document.getElementById("stockCount")
+    .textContent = totalStock;
+
+
+  const list =
+    document.getElementById("inventoryList");
+
+
+  if (products.length === 0) {
+
+    list.innerHTML =
+      '<div class="empty">No products found.</div>';
+
+    return;
+
+  }
+
+
+  list.innerHTML =
+    products.map(product => {
+
+      const stock =
+        Number(product.stock || 0);
+
+      const price =
+        Number(product.price || 0);
+
+
+      let status = "";
+
+      if (stock <= 5) {
+
+        status =
+          '<div class="low">⚠️ Low stock</div>';
+
+      } else {
+
+        status =
+          '<div class="ok">✓ Stock available</div>';
+
+      }
+
+
+      return `
+        <div class="product">
+
+          <div class="product-top">
+
+            <div class="product-name">
+              ${escapeHTML(product.name)}
+            </div>
+
+            <div class="stock">
+              📦 ${stock}
+            </div>
+
+          </div>
+
+          <div class="price">
+            Selling price: MVR ${price.toFixed(2)}
+          </div>
+
+          ${status}
+
+        </div>
+      `;
+
+    }).join("");
+
+}
+
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    String(value);
+
+  return div.innerHTML;
+
+}
+
+
+function goDashboard() {
+
+  window.location.href =
+    "index.html";
+
+}
+
+
+loadInventory();
+
+</script>
+
+</body>
+</html>
+```
