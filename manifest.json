@@ -1,0 +1,10 @@
+{
+"name": "Kanbulo Bakery Management",
+"short_name": "Kanbulo Bakery",
+"start_url": "./index.html",
+"display": "standalone",
+"background_color": "#fff8f0",
+"theme_color": "#7B1E2B",
+"description": "Kanbulo Bakery Management System",
+"orientation": "portrait"
+}
