@@ -188,16 +188,51 @@ button{
   align-items:center;
   border-bottom:1px dashed #dfcabb;
   padding:14px 0;
-  gap:10px;
+  gap:15px;
 }
 
-.item strong{
+.item-info{
+  flex:1;
+  min-width:0;
+}
+
+.item-info strong{
   color:var(--maroon);
 }
 
-.item button{
-  margin:0;
+.item-price{
+  width:120px;
+}
+
+.item-price label{
+  margin:0 0 5px 0;
+  font-size:13px;
+}
+
+.item-price input{
+  padding:9px;
+  font-size:15px;
+  text-align:right;
+}
+
+.item-total{
+  min-width:100px;
+  text-align:right;
+}
+
+.item-total strong{
+  color:var(--maroon);
+}
+
+.item-total button{
+  margin:7px 0 0 5px;
   padding:7px 10px;
+}
+
+.price-note{
+  font-size:12px;
+  color:#8b5a2b;
+  margin-top:4px;
 }
 
 .total{
@@ -285,6 +320,19 @@ footer{
 
   .item{
     align-items:flex-start;
+    flex-wrap:wrap;
+  }
+
+  .item-info{
+    width:100%;
+  }
+
+  .item-price{
+    flex:1;
+  }
+
+  .item-total{
+    flex:1;
   }
 
   header h1{
@@ -591,12 +639,43 @@ function addItem(){
       productId:product.id,
       name:product.name,
       price:Number(product.price),
+      normalPrice:Number(product.price),
       quantity:quantity,
       total:Number(product.price)*quantity
 
     });
 
   }
+
+  renderItems();
+
+}
+
+
+/* ==========================================
+   UPDATE ITEM PRICE
+   ========================================== */
+
+function updateItemPrice(index,value){
+
+  if(!items[index]) return;
+
+  const price=Number(value);
+
+  if(!Number.isFinite(price) || price<0){
+
+    alert("Please enter a valid price.");
+
+    renderItems();
+
+    return;
+
+  }
+
+  items[index].price=price;
+
+  items[index].total=
+    price*Number(items[index].quantity);
 
   renderItems();
 
@@ -637,27 +716,86 @@ function renderItems(){
 
   items.forEach((item,index)=>{
 
-    total+=item.total;
+    total+=
+      Number(item.price||0)*
+      Number(item.quantity||0);
+
+    item.total=
+      Number(item.price||0)*
+      Number(item.quantity||0);
 
     const div=document.createElement("div");
 
     div.className="item";
 
+    const normalPrice=
+      Number(
+        item.normalPrice ??
+        item.price ??
+        0
+      );
+
+    const currentPrice=
+      Number(item.price||0);
+
+    const changed=
+      currentPrice!==normalPrice;
+
     div.innerHTML=`
 
-      <div>
-        <strong>${escapeHTML(item.name)}</strong>
+      <div class="item-info">
+
+        <strong>
+          ${escapeHTML(item.name)}
+        </strong>
+
         <br>
-        ${item.quantity} × MVR ${item.price.toFixed(2)}
+
+        Quantity: ${item.quantity}
+
+        ${
+          changed
+          ?
+          `<div class="price-note">
+            Normal price: MVR ${normalPrice.toFixed(2)}
+          </div>`
+          :
+          ""
+        }
+
       </div>
 
-      <div>
-        <strong>MVR ${item.total.toFixed(2)}</strong>
 
-        <button class="danger"
-          onclick="removeItem(${index})">
+      <div class="item-price">
+
+        <label>✏️ Price</label>
+
+        <input
+          type="number"
+          min="0"
+          step="0.01"
+          value="${currentPrice.toFixed(2)}"
+          onchange="updateItemPrice(${index},this.value)"
+        >
+
+      </div>
+
+
+      <div class="item-total">
+
+        <strong>
+          MVR ${item.total.toFixed(2)}
+        </strong>
+
+        <br>
+
+        <button
+          class="danger"
+          onclick="removeItem(${index})"
+        >
           ✕
         </button>
+
       </div>
 
     `;
@@ -724,7 +862,13 @@ function getCurrentQuotation(){
     customers.find(c=>Number(c.id)===customerId);
 
   const total=
-    items.reduce((sum,item)=>sum+item.total,0);
+    items.reduce(
+      (sum,item)=>
+        sum+
+        Number(item.price||0)*
+        Number(item.quantity||0),
+      0
+    );
 
   return{
 
@@ -750,9 +894,16 @@ function getCurrentQuotation(){
 
         productId:item.productId,
         name:item.name,
-        price:item.price,
-        quantity:item.quantity,
-        total:item.total
+        price:Number(item.price||0),
+        normalPrice:Number(
+          item.normalPrice ??
+          item.price ??
+          0
+        ),
+        quantity:Number(item.quantity||0),
+        total:
+          Number(item.price||0)*
+          Number(item.quantity||0)
 
       })),
 
@@ -883,7 +1034,8 @@ function renderSavedQuotations(){
           <div>
             ${escapeHTML(item.name)}
             × ${item.quantity}
-            — MVR ${Number(item.total).toFixed(2)}
+            — Price: MVR ${Number(item.price).toFixed(2)}
+            — Total: MVR ${Number(item.total).toFixed(2)}
           </div>
 
         `).join("")}
@@ -1388,10 +1540,6 @@ function createThemedQuotationPDF(quotation){
   }
 
 
-  /* ================================================
-     TEXT
-     ================================================ */
-
   function pdfText(
     x,
     y,
@@ -1413,10 +1561,6 @@ function createThemedQuotationPDF(quotation){
   }
 
 
-  /* ================================================
-     FILLED RECTANGLE
-     ================================================ */
-
   function pdfRect(
     x,
     y,
@@ -1433,10 +1577,6 @@ function createThemedQuotationPDF(quotation){
 
   }
 
-
-  /* ================================================
-     VERY THIN LINE
-     ================================================ */
 
   function pdfLine(
     x1,
@@ -1460,10 +1600,6 @@ function createThemedQuotationPDF(quotation){
   let content="";
 
 
-  /* ================================================
-     BACKGROUND
-     ================================================ */
-
   content+=pdfRect(
     0,
     0,
@@ -1472,10 +1608,6 @@ function createThemedQuotationPDF(quotation){
     "1 0.975 0.94"
   );
 
-
-  /* ================================================
-     HEADER
-     ================================================ */
 
   content+=pdfRect(
     0,
@@ -1486,8 +1618,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* Gold accent */
-
   content+=pdfRect(
     0,
     616,
@@ -1496,8 +1626,6 @@ function createThemedQuotationPDF(quotation){
     "0.79 0.60 0.29"
   );
 
-
-  /* Bakery name */
 
   content+=pdfText(
     50,
@@ -1509,8 +1637,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* Tagline */
-
   content+=pdfText(
     50,
     717,
@@ -1520,8 +1646,6 @@ function createThemedQuotationPDF(quotation){
     "1 0.92 0.82"
   );
 
-
-  /* Address */
 
   content+=pdfText(
     50,
@@ -1537,8 +1661,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* Quotation title */
-
   content+=pdfText(
     50,
     648,
@@ -1548,10 +1670,6 @@ function createThemedQuotationPDF(quotation){
     "1 1 1"
   );
 
-
-  /* ================================================
-     INFORMATION AREA
-     ================================================ */
 
   const infoLeft=45;
   const infoBottom=505;
@@ -1566,8 +1684,6 @@ function createThemedQuotationPDF(quotation){
     "1 0.96 0.90"
   );
 
-
-  /* Thin outside border */
 
   content+=pdfLine(
     infoLeft,
@@ -1598,8 +1714,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* Middle divider */
-
   content+=pdfLine(
     305,
     infoBottom+8,
@@ -1608,10 +1722,6 @@ function createThemedQuotationPDF(quotation){
     "0.82 0.74 0.67"
   );
 
-
-  /* ================================================
-     LEFT COLUMN - QUOTATION DETAILS
-     ================================================ */
 
   content+=pdfText(
     60,
@@ -1698,10 +1808,6 @@ function createThemedQuotationPDF(quotation){
 
   }
 
-
-  /* ================================================
-     RIGHT COLUMN - PAYMENT DETAILS
-     ================================================ */
 
   content+=pdfText(
     325,
@@ -1803,10 +1909,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* ================================================
-     TABLE
-     ================================================ */
-
   const tableLeft=45;
   const tableRight=567;
 
@@ -1818,8 +1920,6 @@ function createThemedQuotationPDF(quotation){
     "0.48 0.12 0.17"
   );
 
-
-  /* Header labels */
 
   content+=pdfText(
     60,
@@ -1858,15 +1958,9 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* ================================================
-     TABLE ROWS
-     ================================================ */
-
   let y=433;
 
   quotation.items.forEach((item,index)=>{
-
-    /* Alternating background */
 
     if(index%2===0){
 
@@ -1881,8 +1975,6 @@ function createThemedQuotationPDF(quotation){
     }
 
 
-    /* Product */
-
     content+=pdfText(
       60,
       y,
@@ -1893,8 +1985,6 @@ function createThemedQuotationPDF(quotation){
     );
 
 
-    /* Quantity */
-
     content+=pdfText(
       345,
       y,
@@ -1904,8 +1994,6 @@ function createThemedQuotationPDF(quotation){
       "0.20 0.10 0.08"
     );
 
-
-    /* Price */
 
     content+=pdfText(
       395,
@@ -1918,8 +2006,6 @@ function createThemedQuotationPDF(quotation){
     );
 
 
-    /* Total */
-
     content+=pdfText(
       490,
       y,
@@ -1930,8 +2016,6 @@ function createThemedQuotationPDF(quotation){
       "0.20 0.10 0.08"
     );
 
-
-    /* VERY THIN row line */
 
     content+=pdfLine(
       tableLeft,
@@ -1946,10 +2030,6 @@ function createThemedQuotationPDF(quotation){
 
   });
 
-
-  /* ================================================
-     GRAND TOTAL
-     ================================================ */
 
   y-=12;
 
@@ -1982,10 +2062,6 @@ function createThemedQuotationPDF(quotation){
     "1 1 1"
   );
 
-
-  /* ================================================
-     PAYMENT REMINDER
-     ================================================ */
 
   const paymentY=y-72;
 
@@ -2063,10 +2139,6 @@ function createThemedQuotationPDF(quotation){
   );
 
 
-  /* ================================================
-     FOOTER
-     ================================================ */
-
   content+=pdfText(
     45,
     58,
@@ -2099,10 +2171,6 @@ function createThemedQuotationPDF(quotation){
     "0.79 0.60 0.29"
   );
 
-
-  /* ================================================
-     PDF OBJECTS
-     ================================================ */
 
   const objects=[];
 
@@ -2154,10 +2222,6 @@ function createThemedQuotationPDF(quotation){
     "\nendstream"
   );
 
-
-  /* ================================================
-     BUILD PDF
-     ================================================ */
 
   let pdf="%PDF-1.4\n";
 
@@ -2252,4 +2316,5 @@ updateCustomerDisplay();
 </body>
 </html>
 ```
+
 
