@@ -412,7 +412,9 @@ const QUOTATIONS_KEY="kanbulo_quotations";
 let items=[];
 
 
-/* BAKERY INFORMATION */
+/* ==========================================
+   BAKERY INFORMATION
+   ========================================== */
 
 const BAKERY={
   name:"KANBULO BAKERY",
@@ -423,7 +425,22 @@ const BAKERY={
 };
 
 
-/* DATA */
+/* ==========================================
+   PAYMENT INFORMATION
+   ========================================== */
+
+const PAYMENT={
+  bank:"Bank of Maldives",
+  accountName:"KANBULO BAKERY",
+  accountNumber:"7770000049905",
+  slip:"Customer will send via Viber/WhatsApp",
+  slipContacts:"7653140 / 7359040"
+};
+
+
+/* ==========================================
+   DATA
+   ========================================== */
 
 function getData(key,fallback){
 
@@ -436,7 +453,9 @@ function getData(key,fallback){
 }
 
 
-/* CUSTOMERS */
+/* ==========================================
+   CUSTOMERS
+   ========================================== */
 
 function loadCustomers(){
 
@@ -460,7 +479,9 @@ function loadCustomers(){
 }
 
 
-/* PRODUCTS */
+/* ==========================================
+   PRODUCTS
+   ========================================== */
 
 function loadProducts(){
 
@@ -487,7 +508,9 @@ function loadProducts(){
 }
 
 
-/* QUOTATION NUMBER */
+/* ==========================================
+   QUOTATION NUMBER
+   ========================================== */
 
 function generateQuotationNumber(){
 
@@ -496,7 +519,9 @@ function generateQuotationNumber(){
 }
 
 
-/* DATE */
+/* ==========================================
+   DATE
+   ========================================== */
 
 function setDate(){
 
@@ -511,7 +536,9 @@ function setDate(){
 }
 
 
-/* ADD PRODUCT */
+/* ==========================================
+   ADD PRODUCT
+   ========================================== */
 
 function addItem(){
 
@@ -576,7 +603,9 @@ function addItem(){
 }
 
 
-/* REMOVE */
+/* ==========================================
+   REMOVE
+   ========================================== */
 
 function removeItem(index){
 
@@ -587,7 +616,9 @@ function removeItem(index){
 }
 
 
-/* RENDER ITEMS */
+/* ==========================================
+   RENDER ITEMS
+   ========================================== */
 
 function renderItems(){
 
@@ -641,7 +672,9 @@ function renderItems(){
 }
 
 
-/* CUSTOMER DISPLAY */
+/* ==========================================
+   CUSTOMER DISPLAY
+   ========================================== */
 
 function updateCustomerDisplay(){
 
@@ -675,7 +708,9 @@ document
 .addEventListener("change",updateCustomerDisplay);
 
 
-/* CURRENT QUOTATION */
+/* ==========================================
+   CURRENT QUOTATION
+   ========================================== */
 
 function getCurrentQuotation(){
 
@@ -728,7 +763,9 @@ function getCurrentQuotation(){
 }
 
 
-/* SAVE QUOTATION */
+/* ==========================================
+   SAVE QUOTATION
+   ========================================== */
 
 function saveQuotation(){
 
@@ -761,7 +798,9 @@ function saveQuotation(){
 }
 
 
-/* SAVED QUOTATIONS */
+/* ==========================================
+   SAVED QUOTATIONS
+   ========================================== */
 
 function renderSavedQuotations(){
 
@@ -867,7 +906,9 @@ function renderSavedQuotations(){
 }
 
 
-/* DETAILS */
+/* ==========================================
+   DETAILS
+   ========================================== */
 
 function toggleDetails(id){
 
@@ -881,7 +922,9 @@ function toggleDetails(id){
 }
 
 
-/* DELETE */
+/* ==========================================
+   DELETE
+   ========================================== */
 
 function deleteQuotation(id){
 
@@ -904,7 +947,9 @@ function deleteQuotation(id){
 }
 
 
-/* PRINT CURRENT */
+/* ==========================================
+   PRINT CURRENT
+   ========================================== */
 
 function printCurrentQuotation(){
 
@@ -922,7 +967,9 @@ function printCurrentQuotation(){
 }
 
 
-/* PRINT SAVED */
+/* ==========================================
+   PRINT SAVED
+   ========================================== */
 
 function printQuotation(id){
 
@@ -939,7 +986,9 @@ function printQuotation(id){
 }
 
 
-/* PRINT QUOTATION */
+/* ==========================================
+   PRINT QUOTATION
+   ========================================== */
 
 function printQuotationObject(quotation){
 
@@ -961,7 +1010,9 @@ function printQuotationObject(quotation){
 <html>
 <head>
 
-<title>Kanbulo Bakery - ${escapeHTML(quotation.quotationNumber)}</title>
+<title>
+Kanbulo Bakery - ${escapeHTML(quotation.quotationNumber)}
+</title>
 
 <style>
 
@@ -1005,12 +1056,30 @@ body{
   margin-top:8px;
 }
 
-.info{
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  margin-top:20px;
+}
+
+.info-box{
   background:#fff4e7;
   padding:15px;
   border-radius:10px;
-  margin-top:20px;
-  line-height:1.8;
+  line-height:1.7;
+  border:1px solid #ead7c6;
+}
+
+.info-box h3{
+  color:#7b1e2b;
+  margin-bottom:8px;
+  font-family:Georgia,serif;
+  font-size:16px;
+}
+
+.payment{
+  background:#fffaf4;
 }
 
 table{
@@ -1023,6 +1092,16 @@ th{
   background:#7b1e2b;
   color:white;
   padding:12px;
+  text-align:left;
+}
+
+th:nth-child(2),
+th:nth-child(3),
+th:nth-child(4),
+td:nth-child(2),
+td:nth-child(3),
+td:nth-child(4){
+  text-align:right;
 }
 
 td{
@@ -1046,6 +1125,22 @@ td{
   margin-top:30px;
   color:#7b1e2b;
   font-family:Georgia,serif;
+}
+
+@media(max-width:600px){
+
+  body{
+    padding:10px;
+  }
+
+  .sheet{
+    padding:20px;
+  }
+
+  .info-grid{
+    grid-template-columns:1fr;
+  }
+
 }
 
 </style>
@@ -1074,7 +1169,12 @@ QUOTATION
 
 </div>
 
-<div class="info">
+
+<div class="info-grid">
+
+<div class="info-box">
+
+<h3>📄 Quotation Details</h3>
 
 <strong>Quotation No:</strong>
 ${escapeHTML(quotation.quotationNumber)}
@@ -1098,6 +1198,39 @@ quotation.customerPhone
 
 </div>
 
+
+<div class="info-box payment">
+
+<h3>🏦 Payment Details</h3>
+
+<strong>Bank:</strong>
+${escapeHTML(PAYMENT.bank)}
+
+<br>
+
+<strong>Account Name:</strong>
+${escapeHTML(PAYMENT.accountName)}
+
+<br>
+
+<strong>Account No:</strong>
+${escapeHTML(PAYMENT.accountNumber)}
+
+<br>
+
+<strong>Transfer Slip:</strong>
+${escapeHTML(PAYMENT.slip)}
+
+<br>
+
+<strong>Slip Contacts:</strong>
+${escapeHTML(PAYMENT.slipContacts)}
+
+</div>
+
+</div>
+
+
 <table>
 
 <tr>
@@ -1111,11 +1244,13 @@ ${rows}
 
 </table>
 
+
 <div class="total">
 
 TOTAL: MVR ${Number(quotation.total).toFixed(2)}
 
 </div>
+
 
 <div class="thanks">
 
@@ -1152,7 +1287,9 @@ Thank you for choosing Kanbulo Bakery!
 }
 
 
-/* SAVE CURRENT TO DEVICE */
+/* ==========================================
+   SAVE CURRENT TO DEVICE
+   ========================================== */
 
 function saveCurrentQuotationToDevice(){
 
@@ -1170,7 +1307,9 @@ function saveCurrentQuotationToDevice(){
 }
 
 
-/* SAVE SAVED QUOTATION */
+/* ==========================================
+   SAVE SAVED QUOTATION
+   ========================================== */
 
 function downloadQuotationPDF(id){
 
@@ -1187,7 +1326,9 @@ function downloadQuotationPDF(id){
 }
 
 
-/* DOWNLOAD PDF */
+/* ==========================================
+   DOWNLOAD PDF
+   ========================================== */
 
 function downloadQuotationPDFObject(quotation){
 
@@ -1247,7 +1388,9 @@ function createThemedQuotationPDF(quotation){
   }
 
 
-  /* TEXT */
+  /* ================================================
+     TEXT
+     ================================================ */
 
   function pdfText(
     x,
@@ -1270,7 +1413,9 @@ function createThemedQuotationPDF(quotation){
   }
 
 
-  /* FILLED RECTANGLE */
+  /* ================================================
+     FILLED RECTANGLE
+     ================================================ */
 
   function pdfRect(
     x,
@@ -1289,7 +1434,9 @@ function createThemedQuotationPDF(quotation){
   }
 
 
-  /* VERY THIN LINE */
+  /* ================================================
+     VERY THIN LINE
+     ================================================ */
 
   function pdfLine(
     x1,
@@ -1403,41 +1550,92 @@ function createThemedQuotationPDF(quotation){
 
 
   /* ================================================
-     INFORMATION BOX
+     INFORMATION AREA
      ================================================ */
 
+  const infoLeft=45;
+  const infoBottom=505;
+  const infoWidth=522;
+  const infoHeight=93;
+
   content+=pdfRect(
-    45,
-    520,
-    522,
-    78,
+    infoLeft,
+    infoBottom,
+    infoWidth,
+    infoHeight,
     "1 0.96 0.90"
   );
 
 
-  /* Very thin border */
+  /* Thin outside border */
 
-  content+=pdfLine(45,520,567,520);
-  content+=pdfLine(45,598,567,598);
-  content+=pdfLine(45,520,45,598);
-  content+=pdfLine(567,520,567,598);
+  content+=pdfLine(
+    infoLeft,
+    infoBottom,
+    infoLeft+infoWidth,
+    infoBottom
+  );
+
+  content+=pdfLine(
+    infoLeft,
+    infoBottom+infoHeight,
+    infoLeft+infoWidth,
+    infoBottom+infoHeight
+  );
+
+  content+=pdfLine(
+    infoLeft,
+    infoBottom,
+    infoLeft,
+    infoBottom+infoHeight
+  );
+
+  content+=pdfLine(
+    infoLeft+infoWidth,
+    infoBottom,
+    infoLeft+infoWidth,
+    infoBottom+infoHeight
+  );
 
 
-  /* Left side */
+  /* Middle divider */
+
+  content+=pdfLine(
+    305,
+    infoBottom+8,
+    305,
+    infoBottom+infoHeight-8,
+    "0.82 0.74 0.67"
+  );
+
+
+  /* ================================================
+     LEFT COLUMN - QUOTATION DETAILS
+     ================================================ */
 
   content+=pdfText(
     60,
-    573,
-    9,
+    575,
+    11,
+    "QUOTATION DETAILS",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+
+  content+=pdfText(
+    60,
+    552,
+    8,
     "QUOTATION NO.",
     "/F2",
     "0.36 0.08 0.13"
   );
 
   content+=pdfText(
-    155,
-    573,
-    10,
+    145,
+    552,
+    9,
     quotation.quotationNumber,
     "/F1"
   );
@@ -1445,37 +1643,35 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     60,
-    547,
-    9,
+    531,
+    8,
     "DATE",
     "/F2",
     "0.36 0.08 0.13"
   );
 
   content+=pdfText(
-    155,
-    547,
-    9,
+    145,
+    531,
+    8,
     new Date(quotation.date).toLocaleString(),
     "/F1"
   );
 
 
-  /* Right side */
-
   content+=pdfText(
-    325,
-    573,
-    9,
+    60,
+    510,
+    8,
     "CUSTOMER",
     "/F2",
     "0.36 0.08 0.13"
   );
 
   content+=pdfText(
-    405,
-    573,
-    10,
+    145,
+    510,
+    9,
     quotation.customerName || "Walk-in Customer",
     "/F1"
   );
@@ -1484,18 +1680,18 @@ function createThemedQuotationPDF(quotation){
   if(quotation.customerPhone){
 
     content+=pdfText(
-      325,
-      547,
-      9,
+      60,
+      489,
+      8,
       "PHONE",
       "/F2",
       "0.36 0.08 0.13"
     );
 
     content+=pdfText(
-      405,
-      547,
-      10,
+      145,
+      489,
+      9,
       quotation.customerPhone,
       "/F1"
     );
@@ -1504,7 +1700,111 @@ function createThemedQuotationPDF(quotation){
 
 
   /* ================================================
-     TABLE HEADER
+     RIGHT COLUMN - PAYMENT DETAILS
+     ================================================ */
+
+  content+=pdfText(
+    325,
+    575,
+    11,
+    "PAYMENT DETAILS",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+
+  content+=pdfText(
+    325,
+    552,
+    8,
+    "BANK",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=pdfText(
+    375,
+    552,
+    8,
+    PAYMENT.bank,
+    "/F1"
+  );
+
+
+  content+=pdfText(
+    325,
+    535,
+    8,
+    "ACCOUNT NAME",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=pdfText(
+    400,
+    535,
+    8,
+    PAYMENT.accountName,
+    "/F1"
+  );
+
+
+  content+=pdfText(
+    325,
+    518,
+    8,
+    "ACCOUNT NO.",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=pdfText(
+    400,
+    518,
+    8,
+    PAYMENT.accountNumber,
+    "/F1"
+  );
+
+
+  content+=pdfText(
+    325,
+    501,
+    8,
+    "TRANSFER SLIP",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=pdfText(
+    400,
+    501,
+    7,
+    "Viber / WhatsApp",
+    "/F1"
+  );
+
+
+  content+=pdfText(
+    325,
+    484,
+    8,
+    "SLIP CONTACTS",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=pdfText(
+    400,
+    484,
+    8,
+    PAYMENT.slipContacts,
+    "/F1"
+  );
+
+
+  /* ================================================
+     TABLE
      ================================================ */
 
   const tableLeft=45;
@@ -1512,7 +1812,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfRect(
     tableLeft,
-    475,
+    460,
     522,
     32,
     "0.48 0.12 0.17"
@@ -1523,7 +1823,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     60,
-    486,
+    471,
     9,
     "PRODUCT",
     "/F2",
@@ -1532,7 +1832,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     345,
-    486,
+    471,
     9,
     "QTY",
     "/F2",
@@ -1541,7 +1841,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     395,
-    486,
+    471,
     9,
     "PRICE",
     "/F2",
@@ -1550,7 +1850,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     490,
-    486,
+    471,
     9,
     "TOTAL",
     "/F2",
@@ -1562,7 +1862,7 @@ function createThemedQuotationPDF(quotation){
      TABLE ROWS
      ================================================ */
 
-  let y=448;
+  let y=433;
 
   quotation.items.forEach((item,index)=>{
 
@@ -1653,7 +1953,6 @@ function createThemedQuotationPDF(quotation){
 
   y-=12;
 
-
   content+=pdfRect(
     350,
     y-5,
@@ -1685,13 +1984,93 @@ function createThemedQuotationPDF(quotation){
 
 
   /* ================================================
+     PAYMENT REMINDER
+     ================================================ */
+
+  const paymentY=y-72;
+
+  content+=pdfRect(
+    45,
+    paymentY,
+    522,
+    55,
+    "1 0.96 0.90"
+  );
+
+
+  content+=pdfLine(
+    45,
+    paymentY,
+    567,
+    paymentY
+  );
+
+  content+=pdfLine(
+    45,
+    paymentY+55,
+    567,
+    paymentY+55
+  );
+
+  content+=pdfLine(
+    45,
+    paymentY,
+    45,
+    paymentY+55
+  );
+
+  content+=pdfLine(
+    567,
+    paymentY,
+    567,
+    paymentY+55
+  );
+
+
+  content+=pdfText(
+    60,
+    paymentY+37,
+    10,
+    "PAYMENT INFORMATION",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+
+  content+=pdfText(
+    60,
+    paymentY+21,
+    8,
+    "Bank: "+
+    PAYMENT.bank+
+    "   |   Account: "+
+    PAYMENT.accountName+
+    "   |   No: "+
+    PAYMENT.accountNumber,
+    "/F1",
+    "0.20 0.10 0.08"
+  );
+
+
+  content+=pdfText(
+    60,
+    paymentY+7,
+    8,
+    "Transfer slip: Viber / WhatsApp   |   Slip contacts: "+
+    PAYMENT.slipContacts,
+    "/F1",
+    "0.20 0.10 0.08"
+  );
+
+
+  /* ================================================
      FOOTER
      ================================================ */
 
   content+=pdfText(
     45,
-    72,
-    11,
+    58,
+    10,
     "Thank you for choosing Kanbulo Bakery!",
     "/F2",
     "0.48 0.12 0.17"
@@ -1700,8 +2079,8 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfText(
     45,
-    52,
-    9,
+    43,
+    8,
     BAKERY.location+
     "   |   "+
     BAKERY.island+
@@ -1714,7 +2093,7 @@ function createThemedQuotationPDF(quotation){
 
   content+=pdfRect(
     45,
-    35,
+    28,
     522,
     2,
     "0.79 0.60 0.29"
@@ -1841,7 +2220,9 @@ function createThemedQuotationPDF(quotation){
 }
 
 
-/* ESCAPE HTML */
+/* ==========================================
+   ESCAPE HTML
+   ========================================== */
 
 function escapeHTML(value){
 
@@ -1855,7 +2236,9 @@ function escapeHTML(value){
 }
 
 
-/* START */
+/* ==========================================
+   START
+   ========================================== */
 
 loadCustomers();
 loadProducts();
