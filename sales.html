@@ -1,5 +1,5 @@
-```html
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -107,6 +107,40 @@
       border-bottom: 1px solid #eee;
     }
 
+    .sale-left {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .sale-right {
+      text-align: right;
+      min-width: 105px;
+    }
+
+    .custom-price-box {
+      margin-top: 10px;
+      background: #fffaf5;
+      border: 1px solid #ead7c5;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .custom-price-box label {
+      margin: 0 0 6px;
+      font-size: 13px;
+    }
+
+    .custom-price {
+      padding: 9px;
+      font-size: 15px;
+    }
+
+    .price-note {
+      color: #777;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
     .remove {
       background: #f3d6d6;
       color: #900;
@@ -114,12 +148,81 @@
       margin-top: 5px;
     }
 
-    .total {
-      text-align: right;
-      font-size: 22px;
-      font-weight: bold;
+    .summary {
       margin-top: 20px;
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 16px;
+    }
+
+    .discount-row {
+      color: #9b1c31;
+    }
+
+    .final-total {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #7B1E2B;
+      font-size: 23px;
+      font-weight: bold;
       color: #7B1E2B;
+    }
+
+    .discount-box {
+      background: #fffaf5;
+      border: 1px solid #ead7c5;
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 18px;
+    }
+
+    .discount-types {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .discount-type {
+      position: relative;
+    }
+
+    .discount-type input {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .discount-type label {
+      margin: 0;
+      display: block;
+      padding: 11px;
+      text-align: center;
+      background: white;
+      border: 2px solid #ead7c5;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .discount-type input:checked + label {
+      background: #f5e0d5;
+      border-color: #7B1E2B;
+      color: #7B1E2B;
+    }
+
+    .discount-input {
+      margin-top: 10px;
     }
 
     .payment-options {
@@ -186,7 +289,8 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
-    .payment-badge {
+    .payment-badge,
+    .customer-badge {
       display: inline-block;
       margin-top: 8px;
       padding: 5px 9px;
@@ -252,6 +356,14 @@
       .history-actions {
         flex-direction: column;
       }
+
+      .sale-row {
+        flex-direction: column;
+      }
+
+      .sale-right {
+        text-align: left;
+      }
     }
 
     @media (max-width: 500px) {
@@ -260,6 +372,7 @@
       }
     }
   </style>
+
 </head>
 
 <body>
@@ -280,95 +393,174 @@
 
   <div class="box">
 
-    <h2 id="saleFormTitle">Make a Sale</h2>
+```
+<h2 id="saleFormTitle">Make a Sale</h2>
 
-    <div id="editingBanner" class="editing-banner">
-      ✏️ Editing an existing sale
-    </div>
+<div id="editingBanner" class="editing-banner">
+  ✏️ Editing an existing sale
+</div>
 
-    <label for="productSelect">Product</label>
+<label for="customerSelect">Customer</label>
 
-    <select id="productSelect">
-      <option value="">Loading products...</option>
-    </select>
+<select id="customerSelect" onchange="customerChanged()">
+  <option value="">Walk-in Customer</option>
+</select>
 
-    <label for="quantity">Quantity</label>
+<label for="productSelect">Product</label>
 
-    <input
-      id="quantity"
-      type="number"
-      min="1"
-      value="1"
-    >
+<select id="productSelect">
+  <option value="">Loading products...</option>
+</select>
 
-    <button class="add" onclick="addItem()">
-      ＋ Add to Sale
-    </button>
+<label for="quantity">Quantity</label>
+
+<input
+  id="quantity"
+  type="number"
+  min="1"
+  value="1"
+>
+
+<button class="add" onclick="addItem()">
+  ＋ Add to Sale
+</button>
+```
 
   </div>
 
   <div class="box">
 
-    <h2>Current Sale</h2>
+```
+<h2>Current Sale</h2>
 
-    <div id="currentSale">
-      <div class="empty">
-        No items added yet.
-      </div>
-    </div>
+<div id="currentSale">
+  <div class="empty">
+    No items added yet.
+  </div>
+</div>
 
-    <div class="total">
-      Total: MVR <span id="grandTotal">0.00</span>
-    </div>
+<div class="summary">
 
-    <label>Payment Method</label>
+  <div class="summary-row">
+    <span>Subtotal</span>
+    <strong>
+      MVR <span id="subtotal">0.00</span>
+    </strong>
+  </div>
 
-    <div class="payment-options">
+  <div class="discount-box">
 
-      <div class="payment-option">
+    <strong>💸 Discount</strong>
+
+    <div class="discount-types">
+
+      <div class="discount-type">
         <input
           type="radio"
-          id="cash"
-          name="paymentMethod"
-          value="Cash"
+          id="discountPercent"
+          name="discountType"
+          value="percent"
           checked
+          onchange="renderCart()"
         >
-        <label for="cash">💵 Cash</label>
+        <label for="discountPercent">
+          Percentage %
+        </label>
       </div>
 
-      <div class="payment-option">
+      <div class="discount-type">
         <input
           type="radio"
-          id="card"
-          name="paymentMethod"
-          value="Card"
+          id="discountFixed"
+          name="discountType"
+          value="fixed"
+          onchange="renderCart()"
         >
-        <label for="card">💳 Card</label>
-      </div>
-
-      <div class="payment-option">
-        <input
-          type="radio"
-          id="transfer"
-          name="paymentMethod"
-          value="Bank Transfer"
-        >
-        <label for="transfer">🏦 Transfer</label>
+        <label for="discountFixed">
+          Fixed MVR
+        </label>
       </div>
 
     </div>
 
-    <button id="recordButton" class="record" onclick="completeSale()">
-      ✓ Record Sale
-    </button>
-
-    <button
-      id="cancelEditButton"
-      class="cancel-edit"
-      onclick="cancelEdit()"
+    <input
+      id="discountValue"
+      class="discount-input"
+      type="number"
+      min="0"
+      step="0.01"
+      value="0"
+      placeholder="Enter discount"
+      oninput="renderCart()"
     >
-      Cancel Edit
-    </button>
+
+  </div>
+
+  <div class="summary-row discount-row">
+    <span>Discount</span>
+    <strong>
+      - MVR <span id="discountAmount">0.00</span>
+    </strong>
+  </div>
+
+  <div class="final-total">
+    <span>Final Total</span>
+    <span>
+      MVR <span id="grandTotal">0.00</span>
+    </span>
+  </div>
+
+</div>
+
+<label>Payment Method</label>
+
+<div class="payment-options">
+
+  <div class="payment-option">
+    <input
+      type="radio"
+      id="cash"
+      name="paymentMethod"
+      value="Cash"
+      checked
+    >
+    <label for="cash">💵 Cash</label>
+  </div>
+
+  <div class="payment-option">
+    <input
+      type="radio"
+      id="card"
+      name="paymentMethod"
+      value="Card"
+    >
+    <label for="card">💳 Card</label>
+  </div>
+
+  <div class="payment-option">
+    <input
+      type="radio"
+      id="transfer"
+      name="paymentMethod"
+      value="Bank Transfer"
+    >
+    <label for="transfer">🏦 Transfer</label>
+  </div>
+
+</div>
+
+<button id="recordButton" class="record" onclick="completeSale()">
+  ✓ Record Sale
+</button>
+
+<button
+  id="cancelEditButton"
+  class="cancel-edit"
+  onclick="cancelEdit()"
+>
+  Cancel Edit
+</button>
+```
 
   </div>
 
@@ -386,12 +578,18 @@
 
 const PRODUCTS_KEY = "kanbulo_products";
 const SALES_KEY = "kanbulo_sales";
+const CUSTOMERS_KEY = "kanbulo_customers";
 
 let products = [];
+let customers = [];
 let cart = [];
 let editingSaleId = null;
 let originalSaleItems = [];
 
+
+/* =========================
+   ERROR HANDLING
+========================= */
 
 function showError(message) {
 
@@ -399,8 +597,8 @@ function showError(message) {
     document.getElementById("errorBox");
 
   box.textContent = message;
-
   box.style.display = "block";
+
 }
 
 
@@ -410,10 +608,14 @@ function clearError() {
     document.getElementById("errorBox");
 
   box.textContent = "";
-
   box.style.display = "none";
+
 }
 
+
+/* =========================
+   PRODUCTS
+========================= */
 
 function loadProducts() {
 
@@ -422,17 +624,14 @@ function loadProducts() {
     const saved =
       localStorage.getItem(PRODUCTS_KEY);
 
-    if (!saved) {
-      products = [];
-    } else {
-      products = JSON.parse(saved);
-    }
+    products =
+      saved ? JSON.parse(saved) : [];
 
     if (!Array.isArray(products)) {
       products = [];
     }
 
-  } catch (error) {
+  } catch {
 
     products = [];
 
@@ -442,10 +641,12 @@ function loadProducts() {
 
   }
 
+
   const select =
     document.getElementById("productSelect");
 
   select.innerHTML = "";
+
 
   if (products.length === 0) {
 
@@ -457,17 +658,18 @@ function loadProducts() {
     );
 
     return;
+
   }
+
 
   const first =
     document.createElement("option");
 
   first.value = "";
-
-  first.textContent =
-    "Select product";
+  first.textContent = "Select product";
 
   select.appendChild(first);
+
 
   products.forEach(product => {
 
@@ -502,14 +704,10 @@ function getAvailableStockForProduct(productId) {
     return 0;
   }
 
+
   let available =
     Number(product.stock || 0);
 
-  /*
-    When editing a sale, add the original
-    quantity back temporarily. This means
-    the user can edit the sale correctly.
-  */
 
   if (editingSaleId !== null) {
 
@@ -529,14 +727,210 @@ function getAvailableStockForProduct(productId) {
 
   }
 
+
   return available;
 
 }
 
 
+/* =========================
+   CUSTOMERS
+========================= */
+
+function loadCustomers() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(CUSTOMERS_KEY);
+
+    customers =
+      saved ? JSON.parse(saved) : [];
+
+    if (!Array.isArray(customers)) {
+      customers = [];
+    }
+
+  } catch {
+
+    customers = [];
+
+  }
+
+
+  const select =
+    document.getElementById("customerSelect");
+
+  if (!select) return;
+
+
+  const currentValue =
+    select.value;
+
+
+  select.innerHTML =
+    '<option value="">Walk-in Customer</option>';
+
+
+  customers.forEach(customer => {
+
+    const option =
+      document.createElement("option");
+
+    option.value =
+      String(customer.id);
+
+    option.textContent =
+      customer.name +
+      (
+        customer.phone
+          ? " — " + customer.phone
+          : ""
+      );
+
+    select.appendChild(option);
+
+  });
+
+
+  if (
+    currentValue &&
+    customers.some(
+      c => String(c.id) === String(currentValue)
+    )
+  ) {
+
+    select.value =
+      currentValue;
+
+  }
+
+}
+
+
+function getSelectedCustomer() {
+
+  const select =
+    document.getElementById("customerSelect");
+
+  if (!select || !select.value) {
+    return null;
+  }
+
+
+  return customers.find(
+    customer =>
+      Number(customer.id) ===
+      Number(select.value)
+  ) || null;
+
+}
+
+
+function customerChanged() {
+
+  /*
+    Customer prices are applied to newly
+    added items. Existing cart items are
+    not automatically changed.
+  */
+
+  if (cart.length > 0) {
+
+    const change =
+      confirm(
+        "Customer changed.\n\n" +
+        "Do you want to update existing item prices " +
+        "to this customer's saved prices?"
+      );
+
+    if (change) {
+
+      cart.forEach(item => {
+
+        const customer =
+          getSelectedCustomer();
+
+        const savedPrice =
+          getCustomerPrice(
+            customer,
+            item.productId
+          );
+
+        if (savedPrice !== null) {
+
+          item.price =
+            savedPrice;
+
+          item.total =
+            savedPrice *
+            Number(item.quantity);
+
+        }
+
+      });
+
+      renderCart();
+
+    }
+
+  }
+
+}
+
+
+function getCustomerPrice(customer, productId) {
+
+  if (
+    !customer ||
+    !customer.prices ||
+    typeof customer.prices !== "object"
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    !Object.prototype.hasOwnProperty.call(
+      customer.prices,
+      productId
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  const price =
+    Number(customer.prices[productId]);
+
+
+  if (
+    !Number.isFinite(price) ||
+    price < 0
+  ) {
+
+    return null;
+
+  }
+
+
+  return price;
+
+}
+
+
+/* =========================
+   ADD ITEMS
+========================= */
+
 function addItem() {
 
   clearError();
+
 
   const select =
     document.getElementById("productSelect");
@@ -544,45 +938,48 @@ function addItem() {
   const productId =
     Number(select.value);
 
+
   const quantity =
     Number(
       document.getElementById("quantity").value
     );
 
+
   if (!productId) {
 
-    alert(
-      "Please select a product."
-    );
+    alert("Please select a product.");
 
     return;
+
   }
+
 
   if (
     !Number.isInteger(quantity) ||
     quantity < 1
   ) {
 
-    alert(
-      "Please enter a valid quantity."
-    );
+    alert("Please enter a valid quantity.");
 
     return;
+
   }
+
 
   const product =
     products.find(
       p => Number(p.id) === productId
     );
 
+
   if (!product) {
 
-    alert(
-      "Product not found."
-    );
+    alert("Product not found.");
 
     return;
+
   }
+
 
   const existing =
     cart.find(
@@ -591,13 +988,16 @@ function addItem() {
         productId
     );
 
+
   const currentQuantity =
     existing
       ? Number(existing.quantity)
       : 0;
 
+
   const availableStock =
     getAvailableStockForProduct(productId);
+
 
   if (
     currentQuantity + quantity >
@@ -610,7 +1010,26 @@ function addItem() {
     );
 
     return;
+
   }
+
+
+  const customer =
+    getSelectedCustomer();
+
+
+  const customerPrice =
+    getCustomerPrice(
+      customer,
+      productId
+    );
+
+
+  const startingPrice =
+    customerPrice !== null
+      ? customerPrice
+      : Number(product.price || 0);
+
 
   if (existing) {
 
@@ -631,23 +1050,67 @@ function addItem() {
         product.name,
 
       price:
-        Number(product.price),
+        startingPrice,
+
+      normalPrice:
+        Number(product.price || 0),
 
       quantity:
         quantity,
 
       total:
-        Number(product.price) *
+        startingPrice *
         quantity
 
     });
 
   }
 
+
   renderCart();
+
 
   document.getElementById("quantity")
     .value = 1;
+
+}
+
+
+/* =========================
+   CART
+========================= */
+
+function updateItemPrice(index, value) {
+
+  const price =
+    Number(value);
+
+
+  if (
+    !Number.isFinite(price) ||
+    price < 0
+  ) {
+
+    return;
+
+  }
+
+
+  if (!cart[index]) {
+    return;
+  }
+
+
+  cart[index].price =
+    price;
+
+
+  cart[index].total =
+    price *
+    Number(cart[index].quantity);
+
+
+  renderCart();
 
 }
 
@@ -661,76 +1124,192 @@ function removeItem(index) {
 }
 
 
+function getDiscountType() {
+
+  const selected =
+    document.querySelector(
+      'input[name="discountType"]:checked'
+    );
+
+  return selected
+    ? selected.value
+    : "percent";
+
+}
+
+
+function calculateTotals() {
+
+  const subtotal =
+    cart.reduce(
+      (sum, item) =>
+        sum +
+        (
+          Number(item.price || 0) *
+          Number(item.quantity || 0)
+        ),
+      0
+    );
+
+
+  const discountValue =
+    Math.max(
+      0,
+      Number(
+        document.getElementById("discountValue").value
+      ) || 0
+    );
+
+
+  const type =
+    getDiscountType();
+
+
+  let discountAmount =
+    type === "percent"
+      ? subtotal * discountValue / 100
+      : discountValue;
+
+
+  if (discountAmount > subtotal) {
+    discountAmount = subtotal;
+  }
+
+
+  const total =
+    Math.max(
+      0,
+      subtotal - discountAmount
+    );
+
+
+  return {
+    subtotal,
+    discountType: type,
+    discountValue,
+    discountAmount,
+    total
+  };
+
+}
+
+
 function renderCart() {
 
   const container =
     document.getElementById("currentSale");
 
-  let total = 0;
 
   if (cart.length === 0) {
 
     container.innerHTML =
       '<div class="empty">No items added yet.</div>';
 
-    document.getElementById("grandTotal")
-      .textContent = "0.00";
+  } else {
 
-    return;
+    container.innerHTML =
+      cart.map((item, index) => {
+
+        const lineTotal =
+          Number(item.price || 0) *
+          Number(item.quantity || 0);
+
+
+        return `
+
+          <div class="sale-row">
+
+            <div class="sale-left">
+
+              <strong>
+                ${escapeHTML(item.name)}
+              </strong>
+
+              <br>
+
+              ${item.quantity} ×
+              MVR ${Number(item.price || 0).toFixed(2)}
+
+              ${
+                Number(item.normalPrice || 0) !==
+                Number(item.price || 0)
+                  ? `
+                    <div class="price-note">
+                      Normal price:
+                      MVR ${Number(item.normalPrice || 0).toFixed(2)}
+                    </div>
+                  `
+                  : ""
+              }
+
+              <div class="custom-price-box">
+
+                <label>
+                  ✏️ Price for this sale
+                </label>
+
+                <input
+                  class="custom-price"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value="${Number(item.price || 0).toFixed(2)}"
+                  onchange="updateItemPrice(${index}, this.value)"
+                >
+
+              </div>
+
+            </div>
+
+            <div class="sale-right">
+
+              <strong>
+                MVR ${lineTotal.toFixed(2)}
+              </strong>
+
+              <br>
+
+              <button
+                class="remove"
+                onclick="removeItem(${index})">
+                Remove
+              </button>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }).join("");
+
   }
 
-  container.innerHTML =
-    cart.map((item, index) => {
 
-      total += Number(item.total);
+  const totals =
+    calculateTotals();
 
-      return `
 
-        <div class="sale-row">
+  document.getElementById("subtotal")
+    .textContent =
+    totals.subtotal.toFixed(2);
 
-          <div>
 
-            <strong>
-              ${escapeHTML(item.name)}
-            </strong>
+  document.getElementById("discountAmount")
+    .textContent =
+    totals.discountAmount.toFixed(2);
 
-            <br>
-
-            ${item.quantity} ×
-            MVR ${Number(item.price).toFixed(2)}
-
-          </div>
-
-          <div>
-
-            <strong>
-              MVR ${Number(item.total).toFixed(2)}
-            </strong>
-
-            <br>
-
-            <button
-              class="remove"
-              onclick="removeItem(${index})">
-
-              Remove
-
-            </button>
-
-          </div>
-
-        </div>
-
-      `;
-
-    }).join("");
 
   document.getElementById("grandTotal")
     .textContent =
-    total.toFixed(2);
+    totals.total.toFixed(2);
 
 }
 
+
+/* =========================
+   PAYMENT
+========================= */
 
 function getPaymentMethod() {
 
@@ -753,18 +1332,22 @@ function setPaymentMethod(method) {
       'input[name="paymentMethod"]'
     );
 
+
   let found = false;
+
 
   radios.forEach(radio => {
 
     radio.checked =
       radio.value === method;
 
+
     if (radio.checked) {
       found = true;
     }
 
   });
+
 
   if (!found) {
 
@@ -775,6 +1358,10 @@ function setPaymentMethod(method) {
 
 }
 
+
+/* =========================
+   SALES STORAGE
+========================= */
 
 function loadSales() {
 
@@ -809,28 +1396,34 @@ function saveSales(sales) {
 }
 
 
+/* =========================
+   COMPLETE SALE
+========================= */
+
 function completeSale() {
 
   clearError();
 
+
   if (cart.length === 0) {
 
-    alert(
-      "Please add a product first."
-    );
+    alert("Please add a product first.");
 
     return;
+
   }
+
 
   const paymentMethod =
     getPaymentMethod();
 
 
-  /*
-    Reload the newest products.
-  */
+  const totals =
+    calculateTotals();
+
 
   let latestProducts;
+
 
   try {
 
@@ -841,35 +1434,31 @@ function completeSale() {
 
   } catch {
 
-    alert(
-      "Could not read your products."
-    );
+    alert("Could not read your products.");
 
     return;
+
   }
+
 
   if (!Array.isArray(latestProducts)) {
     latestProducts = [];
   }
 
 
-  /*
-    Load sales.
-  */
-
   const sales =
     loadSales();
 
 
-  /*
-    NEW SALE
-  */
+  const selectedCustomer =
+    getSelectedCustomer();
+
+
+  /* =========================
+     NEW SALE
+  ========================= */
 
   if (editingSaleId === null) {
-
-    /*
-      Check stock.
-    */
 
     for (const item of cart) {
 
@@ -880,6 +1469,7 @@ function completeSale() {
             Number(item.productId)
         );
 
+
       if (!product) {
 
         alert(
@@ -889,7 +1479,9 @@ function completeSale() {
         );
 
         return;
+
       }
+
 
       if (
         Number(product.stock) <
@@ -904,14 +1496,11 @@ function completeSale() {
         );
 
         return;
+
       }
 
     }
 
-
-    /*
-      Reduce stock.
-    */
 
     cart.forEach(item => {
 
@@ -921,6 +1510,7 @@ function completeSale() {
             Number(p.id) ===
             Number(item.productId)
         );
+
 
       product.stock =
         Number(product.stock) -
@@ -935,14 +1525,6 @@ function completeSale() {
     );
 
 
-    const total =
-      cart.reduce(
-        (sum, item) =>
-          sum + Number(item.total),
-        0
-      );
-
-
     sales.push({
 
       id:
@@ -951,8 +1533,35 @@ function completeSale() {
       date:
         new Date().toISOString(),
 
+      customerId:
+        selectedCustomer
+          ? selectedCustomer.id
+          : null,
+
+      customerName:
+        selectedCustomer
+          ? selectedCustomer.name
+          : "Walk-in Customer",
+
+      customerPhone:
+        selectedCustomer
+          ? selectedCustomer.phone || ""
+          : "",
+
       paymentMethod:
         paymentMethod,
+
+      subtotal:
+        totals.subtotal,
+
+      discountType:
+        totals.discountType,
+
+      discountValue:
+        totals.discountValue,
+
+      discountAmount:
+        totals.discountAmount,
 
       items:
         cart.map(item => ({
@@ -966,16 +1575,20 @@ function completeSale() {
           price:
             Number(item.price),
 
+          normalPrice:
+            Number(item.normalPrice || item.price),
+
           quantity:
             Number(item.quantity),
 
           total:
-            Number(item.total)
+            Number(item.price) *
+            Number(item.quantity)
 
         })),
 
       total:
-        total
+        totals.total
 
     });
 
@@ -985,19 +1598,24 @@ function completeSale() {
 
     alert(
       "Sale recorded successfully!\n\n" +
-      "Payment: " +
+      "Customer: " +
+      (
+        selectedCustomer
+          ? selectedCustomer.name
+          : "Walk-in Customer"
+      ) +
+      "\nPayment: " +
       paymentMethod +
-      "\n" +
-      "Total: MVR " +
-      total.toFixed(2)
+      "\nTotal: MVR " +
+      totals.total.toFixed(2)
     );
 
   }
 
 
-  /*
-    EDIT EXISTING SALE
-  */
+  /* =========================
+     EDIT EXISTING SALE
+  ========================= */
 
   else {
 
@@ -1008,6 +1626,7 @@ function completeSale() {
           Number(editingSaleId)
       );
 
+
     if (saleIndex === -1) {
 
       alert(
@@ -1017,6 +1636,7 @@ function completeSale() {
       cancelEdit();
 
       return;
+
     }
 
 
@@ -1025,11 +1645,7 @@ function completeSale() {
 
 
     /*
-      Start from the newest real stock.
-    */
-
-    /*
-      Restore the old sale quantities first.
+      Restore the old quantities.
     */
 
     if (Array.isArray(oldSale.items)) {
@@ -1042,6 +1658,7 @@ function completeSale() {
               Number(p.id) ===
               Number(oldItem.productId)
           );
+
 
         if (product) {
 
@@ -1057,8 +1674,7 @@ function completeSale() {
 
 
     /*
-      Now check whether the edited sale
-      can be fulfilled.
+      Check edited quantities.
     */
 
     for (const item of cart) {
@@ -1070,7 +1686,13 @@ function completeSale() {
             Number(item.productId)
         );
 
+
       if (!product) {
+
+        restoreOriginalStock(
+          latestProducts,
+          oldSale.items
+        );
 
         alert(
           "Product " +
@@ -1079,17 +1701,14 @@ function completeSale() {
         );
 
         return;
+
       }
+
 
       if (
         Number(product.stock) <
         Number(item.quantity)
       ) {
-
-        /*
-          Put stock back to its original
-          state before stopping.
-        */
 
         restoreOriginalStock(
           latestProducts,
@@ -1104,13 +1723,14 @@ function completeSale() {
         );
 
         return;
+
       }
 
     }
 
 
     /*
-      Deduct the new edited quantities.
+      Deduct new quantities.
     */
 
     cart.forEach(item => {
@@ -1121,6 +1741,7 @@ function completeSale() {
             Number(p.id) ===
             Number(item.productId)
         );
+
 
       product.stock =
         Number(product.stock) -
@@ -1135,25 +1756,39 @@ function completeSale() {
     );
 
 
-    const total =
-      cart.reduce(
-        (sum, item) =>
-          sum + Number(item.total),
-        0
-      );
-
-
-    /*
-      Update the sale but keep its
-      original date and ID.
-    */
-
     sales[saleIndex] = {
 
       ...oldSale,
 
+      customerId:
+        selectedCustomer
+          ? selectedCustomer.id
+          : null,
+
+      customerName:
+        selectedCustomer
+          ? selectedCustomer.name
+          : "Walk-in Customer",
+
+      customerPhone:
+        selectedCustomer
+          ? selectedCustomer.phone || ""
+          : "",
+
       paymentMethod:
         paymentMethod,
+
+      subtotal:
+        totals.subtotal,
+
+      discountType:
+        totals.discountType,
+
+      discountValue:
+        totals.discountValue,
+
+      discountAmount:
+        totals.discountAmount,
 
       items:
         cart.map(item => ({
@@ -1167,16 +1802,20 @@ function completeSale() {
           price:
             Number(item.price),
 
+          normalPrice:
+            Number(item.normalPrice || item.price),
+
           quantity:
             Number(item.quantity),
 
           total:
-            Number(item.total)
+            Number(item.price) *
+            Number(item.quantity)
 
         })),
 
       total:
-        total
+        totals.total
 
     };
 
@@ -1186,11 +1825,16 @@ function completeSale() {
 
     alert(
       "Sale updated successfully!\n\n" +
-      "Payment: " +
+      "Customer: " +
+      (
+        selectedCustomer
+          ? selectedCustomer.name
+          : "Walk-in Customer"
+      ) +
+      "\nPayment: " +
       paymentMethod +
-      "\n" +
-      "Total: MVR " +
-      total.toFixed(2)
+      "\nTotal: MVR " +
+      totals.total.toFixed(2)
     );
 
   }
@@ -1198,10 +1842,14 @@ function completeSale() {
 
   resetSaleForm();
 
+
   products =
     latestProducts;
 
+
   loadProducts();
+
+  loadCustomers();
 
   renderCart();
 
@@ -1210,11 +1858,16 @@ function completeSale() {
 }
 
 
+/* =========================
+   STOCK RESTORATION
+========================= */
+
 function restoreOriginalStock(productsList, oldItems) {
 
   if (!Array.isArray(oldItems)) {
     return;
   }
+
 
   oldItems.forEach(oldItem => {
 
@@ -1224,6 +1877,7 @@ function restoreOriginalStock(productsList, oldItems) {
           Number(p.id) ===
           Number(oldItem.productId)
       );
+
 
     if (product) {
 
@@ -1238,12 +1892,18 @@ function restoreOriginalStock(productsList, oldItems) {
 }
 
 
+/* =========================
+   EDIT SALE
+========================= */
+
 function editSale(id) {
 
   clearError();
 
+
   const sales =
     loadSales();
+
 
   const sale =
     sales.find(
@@ -1252,13 +1912,13 @@ function editSale(id) {
         Number(id)
     );
 
+
   if (!sale) {
 
-    alert(
-      "Sale not found."
-    );
+    alert("Sale not found.");
 
     return;
+
   }
 
 
@@ -1272,11 +1932,13 @@ function editSale(id) {
     );
 
     return;
+
   }
 
 
   editingSaleId =
     sale.id;
+
 
   originalSaleItems =
     sale.items.map(item => ({
@@ -1290,11 +1952,6 @@ function editSale(id) {
     }));
 
 
-  /*
-    Copy the sale into the current cart.
-    Stock is NOT changed yet.
-  */
-
   cart =
     sale.items.map(item => ({
 
@@ -1307,6 +1964,12 @@ function editSale(id) {
       price:
         Number(item.price),
 
+      normalPrice:
+        Number(
+          item.normalPrice ||
+          item.price
+        ),
+
       quantity:
         Number(item.quantity),
 
@@ -1314,6 +1977,32 @@ function editSale(id) {
         Number(item.total)
 
     }));
+
+
+  loadCustomers();
+
+
+  const customerSelect =
+    document.getElementById("customerSelect");
+
+
+  if (
+    sale.customerId &&
+    customers.some(
+      c =>
+        Number(c.id) ===
+        Number(sale.customerId)
+    )
+  ) {
+
+    customerSelect.value =
+      String(sale.customerId);
+
+  } else {
+
+    customerSelect.value = "";
+
+  }
 
 
   document.getElementById("saleFormTitle")
@@ -1340,6 +2029,36 @@ function editSale(id) {
   );
 
 
+  const discountType =
+    sale.discountType || "percent";
+
+
+  const percentRadio =
+    document.getElementById("discountPercent");
+
+
+  const fixedRadio =
+    document.getElementById("discountFixed");
+
+
+  if (discountType === "fixed") {
+
+    fixedRadio.checked = true;
+    percentRadio.checked = false;
+
+  } else {
+
+    percentRadio.checked = true;
+    fixedRadio.checked = false;
+
+  }
+
+
+  document.getElementById("discountValue")
+    .value =
+    Number(sale.discountValue || 0);
+
+
   loadProducts();
 
   renderCart();
@@ -1353,58 +2072,97 @@ function editSale(id) {
 }
 
 
+/* =========================
+   CANCEL EDIT
+========================= */
+
 function cancelEdit() {
 
   resetSaleForm();
 
   loadProducts();
 
+  loadCustomers();
+
   renderCart();
 
 }
 
+
+/* =========================
+   RESET
+========================= */
 
 function resetSaleForm() {
 
   editingSaleId =
     null;
 
+
   originalSaleItems =
     [];
 
+
   cart =
     [];
+
 
   document.getElementById("saleFormTitle")
     .textContent =
     "Make a Sale";
 
+
   document.getElementById("editingBanner")
     .classList.remove("show");
+
 
   document.getElementById("recordButton")
     .textContent =
     "✓ Record Sale";
 
+
   document.getElementById("cancelEditButton")
     .style.display =
     "none";
 
+
   document.getElementById("quantity")
     .value =
     1;
+
+
+  document.getElementById("customerSelect")
+    .value =
+    "";
+
+
+  document.getElementById("discountValue")
+    .value =
+    0;
+
+
+  document.getElementById("discountPercent")
+    .checked =
+    true;
+
 
   setPaymentMethod("Cash");
 
 }
 
 
+/* =========================
+   DELETE SALE
+========================= */
+
 function deleteSale(id) {
 
   clearError();
 
+
   const sales =
     loadSales();
+
 
   const index =
     sales.findIndex(
@@ -1413,13 +2171,13 @@ function deleteSale(id) {
         Number(id)
     );
 
+
   if (index === -1) {
 
-    alert(
-      "Sale not found."
-    );
+    alert("Sale not found.");
 
     return;
+
   }
 
 
@@ -1442,11 +2200,8 @@ function deleteSale(id) {
   }
 
 
-  /*
-    Restore stock from the deleted sale.
-  */
-
   let latestProducts;
+
 
   try {
 
@@ -1460,6 +2215,7 @@ function deleteSale(id) {
     latestProducts = [];
 
   }
+
 
   if (!Array.isArray(latestProducts)) {
     latestProducts = [];
@@ -1480,6 +2236,7 @@ function deleteSale(id) {
             Number(item.productId)
         );
 
+
       if (product) {
 
         product.stock =
@@ -1499,29 +2256,16 @@ function deleteSale(id) {
   }
 
 
-  /*
-    Remove the sale.
-  */
-
   sales.splice(index, 1);
 
   saveSales(sales);
 
-
-  /*
-    Save restored inventory.
-  */
 
   localStorage.setItem(
     PRODUCTS_KEY,
     JSON.stringify(latestProducts)
   );
 
-
-  /*
-    If the deleted sale was currently
-    being edited, cancel editing.
-  */
 
   if (
     Number(editingSaleId) ===
@@ -1536,7 +2280,10 @@ function deleteSale(id) {
   products =
     latestProducts;
 
+
   loadProducts();
+
+  loadCustomers();
 
   renderCart();
 
@@ -1563,23 +2310,27 @@ function deleteSale(id) {
 }
 
 
+/* =========================
+   HISTORY
+========================= */
+
 function renderHistory() {
 
   const container =
     document.getElementById("history");
 
+
   const sales =
     loadSales();
 
 
-  if (
-    sales.length === 0
-  ) {
+  if (sales.length === 0) {
 
     container.innerHTML =
       '<div class="empty">No sales recorded yet.</div>';
 
     return;
+
   }
 
 
@@ -1596,24 +2347,35 @@ function renderHistory() {
         new Date(sale.date)
           .toLocaleString();
 
+
       const items =
         Array.isArray(sale.items)
-          ? sale.items.map(item =>
-              escapeHTML(item.name) +
-              " × " +
-              item.quantity
-            ).join("<br>")
+          ? sale.items.map(item => {
+
+              const lineTotal =
+                Number(item.price || 0) *
+                Number(item.quantity || 0);
+
+              return (
+                escapeHTML(item.name) +
+                " × " +
+                item.quantity +
+                " — MVR " +
+                lineTotal.toFixed(2)
+              );
+
+            }).join("<br>")
           : "";
 
-
-      /*
-        Old sales without a payment method
-        are labelled as Previous Sale.
-      */
 
       const payment =
         sale.paymentMethod ||
         "Previous Sale";
+
+
+      const customer =
+        sale.customerName ||
+        "Walk-in Customer";
 
 
       return `
@@ -1621,7 +2383,7 @@ function renderHistory() {
         <div class="history-item">
 
           <strong>
-            MVR ${Number(sale.total).toFixed(2)}
+            MVR ${Number(sale.total || 0).toFixed(2)}
           </strong>
 
           <br>
@@ -1632,11 +2394,39 @@ function renderHistory() {
 
           <br>
 
+          <span class="customer-badge">
+            👤 ${escapeHTML(customer)}
+          </span>
+
+          <br>
+
           <span class="payment-badge">
             ${escapeHTML(payment)}
           </span>
 
           <br><br>
+
+          ${
+            sale.subtotal !== undefined
+              ? `
+                <small>
+                  Subtotal: MVR
+                  ${Number(sale.subtotal).toFixed(2)}
+                  ${
+                    Number(sale.discountAmount || 0) > 0
+                      ? `
+                        <br>
+                        Discount: - MVR
+                        ${Number(sale.discountAmount).toFixed(2)}
+                      `
+                      : ""
+                  }
+                </small>
+
+                <br><br>
+              `
+              : ""
+          }
 
           ${items}
 
@@ -1644,15 +2434,13 @@ function renderHistory() {
 
             <button
               class="edit-sale"
-              onclick="editSale(${sale.id})"
-            >
+              onclick="editSale(${sale.id})">
               ✏️ Edit
             </button>
 
             <button
               class="delete-sale"
-              onclick="deleteSale(${sale.id})"
-            >
+              onclick="deleteSale(${sale.id})">
               🗑️ Delete
             </button>
 
@@ -1667,13 +2455,19 @@ function renderHistory() {
 }
 
 
+/* =========================
+   UTILITIES
+========================= */
+
 function escapeHTML(value) {
 
   const div =
     document.createElement("div");
 
+
   div.textContent =
     String(value);
+
 
   return div.innerHTML;
 
@@ -1688,9 +2482,11 @@ function goDashboard() {
 }
 
 
-/*
-  Start the page.
-*/
+/* =========================
+   START
+========================= */
+
+loadCustomers();
 
 loadProducts();
 
@@ -1702,5 +2498,4 @@ renderHistory();
 
 </body>
 </html>
-```
 
