@@ -1,9 +1,10 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <meta name="theme-color" content="#7B1E2B">
   <meta name="mobile-web-app-capable" content="yes">
@@ -16,105 +17,70 @@
   <title>Kanbulo Bakery Management</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
       font-family: Arial, sans-serif;
       background: #fff8f0;
-      color: #4b1f1f;
+      margin: 0;
+      padding: 20px;
+      color: #3b2416;
     }
 
-    header {
-      background: #7B1E2B;
-      color: white;
-      padding: 24px 15px;
-      text-align: center;
-    }
-
-    header h1 {
-      font-size: 26px;
-      margin-bottom: 6px;
-    }
-
-    header p {
-      font-size: 14px;
-      opacity: 0.92;
-    }
-
-    main {
+    .container {
       max-width: 900px;
       margin: auto;
-      padding: 20px;
     }
 
-    .welcome {
-      margin-bottom: 18px;
+    h1 {
+      margin-bottom: 5px;
     }
 
-    .welcome h2 {
-      color: #7B1E2B;
-      margin-bottom: 6px;
-    }
-
-    .welcome p {
+    .subtitle {
       color: #777;
-      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 25px;
     }
 
-    /* LIVE TOTALS */
     .live-totals {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 22px;
+      gap: 15px;
+      margin-bottom: 25px;
     }
 
-    .total-box {
+    .total-card {
       background: white;
-      border: 1px solid #f0dfd2;
-      border-radius: 15px;
-      padding: 17px 12px;
-      text-align: center;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
-    .total-box .total-icon {
-      font-size: 27px;
-      margin-bottom: 7px;
-    }
-
-    .total-box h3 {
-      font-size: 13px;
+    .total-card h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
       color: #777;
-      margin-bottom: 7px;
-      font-weight: normal;
     }
 
-    .total-box .amount {
-      font-size: 19px;
+    .total-card .value {
+      font-size: 24px;
       font-weight: bold;
+    }
+
+    .income .value {
+      color: #218838;
+    }
+
+    .expense-total .value {
+      color: #c0392b;
+    }
+
+    .profit .value {
       color: #7B1E2B;
-      word-break: break-word;
-    }
-
-    .total-box.profit .amount {
-      color: #2e7d32;
-    }
-
-    .total-box.expense .amount {
-      color: #c62828;
     }
 
     .updated {
-      text-align: center;
-      color: #999;
-      font-size: 11px;
-      margin-top: -14px;
-      margin-bottom: 20px;
+      font-size: 12px;
+      color: #888;
+      margin-top: 8px;
     }
 
     .cards {
@@ -124,85 +90,45 @@
     }
 
     .card {
-      display: block;
       background: white;
-      border: 1px solid #f0dfd2;
-      border-radius: 15px;
-      padding: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
-      text-align: left;
-      width: 100%;
-      color: #4b1f1f;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       text-decoration: none;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      color: #3b2416;
+      transition: transform 0.15s;
     }
 
     .card:active {
-      transform: scale(0.97);
+      transform: scale(0.98);
     }
 
-    .card:hover {
-      box-shadow: 0 5px 14px rgba(0,0,0,0.10);
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
     }
 
-    .card .icon {
+    .card p {
+      margin: 0;
+      color: #777;
+    }
+
+    .icon {
       font-size: 32px;
       margin-bottom: 10px;
     }
 
-    .card h3 {
-      margin-bottom: 5px;
-      font-size: 18px;
-      color: #7B1E2B;
-    }
-
-    .card p {
-      color: #777;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    footer {
-      text-align: center;
-      padding: 30px 10px;
-      color: #888;
-      font-size: 13px;
-    }
-
     @media (max-width: 600px) {
+
       .live-totals {
         grid-template-columns: 1fr;
-        gap: 10px;
       }
 
-      .total-box {
-        padding: 15px;
-      }
-
-      .total-box .total-icon {
-        display: inline-block;
-        margin-right: 6px;
-        margin-bottom: 0;
-      }
-
-      .total-box h3 {
-        display: inline;
-      }
-
-      .total-box .amount {
-        display: block;
-        margin-top: 6px;
-        font-size: 20px;
-      }
-    }
-
-    @media (max-width: 500px) {
       .cards {
         grid-template-columns: 1fr;
       }
 
-      main {
+      body {
         padding: 15px;
       }
     }
@@ -211,208 +137,292 @@
 
 <body>
 
-<header>
+<div class="container">
+
   <h1>🥐 Kanbulo Bakery</h1>
-  <p>Bakery Management System</p>
-</header>
 
-<main>
+  <p class="subtitle">
+    Freshly baked with love ❤️
+  </p>
 
-  <section class="welcome">
-    <h2>Dashboard</h2>
-    <p>Welcome to Kanbulo Bakery Management.</p>
-  </section>
 
-  <!-- LIVE BUSINESS TOTALS -->
-  <section class="live-totals">
+  <!-- LIVE TOTALS -->
 
-    <div class="total-box income">
-      <div class="total-icon">💰</div>
-      <h3>Total Income</h3>
-      <div class="amount" id="totalIncome">MVR 0.00</div>
+  <div class="live-totals">
+
+    <div class="total-card income">
+      <h3>💰 Total Income</h3>
+
+      <div class="value">
+        MVR <span id="totalIncome">0.00</span>
+      </div>
+
+      <div class="updated">
+        Live from Sales
+      </div>
     </div>
 
-    <div class="total-box expense">
-      <div class="total-icon">💸</div>
-      <h3>Total Expenses</h3>
-      <div class="amount" id="totalExpenses">MVR 0.00</div>
+
+    <div class="total-card expense-total">
+      <h3>💸 Total Expenses</h3>
+
+      <div class="value">
+        MVR <span id="totalExpenses">0.00</span>
+      </div>
+
+      <div class="updated">
+        Live from Expenses
+      </div>
     </div>
 
-    <div class="total-box profit">
-      <div class="total-icon">📈</div>
-      <h3>Net Profit</h3>
-      <div class="amount" id="totalProfit">MVR 0.00</div>
+
+    <div class="total-card profit">
+      <h3>📈 Net Profit</h3>
+
+      <div class="value">
+        MVR <span id="netProfit">0.00</span>
+      </div>
+
+      <div class="updated">
+        Income − Expenses
+      </div>
     </div>
 
-  </section>
-
-  <div class="updated" id="lastUpdated">
-    Live totals
   </div>
 
-  <section class="cards">
 
-    <a class="card" href="./sales.html">
-      <div class="icon">🛒</div>
-      <h3>Sales</h3>
-      <p>Record and manage bakery sales.</p>
-    </a>
+  <!-- DASHBOARD -->
 
-    <a class="card" href="./products.html">
-      <div class="icon">🍞</div>
-      <h3>Products</h3>
-      <p>Manage bakery products and prices.</p>
-    </a>
+  <div class="cards">
 
-    <a class="card" href="./reports.html">
-      <div class="icon">📊</div>
-      <h3>Reports</h3>
-      <p>View daily and monthly business reports.</p>
-    </a>
-
-    <a class="card" href="./expenses.html">
+    <a class="card" href="sales.html">
       <div class="icon">💰</div>
-      <h3>Expenses</h3>
-      <p>Track bakery expenses and costs.</p>
+      <h2>Sales</h2>
+      <p>Record and manage bakery sales</p>
     </a>
 
-    <a class="card" href="./inventory.html">
+
+    <a class="card" href="products.html">
+      <div class="icon">🥐</div>
+      <h2>Products</h2>
+      <p>Manage bakery products and prices</p>
+    </a>
+
+
+    <a class="card" href="reports.html">
+      <div class="icon">📊</div>
+      <h2>Reports</h2>
+      <p>View sales, expenses and profit reports</p>
+    </a>
+
+
+    <a class="card" href="expenses.html">
+      <div class="icon">💸</div>
+      <h2>Expenses</h2>
+      <p>Record and manage expenses</p>
+    </a>
+
+
+    <a class="card" href="inventory.html">
       <div class="icon">📦</div>
-      <h3>Inventory</h3>
-      <p>Keep track of your stock.</p>
+      <h2>Inventory</h2>
+      <p>Manage stock and inventory</p>
     </a>
 
-    <a class="card" href="./customers.html">
+
+    <a class="card" href="customers.html">
       <div class="icon">👥</div>
-      <h3>Customers</h3>
-      <p>Manage customer information.</p>
+      <h2>Customers</h2>
+      <p>Manage your customers</p>
     </a>
 
-    <a class="card" href="./quotations.html">
-      <div class="icon">📝</div>
-      <h3>Quotations</h3>
-      <p>Create and manage customer quotations.</p>
-    </a>
 
-    <a class="card" href="./invoices.html">
+    <a class="card" href="quotations.html">
       <div class="icon">🧾</div>
-      <h3>Invoices</h3>
-      <p>Create and manage customer invoices.</p>
+      <h2>Quotations</h2>
+      <p>Create and manage quotations</p>
     </a>
 
-  </section>
 
-</main>
+    <a class="card" href="invoices.html">
+      <div class="icon">📄</div>
+      <h2>Invoices</h2>
+      <p>Create and manage invoices</p>
+    </a>
 
-<footer>
-  Kanbulo Bakery Management © 2026
-</footer>
+  </div>
+
+</div>
+
 
 <script>
-  function updateDashboardTotals() {
 
-    let totalIncome = 0;
-    let totalExpenses = 0;
+const SALES_KEY = "kanbulo_sales";
+const EXPENSES_KEY = "kanbulo_expenses";
 
-    /* READ SALES */
-    try {
-      const sales = JSON.parse(
-        localStorage.getItem("kanbulo_sales") || "[]"
-      );
 
-      sales.forEach(sale => {
-        const total = Number(
-          sale.total ??
-          sale.grandTotal ??
-          sale.amount ??
-          0
-        );
+/* =========================
+   LOAD SALES
+========================= */
 
-        if (Number.isFinite(total)) {
-          totalIncome += total;
-        }
-      });
+function getSales() {
 
-    } catch (error) {
-      console.error("Could not read sales:", error);
-    }
+  try {
 
-    /* READ EXPENSES */
-    try {
-      const expenses = JSON.parse(
-        localStorage.getItem("kanbulo_expenses") || "[]"
-      );
+    return JSON.parse(
+      localStorage.getItem(SALES_KEY) || "[]"
+    );
 
-      expenses.forEach(expense => {
-        const amount = Number(
-          expense.amount ??
-          expense.total ??
-          expense.cost ??
-          0
-        );
+  } catch (error) {
 
-        if (Number.isFinite(amount)) {
-          totalExpenses += amount;
-        }
-      });
+    return [];
 
-    } catch (error) {
-      console.error("Could not read expenses:", error);
-    }
-
-    const profit = totalIncome - totalExpenses;
-
-    document.getElementById("totalIncome").textContent =
-      "MVR " + totalIncome.toFixed(2);
-
-    document.getElementById("totalExpenses").textContent =
-      "MVR " + totalExpenses.toFixed(2);
-
-    document.getElementById("totalProfit").textContent =
-      "MVR " + profit.toFixed(2);
-
-    document.getElementById("lastUpdated").textContent =
-      "Updated: " + new Date().toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit"
-      });
   }
 
-  /* Update when dashboard opens */
-  window.addEventListener("load", updateDashboardTotals);
-
-  /* Update whenever user returns to dashboard */
-  window.addEventListener("pageshow", updateDashboardTotals);
-
-  /* Update when another page changes localStorage */
-  window.addEventListener("storage", updateDashboardTotals);
+}
 
 
-  /* SERVICE WORKER */
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", function () {
-      navigator.serviceWorker.register("./sw.js", {
-        scope: "./"
-      })
-      .then(function (registration) {
-        console.log(
-          "Kanbulo service worker registered:",
-          registration.scope
-        );
-      })
-      .catch(function (error) {
-        console.error(
-          "Service worker registration failed:",
-          error
-        );
-      });
+/* =========================
+   LOAD EXPENSES
+========================= */
+
+function getExpenses() {
+
+  try {
+
+    return JSON.parse(
+      localStorage.getItem(EXPENSES_KEY) || "[]"
+    );
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+/* =========================
+   UPDATE DASHBOARD TOTALS
+========================= */
+
+function updateDashboardTotals() {
+
+  const sales = getSales();
+  const expenses = getExpenses();
+
+
+  /* TOTAL INCOME */
+
+  let income = 0;
+
+  sales.forEach(function(sale) {
+
+    income += Number(sale.total || 0);
+
+  });
+
+
+  /* TOTAL EXPENSES */
+
+  let expenseTotal = 0;
+
+  expenses.forEach(function(expense) {
+
+    expenseTotal += Number(expense.amount || 0);
+
+  });
+
+
+  /* NET PROFIT */
+
+  const profit = income - expenseTotal;
+
+
+  /* DISPLAY */
+
+  document.getElementById("totalIncome").textContent =
+    income.toFixed(2);
+
+  document.getElementById("totalExpenses").textContent =
+    expenseTotal.toFixed(2);
+
+  document.getElementById("netProfit").textContent =
+    profit.toFixed(2);
+
+}
+
+
+/* =========================
+   UPDATE WHEN PAGE OPENS
+========================= */
+
+updateDashboardTotals();
+
+
+/* =========================
+   UPDATE WHEN RETURNING
+   TO DASHBOARD
+========================= */
+
+window.addEventListener("pageshow", function() {
+
+  updateDashboardTotals();
+
+});
+
+
+/* =========================
+   UPDATE WHEN WINDOW
+   GETS FOCUS
+========================= */
+
+window.addEventListener("focus", function() {
+
+  updateDashboardTotals();
+
+});
+
+
+/* =========================
+   SERVICE WORKER
+========================= */
+
+if ("serviceWorker" in navigator) {
+
+  window.addEventListener("load", function() {
+
+    navigator.serviceWorker.register("./sw.js", {
+      scope: "./"
+    })
+
+    .then(function(registration) {
+
+      console.log(
+        "Kanbulo service worker registered:",
+        registration.scope
+      );
+
+    })
+
+    .catch(function(error) {
+
+      console.error(
+        "Service worker registration failed:",
+        error
+      );
+
     });
-  }
+
+  });
+
+}
+
 </script>
 
 </body>
 </html>
-```
 
 
 
