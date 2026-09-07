@@ -30,8 +30,6 @@ body{
   padding-bottom:40px;
 }
 
-/* HEADER */
-
 header{
   background:linear-gradient(135deg,var(--maroon-dark),var(--maroon));
   color:white;
@@ -63,8 +61,6 @@ header p{
   opacity:.9;
 }
 
-/* MAIN */
-
 main{
   max-width:850px;
   margin:auto;
@@ -78,8 +74,6 @@ main{
   text-decoration:none;
   font-weight:bold;
 }
-
-/* CARDS */
 
 .card{
   background:white;
@@ -95,8 +89,6 @@ h2{
   font-family:Georgia,serif;
   margin-bottom:15px;
 }
-
-/* FORM */
 
 label{
   display:block;
@@ -123,8 +115,6 @@ input:focus{
   border-color:var(--maroon);
   box-shadow:0 0 0 3px rgba(123,30,43,.10);
 }
-
-/* BUTTONS */
 
 button{
   border:none;
@@ -165,8 +155,6 @@ button{
   color:white;
 }
 
-/* QUOTATION NUMBER */
-
 .quotation-number{
   background:var(--cream-dark);
   border-left:5px solid var(--maroon);
@@ -180,8 +168,6 @@ button{
   color:var(--maroon);
 }
 
-/* CUSTOMER */
-
 #customerDisplay{
   background:#fffaf4;
   border:1px solid #f0dfcf;
@@ -190,8 +176,6 @@ button{
   font-weight:bold;
   color:var(--maroon);
 }
-
-/* ITEMS */
 
 .items{
   margin-top:15px;
@@ -215,8 +199,6 @@ button{
   padding:7px 10px;
 }
 
-/* TOTAL */
-
 .total{
   text-align:right;
   font-size:21px;
@@ -228,8 +210,6 @@ button{
   border-radius:10px;
 }
 
-/* ACTIONS */
-
 .actions{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -240,8 +220,6 @@ button{
 .actions button{
   margin:0;
 }
-
-/* SAVED */
 
 .saved{
   background:#fffaf4;
@@ -287,8 +265,6 @@ button{
   padding:15px;
 }
 
-/* FOOTER */
-
 footer{
   text-align:center;
   color:#9a8177;
@@ -299,8 +275,6 @@ footer{
 .footer-heart{
   color:var(--maroon);
 }
-
-/* MOBILE */
 
 @media(max-width:600px){
 
@@ -329,8 +303,6 @@ footer{
 <main>
 
 <a class="back" href="index.html">← Dashboard</a>
-
-<!-- CREATE -->
 
 <div class="card">
 
@@ -375,9 +347,6 @@ value="1"
 
 </div>
 
-
-<!-- CURRENT QUOTATION -->
-
 <div class="card">
 
 <h2>📄 Current Quotation</h2>
@@ -410,9 +379,6 @@ Total: MVR <span id="total">0.00</span>
 
 </div>
 
-
-<!-- SAVED -->
-
 <div class="card">
 
 <h2>
@@ -440,6 +406,17 @@ const CUSTOMERS_KEY="kanbulo_customers";
 const QUOTATIONS_KEY="kanbulo_quotations";
 
 let items=[];
+
+
+/* BAKERY INFORMATION */
+
+const BAKERY={
+  name:"KANBULO BAKERY",
+  tagline:"Freshly baked with love",
+  location:"Daisymaage,",
+  island:"N. Velidhoo",
+  phone:"+960 7653140"
+};
 
 
 /* DATA */
@@ -1014,6 +991,13 @@ body{
   color:#777;
 }
 
+.bakery-info{
+  color:#7b1e2b;
+  font-size:13px;
+  line-height:1.7;
+  margin-top:8px;
+}
+
 .info{
   background:#fff4e7;
   padding:15px;
@@ -1067,9 +1051,15 @@ td{
 
 <div class="header">
 
-<h1>🥐 Kanbulo Bakery</h1>
+<h1>KANBULO BAKERY</h1>
 
 <p>Freshly baked with love</p>
+
+<div class="bakery-info">
+Daisymaage,<br>
+N. Velidhoo<br>
++960 7653140
+</div>
 
 <h2 style="margin-top:15px;color:#7b1e2b;">
 QUOTATION
@@ -1122,7 +1112,7 @@ TOTAL: MVR ${Number(quotation.total).toFixed(2)}
 
 <div class="thanks">
 
-🥐 Thank you for choosing Kanbulo Bakery! ❤️
+Thank you for choosing Kanbulo Bakery!
 
 </div>
 
@@ -1182,86 +1172,11 @@ function downloadQuotationPDF(id){
 }
 
 
-/* PDF */
+/* ACTUAL THEMED PDF */
 
 function downloadQuotationPDFObject(quotation){
 
-  const lines=[];
-
-  lines.push("KANBULO BAKERY");
-  lines.push("Freshly baked with love");
-  lines.push("");
-  lines.push("QUOTATION");
-  lines.push("");
-  lines.push(
-    "Quotation No: "+
-    quotation.quotationNumber
-  );
-
-  lines.push(
-    "Date: "+
-    new Date(quotation.date).toLocaleString()
-  );
-
-  lines.push(
-    "Customer: "+
-    quotation.customerName
-  );
-
-  if(quotation.customerPhone){
-
-    lines.push(
-      "Phone: "+
-      quotation.customerPhone
-    );
-
-  }
-
-  lines.push("");
-  lines.push("----------------------------------------");
-  lines.push("Product              Qty       Total");
-  lines.push("----------------------------------------");
-
-  quotation.items.forEach(item=>{
-
-    let name=
-      String(item.name)
-      .replace(/[^\x20-\x7E]/g,"?");
-
-    if(name.length>20){
-      name=name.substring(0,20);
-    }
-
-    const product=name.padEnd(20," ");
-
-    const qty=
-      String(item.quantity).padStart(5," ");
-
-    const total=
-      ("MVR "+
-      Number(item.total).toFixed(2))
-      .padStart(14," ");
-
-    lines.push(
-      product+qty+"  "+total
-    );
-
-  });
-
-  lines.push("----------------------------------------");
-
-  lines.push(
-    "TOTAL: MVR "+
-    Number(quotation.total).toFixed(2)
-  );
-
-  lines.push("");
-
-  lines.push(
-    "Thank you for choosing Kanbulo Bakery!"
-  );
-
-  const pdf=createSimplePDF(lines);
+  const pdf=createThemedQuotationPDF(quotation);
 
   const blob=
     new Blob([pdf],{
@@ -1298,48 +1213,304 @@ function downloadQuotationPDFObject(quotation){
 }
 
 
-/* SIMPLE PDF */
+/* THEMED PDF GENERATOR */
 
-function createSimplePDF(lines){
+function createThemedQuotationPDF(quotation){
 
   function escapePDF(text){
 
     return String(text)
       .replace(/\\/g,"\\\\")
       .replace(/\(/g,"\\(")
-      .replace(/\)/g,"\\)");
+      .replace(/\)/g,"\\)")
+      .replace(/[^\x20-\x7E]/g,"?");
 
   }
 
-  let content=
-    "BT\n"+
-    "/F1 16 Tf\n"+
-    "50 780 Td\n";
+  function text(x,y,size,text,font="/F1",color="0.20 0.10 0.08"){
 
-  lines.forEach((line,index)=>{
+    return (
+      color+" rg\n"+
+      "BT\n"+
+      font+" "+size+" Tf\n"+
+      x+" "+y+" Td\n"+
+      "("+escapePDF(text)+") Tj\n"+
+      "ET\n"
+    );
 
-    const size=
-      index===0 ? 20 : 10;
+  }
 
-    content+=
-      "/F1 "+
-      size+
-      " Tf\n";
+  function rect(x,y,w,h,color){
 
-    content+=
-      "("+
-      escapePDF(
-        String(line)
-        .replace(/[^\x20-\x7E]/g,"?")
-      )+
-      ") Tj\n";
+    return (
+      color+" rg\n"+
+      x+" "+y+" "+w+" "+h+" re\n"+
+      "f\n"
+    );
 
-    content+=
-      "0 -18 Td\n";
+  }
+
+  let content="";
+
+  /* PAGE BACKGROUND */
+
+  content+=rect(
+    0,0,612,792,
+    "1 0.97 0.93"
+  );
+
+  /* TOP MAROON HEADER */
+
+  content+=rect(
+    0,610,612,182,
+    "0.36 0.08 0.13"
+  );
+
+  /* DECORATIVE CREAM STRIPE */
+
+  content+=rect(
+    0,606,612,4,
+    "0.79 0.60 0.29"
+  );
+
+  /* BAKERY NAME */
+
+  content+=text(
+    50,735,25,
+    BAKERY.name,
+    "/F2",
+    "1 1 1"
+  );
+
+  content+=text(
+    50,708,12,
+    BAKERY.tagline,
+    "/F1",
+    "1 0.92 0.82"
+  );
+
+  /* BAKERY INFORMATION */
+
+  content+=text(
+    50,680,10,
+    BAKERY.location+
+    "   |   "+
+    BAKERY.island+
+    "   |   "+
+    BAKERY.phone,
+    "/F1",
+    "1 0.92 0.82"
+  );
+
+  /* QUOTATION TITLE */
+
+  content+=text(
+    50,630,22,
+    "QUOTATION",
+    "/F2",
+    "1 1 1"
+  );
+
+  /* INFO BOX */
+
+  content+=rect(
+    45,515,522,78,
+    "1 0.96 0.90"
+  );
+
+  content+=text(
+    60,570,10,
+    "QUOTATION NO:",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=text(
+    155,570,10,
+    quotation.quotationNumber,
+    "/F1",
+    "0.20 0.10 0.08"
+  );
+
+  content+=text(
+    60,545,10,
+    "DATE:",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=text(
+    155,545,10,
+    new Date(quotation.date).toLocaleString(),
+    "/F1",
+    "0.20 0.10 0.08"
+  );
+
+  content+=text(
+    320,570,10,
+    "CUSTOMER:",
+    "/F2",
+    "0.36 0.08 0.13"
+  );
+
+  content+=text(
+    400,570,10,
+    quotation.customerName,
+    "/F1",
+    "0.20 0.10 0.08"
+  );
+
+  if(quotation.customerPhone){
+
+    content+=text(
+      320,545,10,
+      "PHONE:",
+      "/F2",
+      "0.36 0.08 0.13"
+    );
+
+    content+=text(
+      400,545,10,
+      quotation.customerPhone,
+      "/F1",
+      "0.20 0.10 0.08"
+    );
+
+  }
+
+  /* TABLE HEADER */
+
+  content+=rect(
+    45,480,522,30,
+    "0.48 0.12 0.17"
+  );
+
+  content+=text(
+    60,490,10,
+    "PRODUCT",
+    "/F2",
+    "1 1 1"
+  );
+
+  content+=text(
+    345,490,10,
+    "QTY",
+    "/F2",
+    "1 1 1"
+  );
+
+  content+=text(
+    405,490,10,
+    "PRICE",
+    "/F2",
+    "1 1 1"
+  );
+
+  content+=text(
+    495,490,10,
+    "TOTAL",
+    "/F2",
+    "1 1 1"
+  );
+
+  /* TABLE ROWS */
+
+  let y=455;
+
+  quotation.items.forEach((item,index)=>{
+
+    if(index%2===0){
+
+      content+=rect(
+        45,y-8,522,28,
+        "1 0.985 0.96"
+      );
+
+    }
+
+    content+=text(
+      60,y,10,
+      String(item.name).substring(0,30),
+      "/F1",
+      "0.20 0.10 0.08"
+    );
+
+    content+=text(
+      350,y,10,
+      String(item.quantity),
+      "/F1",
+      "0.20 0.10 0.08"
+    );
+
+    content+=text(
+      400,y,10,
+      "MVR "+
+      Number(item.price).toFixed(2),
+      "/F1",
+      "0.20 0.10 0.08"
+    );
+
+    content+=text(
+      490,y,10,
+      "MVR "+
+      Number(item.total).toFixed(2),
+      "/F1",
+      "0.20 0.10 0.08"
+    );
+
+    y-=30;
 
   });
 
-  content+="ET";
+  /* TOTAL BOX */
+
+  content+=rect(
+    350,y-5,217,48,
+    "0.48 0.12 0.17"
+  );
+
+  content+=text(
+    365,y+12,11,
+    "TOTAL",
+    "/F2",
+    "1 0.92 0.82"
+  );
+
+  content+=text(
+    435,y+12,14,
+    "MVR "+
+    Number(quotation.total).toFixed(2),
+    "/F2",
+    "1 1 1"
+  );
+
+  /* FOOTER */
+
+  content+=text(
+    45,75,11,
+    "Thank you for choosing Kanbulo Bakery!",
+    "/F2",
+    "0.48 0.12 0.17"
+  );
+
+  content+=text(
+    45,55,9,
+    BAKERY.location+
+    "   |   "+
+    BAKERY.island+
+    "   |   "+
+    BAKERY.phone,
+    "/F1",
+    "0.45 0.36 0.32"
+  );
+
+  content+=rect(
+    45,38,522,3,
+    "0.79 0.60 0.29"
+  );
+
+
+  /* PDF OBJECTS */
 
   const objects=[];
 
@@ -1354,19 +1525,30 @@ function createSimplePDF(lines){
   objects.push(
     "<< /Type /Page /Parent 2 0 R "+
     "/MediaBox [0 0 612 792] "+
-    "/Resources << /Font << /F1 4 0 R >> >> "+
-    "/Contents 5 0 R >>"
+    "/Resources << /Font << "+
+    "/F1 4 0 R "+
+    "/F2 5 0 R "+
+    ">> >> "+
+    "/Contents 6 0 R >>"
   );
 
   objects.push(
-    "<< /Type /Font /Subtype /Type1 "+
+    "<< /Type /Font "+
+    "/Subtype /Type1 "+
     "/BaseFont /Helvetica >>"
+  );
+
+  objects.push(
+    "<< /Type /Font "+
+    "/Subtype /Type1 "+
+    "/BaseFont /Helvetica-Bold >>"
   );
 
   objects.push(
     "<< /Length "+
     content.length+
-    " >>\nstream\n"+
+    " >>\n"+
+    "stream\n"+
     content+
     "\nendstream"
   );
