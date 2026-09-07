@@ -58,6 +58,10 @@
       margin-bottom: 20px;
     }
 
+    h3 {
+      margin-bottom: 15px;
+    }
+
     .box {
       background: white;
       padding: 20px;
@@ -138,7 +142,6 @@
       font-weight: bold;
     }
 
-    .item-price,
     .item-total {
       text-align: right;
     }
@@ -187,14 +190,113 @@
     }
 
     .empty {
-      background: white;
+      background: #fff;
       text-align: center;
       color: #777;
       padding: 30px 15px;
       border-radius: 15px;
     }
 
+    /* SAVED QUOTATIONS */
+
+    .saved-quotation {
+      border: 1px solid #eee;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 12px;
+      background: #fffaf5;
+    }
+
+    .saved-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .saved-number {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .saved-total {
+      font-weight: bold;
+      font-size: 17px;
+    }
+
+    .saved-customer {
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .saved-date {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .saved-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 7px;
+    }
+
+    .view-btn,
+    .print-btn,
+    .delete-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .view-btn {
+      background: #e8dccf;
+      color: #3b2415;
+    }
+
+    .print-btn {
+      background: #555;
+      color: white;
+    }
+
+    .delete-btn {
+      background: #f3d6d6;
+      color: #900;
+    }
+
+    .details {
+      display: none;
+      margin-top: 12px;
+      border-top: 1px solid #eee;
+      padding-top: 12px;
+    }
+
+    .details.show {
+      display: block;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 14px;
+    }
+
+    .saved-count {
+      background: #8B4513;
+      color: white;
+      display: inline-block;
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 13px;
+      margin-left: 5px;
+    }
+
     @media (max-width: 600px) {
+
       .row {
         grid-template-columns: 1fr;
       }
@@ -203,12 +305,23 @@
         grid-template-columns: 1fr 60px 80px 35px;
         font-size: 14px;
       }
+
+      .saved-top {
+        align-items: flex-start;
+      }
+
+      .saved-actions {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
     }
 
     @media print {
+
       .back,
       .form-box,
-      .actions {
+      .actions,
+      .saved-box {
         display: none !important;
       }
 
@@ -219,6 +332,7 @@
       .box {
         box-shadow: none;
       }
+
     }
   </style>
 </head>
@@ -227,7 +341,7 @@
 
 <header>
   <h1>🥐 Kanbulo Bakery</h1>
-  <p>Quotation</p>
+  <p>Quotations</p>
 </header>
 
 <main>
@@ -236,9 +350,13 @@
     ← Dashboard
   </button>
 
-  <h2>📝 Create Quotation</h2>
+  <h2>📝 Quotations</h2>
+
+  <!-- CREATE QUOTATION -->
 
   <div class="box form-box">
+
+    <h3>➕ Create New Quotation</h3>
 
     <label for="customer">
       Customer
@@ -251,6 +369,7 @@
     <div class="row">
 
       <div>
+
         <label for="product">
           Product
         </label>
@@ -258,9 +377,11 @@
         <select id="product">
           <option value="">Select Product</option>
         </select>
+
       </div>
 
       <div>
+
         <label for="quantity">
           Quantity
         </label>
@@ -271,6 +392,7 @@
           min="1"
           value="1"
         >
+
       </div>
 
     </div>
@@ -281,7 +403,12 @@
 
   </div>
 
+
+  <!-- CURRENT QUOTATION -->
+
   <div class="box">
+
+    <h3>📄 Current Quotation</h3>
 
     <div class="quotation-header">
 
@@ -295,21 +422,28 @@
     </div>
 
     <div class="customer-info">
+
       <strong>Customer:</strong>
+
       <span id="selectedCustomer">
         Walk-in Customer
       </span>
+
     </div>
 
     <div id="itemsList">
+
       <div class="empty">
         No products added yet.
       </div>
+
     </div>
 
     <div class="total">
+
       Total:
       MVR <span id="grandTotal">0.00</span>
+
     </div>
 
     <div class="actions">
@@ -326,7 +460,28 @@
 
   </div>
 
+
+  <!-- SAVED QUOTATIONS -->
+
+  <div class="box saved-box">
+
+    <h3>
+      📋 Saved Quotations
+      <span class="saved-count" id="savedCount">0</span>
+    </h3>
+
+    <div id="savedQuotations">
+
+      <div class="empty">
+        No saved quotations yet.
+      </div>
+
+    </div>
+
+  </div>
+
 </main>
+
 
 <script>
 
@@ -337,17 +492,23 @@ const QUOTATIONS_KEY = "kanbulo_quotations";
 let items = [];
 
 
+/* GET DATA */
+
 function getData(key) {
 
   try {
 
-    const saved = localStorage.getItem(key);
+    const saved =
+      localStorage.getItem(key);
 
-    const data = saved
-      ? JSON.parse(saved)
+    const data =
+      saved
+        ? JSON.parse(saved)
+        : [];
+
+    return Array.isArray(data)
+      ? data
       : [];
-
-    return Array.isArray(data) ? data : [];
 
   } catch (error) {
 
@@ -358,6 +519,8 @@ function getData(key) {
 }
 
 
+/* LOAD CUSTOMERS */
+
 function loadCustomers() {
 
   const customers =
@@ -365,6 +528,9 @@ function loadCustomers() {
 
   const select =
     document.getElementById("customer");
+
+  select.innerHTML =
+    '<option value="">Walk-in / Select Customer</option>';
 
   customers.forEach(customer => {
 
@@ -376,9 +542,11 @@ function loadCustomers() {
 
     option.textContent =
       customer.name +
-      (customer.phone
-        ? " - " + customer.phone
-        : "");
+      (
+        customer.phone
+          ? " - " + customer.phone
+          : ""
+      );
 
     select.appendChild(option);
 
@@ -387,6 +555,8 @@ function loadCustomers() {
 }
 
 
+/* LOAD PRODUCTS */
+
 function loadProducts() {
 
   const products =
@@ -394,6 +564,9 @@ function loadProducts() {
 
   const select =
     document.getElementById("product");
+
+  select.innerHTML =
+    '<option value="">Select Product</option>';
 
   products.forEach(product => {
 
@@ -415,10 +588,14 @@ function loadProducts() {
 }
 
 
+/* QUOTATION NUMBER */
+
 function generateQuotationNumber() {
 
   const number =
-    Date.now().toString().slice(-6);
+    Date.now()
+      .toString()
+      .slice(-6);
 
   document.getElementById(
     "quotationNumber"
@@ -428,32 +605,39 @@ function generateQuotationNumber() {
 }
 
 
-function setDate() {
+/* DATE */
 
-  const now =
-    new Date();
+function setDate() {
 
   document.getElementById(
     "quotationDate"
   ).textContent =
-    now.toLocaleString();
+    new Date().toLocaleString();
 
 }
 
 
+/* ADD ITEM */
+
 function addItem() {
 
   const productId =
-    document.getElementById("product").value;
+    document.getElementById(
+      "product"
+    ).value;
 
   const quantity =
     Number(
-      document.getElementById("quantity").value
+      document.getElementById(
+        "quantity"
+      ).value
     );
 
   if (!productId) {
 
-    alert("Please select a product.");
+    alert(
+      "Please select a product."
+    );
 
     return;
 
@@ -461,7 +645,9 @@ function addItem() {
 
   if (!quantity || quantity < 1) {
 
-    alert("Please enter a valid quantity.");
+    alert(
+      "Please enter a valid quantity."
+    );
 
     return;
 
@@ -472,12 +658,16 @@ function addItem() {
 
   const product =
     products.find(
-      p => Number(p.id) === Number(productId)
+      p =>
+        Number(p.id) ===
+        Number(productId)
     );
 
   if (!product) {
 
-    alert("Product not found.");
+    alert(
+      "Product not found."
+    );
 
     return;
 
@@ -492,7 +682,8 @@ function addItem() {
 
   if (existing) {
 
-    existing.quantity += quantity;
+    existing.quantity +=
+      quantity;
 
     existing.total =
       existing.quantity *
@@ -522,13 +713,16 @@ function addItem() {
 
   }
 
-  document.getElementById("quantity")
-    .value = 1;
+  document.getElementById(
+    "quantity"
+  ).value = 1;
 
   renderItems();
 
 }
 
+
+/* REMOVE ITEM */
 
 function removeItem(index) {
 
@@ -539,10 +733,14 @@ function removeItem(index) {
 }
 
 
+/* RENDER CURRENT ITEMS */
+
 function renderItems() {
 
   const list =
-    document.getElementById("itemsList");
+    document.getElementById(
+      "itemsList"
+    );
 
   if (items.length === 0) {
 
@@ -551,47 +749,51 @@ function renderItems() {
 
     document.getElementById(
       "grandTotal"
-    ).textContent = "0.00";
+    ).textContent =
+      "0.00";
 
     return;
 
   }
 
-
   let total = 0;
 
-
   list.innerHTML =
-    items.map((item, index) => {
+    items.map(
+      (item, index) => {
 
-      total += Number(item.total);
+        total +=
+          Number(item.total);
 
-      return `
-        <div class="item">
+        return `
 
-          <div class="item-name">
-            ${escapeHTML(item.name)}
+          <div class="item">
+
+            <div class="item-name">
+              ${escapeHTML(item.name)}
+            </div>
+
+            <div>
+              × ${item.quantity}
+            </div>
+
+            <div class="item-total">
+              MVR
+              ${Number(item.total).toFixed(2)}
+            </div>
+
+            <button
+              class="remove"
+              onclick="removeItem(${index})">
+              ×
+            </button>
+
           </div>
 
-          <div>
-            × ${item.quantity}
-          </div>
+        `;
 
-          <div class="item-total">
-            MVR ${Number(item.total).toFixed(2)}
-          </div>
-
-          <button
-            class="remove"
-            onclick="removeItem(${index})">
-            ×
-          </button>
-
-        </div>
-      `;
-
-    }).join("");
-
+      }
+    ).join("");
 
   document.getElementById(
     "grandTotal"
@@ -601,10 +803,14 @@ function renderItems() {
 }
 
 
+/* CUSTOMER DISPLAY */
+
 function updateCustomerDisplay() {
 
   const customerId =
-    document.getElementById("customer").value;
+    document.getElementById(
+      "customer"
+    ).value;
 
   const customers =
     getData(CUSTOMERS_KEY);
@@ -621,19 +827,25 @@ function updateCustomerDisplay() {
   ).textContent =
     customer
       ? customer.name +
-        (customer.phone
-          ? " — " + customer.phone
-          : "")
+        (
+          customer.phone
+            ? " — " + customer.phone
+            : ""
+        )
       : "Walk-in Customer";
 
 }
 
 
+/* SAVE QUOTATION */
+
 function saveQuotation() {
 
   if (items.length === 0) {
 
-    alert("Please add at least one product.");
+    alert(
+      "Please add at least one product."
+    );
 
     return;
 
@@ -643,7 +855,9 @@ function saveQuotation() {
     getData(QUOTATIONS_KEY);
 
   const customerId =
-    document.getElementById("customer").value;
+    document.getElementById(
+      "customer"
+    ).value;
 
   const customers =
     getData(CUSTOMERS_KEY);
@@ -661,7 +875,6 @@ function saveQuotation() {
         sum + Number(item.total),
       0
     );
-
 
   const quotation = {
 
@@ -692,22 +905,26 @@ function saveQuotation() {
         : "",
 
     items:
-      items.map(item => ({
-        productId:
-          item.productId,
+      items.map(
+        item => ({
 
-        name:
-          item.name,
+          productId:
+            item.productId,
 
-        price:
-          item.price,
+          name:
+            item.name,
 
-        quantity:
-          item.quantity,
+          price:
+            item.price,
 
-        total:
-          item.total
-      })),
+          quantity:
+            item.quantity,
+
+          total:
+            item.total
+
+        })
+      ),
 
     total:
       total
@@ -715,7 +932,9 @@ function saveQuotation() {
   };
 
 
-  quotations.push(quotation);
+  quotations.push(
+    quotation
+  );
 
   localStorage.setItem(
     QUOTATIONS_KEY,
@@ -729,13 +948,515 @@ function saveQuotation() {
     " saved successfully!"
   );
 
+
+  /* REFRESH SAVED LIST */
+
+  renderSavedQuotations();
+
 }
 
+
+/* SHOW SAVED QUOTATIONS */
+
+function renderSavedQuotations() {
+
+  const quotations =
+    getData(QUOTATIONS_KEY);
+
+  const container =
+    document.getElementById(
+      "savedQuotations"
+    );
+
+  const count =
+    document.getElementById(
+      "savedCount"
+    );
+
+  count.textContent =
+    quotations.length;
+
+
+  if (quotations.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No saved quotations yet.</div>';
+
+    return;
+
+  }
+
+
+  const latest =
+    [...quotations].reverse();
+
+
+  container.innerHTML =
+    latest.map(
+      quotation => {
+
+        const customer =
+          quotation.customerName ||
+          "Walk-in Customer";
+
+        const phone =
+          quotation.customerPhone ||
+          "";
+
+        const date =
+          new Date(
+            quotation.date
+          ).toLocaleString();
+
+        return `
+
+          <div
+            class="saved-quotation"
+            id="saved-${quotation.id}">
+
+            <div class="saved-top">
+
+              <div class="saved-number">
+                ${escapeHTML(
+                  quotation.quotationNumber
+                )}
+              </div>
+
+              <div class="saved-total">
+                MVR
+                ${Number(
+                  quotation.total
+                ).toFixed(2)}
+              </div>
+
+            </div>
+
+            <div class="saved-customer">
+
+              👤
+              ${escapeHTML(customer)}
+
+              ${
+                phone
+                  ? " — " +
+                    escapeHTML(phone)
+                  : ""
+              }
+
+            </div>
+
+            <div class="saved-date">
+              📅 ${escapeHTML(date)}
+            </div>
+
+            <div class="saved-actions">
+
+              <button
+                class="view-btn"
+                onclick="toggleDetails(${quotation.id})">
+                👁️ View
+              </button>
+
+              <button
+                class="print-btn"
+                onclick="printQuotation(${quotation.id})">
+                🖨️ Print
+              </button>
+
+              <button
+                class="delete-btn"
+                onclick="deleteQuotation(${quotation.id})">
+                🗑️ Delete
+              </button>
+
+            </div>
+
+            <div
+              class="details"
+              id="details-${quotation.id}">
+
+              ${
+                quotation.items &&
+                quotation.items.length
+                  ? quotation.items.map(
+                      item => `
+
+                        <div class="detail-item">
+
+                          <span>
+                            ${escapeHTML(
+                              item.name
+                            )}
+                            × ${item.quantity}
+                          </span>
+
+                          <strong>
+                            MVR
+                            ${Number(
+                              item.total
+                            ).toFixed(2)}
+                          </strong>
+
+                        </div>
+
+                      `
+                    ).join("")
+                  : ""
+              }
+
+              <div
+                class="detail-item"
+                style="border-top:1px solid #ddd; margin-top:8px; padding-top:10px;">
+
+                <strong>
+                  Total
+                </strong>
+
+                <strong>
+                  MVR
+                  ${Number(
+                    quotation.total
+                  ).toFixed(2)}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* VIEW DETAILS */
+
+function toggleDetails(id) {
+
+  const box =
+    document.getElementById(
+      "details-" + id
+    );
+
+  if (!box) return;
+
+  box.classList.toggle(
+    "show"
+  );
+
+}
+
+
+/* PRINT SAVED QUOTATION */
+
+function printQuotation(id) {
+
+  const quotations =
+    getData(QUOTATIONS_KEY);
+
+  const quotation =
+    quotations.find(
+      q =>
+        Number(q.id) ===
+        Number(id)
+    );
+
+  if (!quotation) {
+
+    alert(
+      "Quotation not found."
+    );
+
+    return;
+
+  }
+
+
+  const date =
+    new Date(
+      quotation.date
+    ).toLocaleString();
+
+
+  const itemsHTML =
+    (quotation.items || [])
+      .map(
+        item => `
+
+          <tr>
+
+            <td>
+              ${escapeHTML(item.name)}
+            </td>
+
+            <td>
+              ${item.quantity}
+            </td>
+
+            <td>
+              MVR
+              ${Number(
+                item.price
+              ).toFixed(2)}
+            </td>
+
+            <td>
+              MVR
+              ${Number(
+                item.total
+              ).toFixed(2)}
+            </td>
+
+          </tr>
+
+        `
+      ).join("");
+
+
+  const printWindow =
+    window.open(
+      "",
+      "_blank"
+    );
+
+  if (!printWindow) {
+
+    alert(
+      "Please allow pop-ups to print the quotation."
+    );
+
+    return;
+
+  }
+
+
+  printWindow.document.write(`
+
+    <!DOCTYPE html>
+
+    <html>
+
+    <head>
+
+      <title>
+        ${escapeHTML(
+          quotation.quotationNumber
+        )}
+      </title>
+
+      <style>
+
+        body {
+          font-family: Arial, sans-serif;
+          padding: 30px;
+          color: #222;
+        }
+
+        h1 {
+          color: #8B4513;
+          margin-bottom: 5px;
+        }
+
+        h2 {
+          margin-top: 25px;
+        }
+
+        .line {
+          border-bottom: 1px solid #ddd;
+          margin: 15px 0;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 20px;
+        }
+
+        th,
+        td {
+          border: 1px solid #ddd;
+          padding: 10px;
+          text-align: left;
+        }
+
+        th {
+          background: #f5eee8;
+        }
+
+        .total {
+          text-align: right;
+          font-size: 20px;
+          font-weight: bold;
+          margin-top: 20px;
+        }
+
+      </style>
+
+    </head>
+
+    <body>
+
+      <h1>
+        🥐 Kanbulo Bakery
+      </h1>
+
+      <h2>
+        QUOTATION
+      </h2>
+
+      <div>
+        <strong>
+          Quotation No:
+        </strong>
+        ${escapeHTML(
+          quotation.quotationNumber
+        )}
+      </div>
+
+      <div>
+        <strong>
+          Date:
+        </strong>
+        ${escapeHTML(date)}
+      </div>
+
+      <div class="line"></div>
+
+      <div>
+        <strong>
+          Customer:
+        </strong>
+        ${escapeHTML(
+          quotation.customerName ||
+          "Walk-in Customer"
+        )}
+      </div>
+
+      ${
+        quotation.customerPhone
+          ? `
+            <div>
+              <strong>
+                Phone:
+              </strong>
+              ${escapeHTML(
+                quotation.customerPhone
+              )}
+            </div>
+          `
+          : ""
+      }
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Product</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          ${itemsHTML}
+
+        </tbody>
+
+      </table>
+
+      <div class="total">
+
+        Total:
+        MVR
+        ${Number(
+          quotation.total
+        ).toFixed(2)}
+
+      </div>
+
+    </body>
+
+    </html>
+
+  `);
+
+
+  printWindow.document.close();
+
+  printWindow.focus();
+
+  setTimeout(
+    () => {
+      printWindow.print();
+    },
+    300
+  );
+
+}
+
+
+/* DELETE */
+
+function deleteQuotation(id) {
+
+  const quotations =
+    getData(QUOTATIONS_KEY);
+
+  const quotation =
+    quotations.find(
+      q =>
+        Number(q.id) ===
+        Number(id)
+    );
+
+  if (!quotation) return;
+
+
+  const confirmed =
+    confirm(
+      "Delete quotation " +
+      quotation.quotationNumber +
+      "?"
+    );
+
+  if (!confirmed) return;
+
+
+  const updated =
+    quotations.filter(
+      q =>
+        Number(q.id) !==
+        Number(id)
+    );
+
+
+  localStorage.setItem(
+    QUOTATIONS_KEY,
+    JSON.stringify(updated)
+  );
+
+
+  renderSavedQuotations();
+
+}
+
+
+/* ESCAPE HTML */
 
 function escapeHTML(value) {
 
   const div =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   div.textContent =
     String(value);
@@ -745,6 +1466,8 @@ function escapeHTML(value) {
 }
 
 
+/* DASHBOARD */
+
 function goDashboard() {
 
   window.location.href =
@@ -753,18 +1476,29 @@ function goDashboard() {
 }
 
 
-document.getElementById("customer")
-  .addEventListener(
-    "change",
-    updateCustomerDisplay
-  );
+/* CUSTOMER CHANGE */
 
+document.getElementById(
+  "customer"
+).addEventListener(
+  "change",
+  updateCustomerDisplay
+);
+
+
+/* START */
 
 loadCustomers();
+
 loadProducts();
+
 generateQuotationNumber();
+
 setDate();
+
 renderItems();
+
+renderSavedQuotations();
 
 </script>
 
