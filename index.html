@@ -17,60 +17,106 @@
   <title>Kanbulo Bakery Management</title>
 
   <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #fff8f0;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       color: #3b2416;
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
+      padding: 20px;
     }
 
-    h1 {
-      margin-bottom: 5px;
+    /* =========================
+       HEADER
+    ========================= */
+
+    .header {
+      background: linear-gradient(135deg, #7B1E2B, #9b3040);
+      color: white;
+      padding: 28px 22px;
+      border-radius: 20px;
+      margin-bottom: 22px;
+      box-shadow: 0 5px 18px rgba(123, 30, 43, 0.25);
     }
 
-    .subtitle {
-      color: #777;
-      margin-top: 0;
-      margin-bottom: 25px;
+    .header h1 {
+      margin: 0;
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .header p {
+      margin: 7px 0 0;
+      opacity: 0.9;
+      font-size: 15px;
+    }
+
+    /* =========================
+       BUSINESS TOTALS
+    ========================= */
+
+    .section-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin: 0 0 12px;
     }
 
     .live-totals {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 28px;
     }
 
     .total-card {
       background: white;
       padding: 20px;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-radius: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      border: 1px solid #f1e5dc;
     }
 
     .total-card h3 {
-      margin: 0 0 10px;
-      font-size: 15px;
+      margin: 0 0 12px;
+      font-size: 14px;
       color: #777;
+      font-weight: 600;
     }
 
     .total-card .value {
-      font-size: 24px;
+      font-size: 25px;
       font-weight: bold;
+      line-height: 1.2;
+    }
+
+    .income {
+      border-top: 4px solid #218838;
     }
 
     .income .value {
       color: #218838;
     }
 
+    .expense-total {
+      border-top: 4px solid #c0392b;
+    }
+
     .expense-total .value {
       color: #c0392b;
+    }
+
+    .profit {
+      border-top: 4px solid #7B1E2B;
     }
 
     .profit .value {
@@ -79,8 +125,17 @@
 
     .updated {
       font-size: 12px;
-      color: #888;
+      color: #999;
       margin-top: 8px;
+    }
+
+    /* =========================
+       MENU
+    ========================= */
+
+    .menu-title {
+      font-size: 20px;
+      margin: 0 0 14px;
     }
 
     .cards {
@@ -90,48 +145,102 @@
     }
 
     .card {
+      display: block;
       background: white;
-      padding: 25px;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 22px;
+      border-radius: 16px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
       text-decoration: none;
       color: #3b2416;
-      transition: transform 0.15s;
+      border: 1px solid #f1e5dc;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .card:hover {
+      box-shadow: 0 5px 16px rgba(0,0,0,0.10);
     }
 
     .card:active {
       transform: scale(0.98);
     }
 
+    .icon {
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff1e5;
+      border-radius: 14px;
+      font-size: 27px;
+      margin-bottom: 14px;
+    }
+
     .card h2 {
-      margin-top: 0;
-      margin-bottom: 8px;
+      margin: 0 0 7px;
+      font-size: 19px;
     }
 
     .card p {
       margin: 0;
       color: #777;
+      font-size: 14px;
+      line-height: 1.4;
     }
 
-    .icon {
-      font-size: 32px;
-      margin-bottom: 10px;
+    /* =========================
+       FOOTER
+    ========================= */
+
+    .footer {
+      text-align: center;
+      color: #999;
+      font-size: 12px;
+      margin: 28px 0 10px;
     }
 
-    @media (max-width: 600px) {
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 700px) {
+
+      .container {
+        padding: 15px;
+      }
+
+      .header {
+        padding: 24px 18px;
+        border-radius: 17px;
+      }
+
+      .header h1 {
+        font-size: 25px;
+      }
 
       .live-totals {
         grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .total-card {
+        padding: 18px;
+      }
+
+      .total-card .value {
+        font-size: 24px;
       }
 
       .cards {
         grid-template-columns: 1fr;
+        gap: 12px;
       }
 
-      body {
-        padding: 15px;
+      .card {
+        padding: 19px;
       }
     }
+
   </style>
 </head>
 
@@ -139,19 +248,32 @@
 
 <div class="container">
 
-  <h1>🥐 Kanbulo Bakery</h1>
+  <!-- HEADER -->
 
-  <p class="subtitle">
-    Freshly baked with love ❤️
-  </p>
+  <div class="header">
+
+    <h1>🥐 Kanbulo Bakery</h1>
+
+    <p>
+      Freshly baked with love ❤️
+    </p>
+
+  </div>
 
 
-  <!-- LIVE TOTALS -->
+  <!-- BUSINESS OVERVIEW -->
+
+  <div class="section-title">
+    📊 Business Overview
+  </div>
 
   <div class="live-totals">
 
+    <!-- INCOME -->
+
     <div class="total-card income">
-      <h3>💰 Total Income</h3>
+
+      <h3>💰 TOTAL INCOME</h3>
 
       <div class="value">
         MVR <span id="totalIncome">0.00</span>
@@ -160,11 +282,15 @@
       <div class="updated">
         Live from Sales
       </div>
+
     </div>
 
 
+    <!-- EXPENSES -->
+
     <div class="total-card expense-total">
-      <h3>💸 Total Expenses</h3>
+
+      <h3>💸 TOTAL EXPENSES</h3>
 
       <div class="value">
         MVR <span id="totalExpenses">0.00</span>
@@ -173,11 +299,15 @@
       <div class="updated">
         Live from Expenses
       </div>
+
     </div>
 
 
+    <!-- PROFIT -->
+
     <div class="total-card profit">
-      <h3>📈 Net Profit</h3>
+
+      <h3>📈 NET PROFIT</h3>
 
       <div class="value">
         MVR <span id="netProfit">0.00</span>
@@ -186,70 +316,128 @@
       <div class="updated">
         Income − Expenses
       </div>
+
     </div>
 
   </div>
 
 
-  <!-- DASHBOARD -->
+  <!-- MANAGEMENT MENU -->
+
+  <div class="menu-title">
+    🏪 Management
+  </div>
 
   <div class="cards">
 
     <a class="card" href="sales.html">
-      <div class="icon">💰</div>
+
+      <div class="icon">🛒</div>
+
       <h2>Sales</h2>
-      <p>Record and manage bakery sales</p>
+
+      <p>
+        Record and manage bakery sales.
+      </p>
+
     </a>
 
 
     <a class="card" href="products.html">
-      <div class="icon">🥐</div>
+
+      <div class="icon">🍞</div>
+
       <h2>Products</h2>
-      <p>Manage bakery products and prices</p>
+
+      <p>
+        Manage bakery products and prices.
+      </p>
+
     </a>
 
 
     <a class="card" href="reports.html">
+
       <div class="icon">📊</div>
+
       <h2>Reports</h2>
-      <p>View sales, expenses and profit reports</p>
+
+      <p>
+        View daily and monthly business reports.
+      </p>
+
     </a>
 
 
     <a class="card" href="expenses.html">
-      <div class="icon">💸</div>
+
+      <div class="icon">💰</div>
+
       <h2>Expenses</h2>
-      <p>Record and manage expenses</p>
+
+      <p>
+        Track bakery expenses and costs.
+      </p>
+
     </a>
 
 
     <a class="card" href="inventory.html">
+
       <div class="icon">📦</div>
+
       <h2>Inventory</h2>
-      <p>Manage stock and inventory</p>
+
+      <p>
+        Keep track of your bakery stock.
+      </p>
+
     </a>
 
 
     <a class="card" href="customers.html">
+
       <div class="icon">👥</div>
+
       <h2>Customers</h2>
-      <p>Manage your customers</p>
+
+      <p>
+        Manage customer information.
+      </p>
+
     </a>
 
 
     <a class="card" href="quotations.html">
-      <div class="icon">🧾</div>
+
+      <div class="icon">📝</div>
+
       <h2>Quotations</h2>
-      <p>Create and manage quotations</p>
+
+      <p>
+        Create and manage customer quotations.
+      </p>
+
     </a>
 
 
     <a class="card" href="invoices.html">
-      <div class="icon">📄</div>
+
+      <div class="icon">🧾</div>
+
       <h2>Invoices</h2>
-      <p>Create and manage invoices</p>
+
+      <p>
+        Create and manage customer invoices.
+      </p>
+
     </a>
 
+  </div>
+
+
+  <div class="footer">
+    Kanbulo Bakery Management System
   </div>
 
 </div>
@@ -262,7 +450,7 @@ const EXPENSES_KEY = "kanbulo_expenses";
 
 
 /* =========================
-   LOAD SALES
+   GET SALES
 ========================= */
 
 function getSales() {
@@ -283,7 +471,7 @@ function getSales() {
 
 
 /* =========================
-   LOAD EXPENSES
+   GET EXPENSES
 ========================= */
 
 function getExpenses() {
@@ -304,7 +492,7 @@ function getExpenses() {
 
 
 /* =========================
-   UPDATE DASHBOARD TOTALS
+   UPDATE LIVE TOTALS
 ========================= */
 
 function updateDashboardTotals() {
@@ -340,13 +528,19 @@ function updateDashboardTotals() {
   const profit = income - expenseTotal;
 
 
-  /* DISPLAY */
+  /* DISPLAY INCOME */
 
   document.getElementById("totalIncome").textContent =
     income.toFixed(2);
 
+
+  /* DISPLAY EXPENSES */
+
   document.getElementById("totalExpenses").textContent =
     expenseTotal.toFixed(2);
+
+
+  /* DISPLAY PROFIT */
 
   document.getElementById("netProfit").textContent =
     profit.toFixed(2);
@@ -355,15 +549,14 @@ function updateDashboardTotals() {
 
 
 /* =========================
-   UPDATE WHEN PAGE OPENS
+   INITIAL UPDATE
 ========================= */
 
 updateDashboardTotals();
 
 
 /* =========================
-   UPDATE WHEN RETURNING
-   TO DASHBOARD
+   REFRESH WHEN RETURNING
 ========================= */
 
 window.addEventListener("pageshow", function() {
@@ -374,7 +567,7 @@ window.addEventListener("pageshow", function() {
 
 
 /* =========================
-   UPDATE WHEN WINDOW
+   REFRESH WHEN PAGE
    GETS FOCUS
 ========================= */
 
@@ -423,6 +616,5 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
 
 
