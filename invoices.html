@@ -171,13 +171,63 @@ th{
   color:#7b1e2b;
 }
 
+.payment-method-box{
+  margin-top:18px;
+  padding:15px;
+  background:#fffaf5;
+  border:1px solid #ead7c5;
+  border-radius:10px;
+}
+
+.payment-method-box h3{
+  margin-top:0;
+  color:#7b1e2b;
+}
+
+.payment-options{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:10px;
+}
+
+.payment-option{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px;
+  border:1px solid #d8c1b0;
+  border-radius:8px;
+  background:white;
+  cursor:pointer;
+  font-weight:bold;
+  margin:0;
+}
+
+.payment-option input{
+  width:auto;
+  margin:0;
+}
+
 .empty{
   color:#777;
   text-align:center;
   padding:15px;
 }
 
+.method-badge{
+  display:inline-block;
+  margin-top:5px;
+  padding:5px 9px;
+  border-radius:20px;
+  background:#f2dfdf;
+  color:#7b1e2b;
+  font-size:12px;
+  font-weight:bold;
+}
+
 @media(max-width:600px){
+
   .container{
     padding:10px;
   }
@@ -200,6 +250,10 @@ th{
   .saved-actions button{
     width:auto;
   }
+
+  .payment-options{
+    grid-template-columns:1fr;
+  }
 }
 </style>
 </head>
@@ -221,22 +275,28 @@ th{
     <h2>🧾 Create New Invoice</h2>
 
     <label>Customer</label>
-    <select id="customerSelect">
+
+    <select id="customerSelect" onchange="renderCurrentInvoice()">
       <option value="">Walk-in Customer</option>
     </select>
 
+
     <label>Product</label>
+
     <select id="productSelect">
       <option value="">Select Product</option>
     </select>
 
+
     <label>Quantity</label>
+
     <input
       type="number"
       id="quantity"
       min="1"
       value="1"
     >
+
 
     <button class="primary full" onclick="addItem()">
       ➕ Add Product
@@ -252,11 +312,13 @@ th{
 
     <div id="invoiceInfo"></div>
 
+
     <div class="table-wrap">
 
       <table id="invoiceTable">
 
         <thead>
+
           <tr>
             <th>Product</th>
             <th>Qty</th>
@@ -264,6 +326,7 @@ th{
             <th>Total</th>
             <th></th>
           </tr>
+
         </thead>
 
         <tbody id="invoiceBody"></tbody>
@@ -272,17 +335,84 @@ th{
 
     </div>
 
+
     <div class="total-box">
       Grand Total: MVR <span id="grandTotal">0.00</span>
     </div>
+
+
+    <!-- PAYMENT METHOD -->
+
+    <div class="payment-method-box">
+
+      <h3>💳 Payment Method</h3>
+
+      <div class="payment-options">
+
+        <label class="payment-option">
+
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="Cash"
+            checked
+          >
+
+          💵 Cash
+
+        </label>
+
+
+        <label class="payment-option">
+
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="Card"
+          >
+
+          💳 Card
+
+        </label>
+
+
+        <label class="payment-option">
+
+          <input
+            type="radio"
+            name="paymentMethod"
+            value="Bank Transfer"
+          >
+
+          🏦 Bank Transfer
+
+        </label>
+
+      </div>
+
+    </div>
+
+
+    <!-- BANK PAYMENT DETAILS -->
 
     <div class="payment-box">
 
       <h3>🏦 Payment Details</h3>
 
-      <div><strong>Bank:</strong> Bank of Maldives</div>
-      <div><strong>Account Name:</strong> KANBULO BAKERY</div>
-      <div><strong>Account Number:</strong> 7770000049905</div>
+      <div>
+        <strong>Bank:</strong>
+        Bank of Maldives
+      </div>
+
+      <div>
+        <strong>Account Name:</strong>
+        KANBULO BAKERY
+      </div>
+
+      <div>
+        <strong>Account Number:</strong>
+        7770000049905
+      </div>
 
       <br>
 
@@ -298,13 +428,16 @@ th{
 
     </div>
 
+
     <button class="success full" onclick="saveInvoice()">
       💾 Save Invoice
     </button>
 
+
     <button class="secondary full" onclick="printCurrentInvoice()">
       🖨️ Print Invoice
     </button>
+
 
     <button class="secondary full" onclick="downloadCurrentInvoice()">
       📥 Save Invoice to Device
@@ -314,6 +447,7 @@ th{
 
 
   <!-- SAVED INVOICES -->
+
   <div class="card">
 
     <h2>📋 Saved Invoices</h2>
@@ -332,30 +466,48 @@ const CUSTOMERS_KEY = "kanbulo_customers";
 const INVOICES_KEY = "kanbulo_invoices";
 const SALES_KEY = "kanbulo_sales";
 
+
 const PAYMENT = {
+
   bank: "Bank of Maldives",
+
   accountName: "KANBULO BAKERY",
+
   accountNumber: "7770000049905",
+
   slip: "Customer will send via Viber/WhatsApp",
+
   slipContacts: "7653140 / 7359040"
+
 };
 
+
 let products = read(PRODUCTS_KEY, []);
+
 let customers = read(CUSTOMERS_KEY, []);
+
 let invoices = read(INVOICES_KEY, []);
 
 let items = [];
 
 
+/* -------------------------
+   READ / SAVE
+------------------------- */
+
 function read(key, fallback){
 
   try{
+
     return JSON.parse(
       localStorage.getItem(key) ||
       JSON.stringify(fallback)
     );
+
   }catch(e){
+
     return fallback;
+
   }
 
 }
@@ -372,7 +524,25 @@ function save(key, value){
 
 
 /* -------------------------
-   LOAD DATA
+   PAYMENT METHOD
+------------------------- */
+
+function getPaymentMethod(){
+
+  const selected =
+    document.querySelector(
+      'input[name="paymentMethod"]:checked'
+    );
+
+  return selected
+    ? selected.value
+    : "Cash";
+
+}
+
+
+/* -------------------------
+   LOAD CUSTOMERS
 ------------------------- */
 
 function loadCustomers(){
@@ -383,12 +553,14 @@ function loadCustomers(){
   select.innerHTML =
     `<option value="">Walk-in Customer</option>`;
 
+
   customers.forEach(customer => {
 
     const option =
       document.createElement("option");
 
-    option.value = customer.id;
+    option.value =
+      customer.id;
 
     option.textContent =
       `${customer.name} — ${customer.phone || ""}`;
@@ -399,6 +571,10 @@ function loadCustomers(){
 
 }
 
+
+/* -------------------------
+   LOAD PRODUCTS
+------------------------- */
 
 function loadProducts(){
 
@@ -411,12 +587,14 @@ function loadProducts(){
   select.innerHTML =
     `<option value="">Select Product</option>`;
 
+
   products.forEach(product => {
 
     const option =
       document.createElement("option");
 
-    option.value = product.id;
+    option.value =
+      product.id;
 
     option.textContent =
       `${product.name} — MVR ${Number(product.price).toFixed(2)} — Stock ${product.stock}`;
@@ -441,27 +619,45 @@ function addItem(){
     document.getElementById("productSelect").value;
 
   const quantity =
-    Number(document.getElementById("quantity").value);
+    Number(
+      document.getElementById("quantity").value
+    );
+
 
   if(!productId){
+
     alert("Please select a product.");
+
     return;
+
   }
 
+
   if(!quantity || quantity < 1){
+
     alert("Please enter a valid quantity.");
+
     return;
+
   }
+
 
   const product =
     products.find(
-      p => String(p.id) === String(productId)
+      p =>
+        String(p.id) ===
+        String(productId)
     );
 
+
   if(!product){
+
     alert("Product not found.");
+
     return;
+
   }
+
 
   const existing =
     items.find(
@@ -470,16 +666,27 @@ function addItem(){
         String(product.id)
     );
 
-  const currentQty =
-    existing ? existing.quantity : 0;
 
-  if(currentQty + quantity > Number(product.stock)){
+  const currentQty =
+    existing
+    ? existing.quantity
+    : 0;
+
+
+  if(
+    currentQty + quantity >
+    Number(product.stock)
+  ){
+
     alert(
       `Not enough stock.\n\n` +
       `${product.name} available stock: ${product.stock}`
     );
+
     return;
+
   }
+
 
   if(existing){
 
@@ -493,13 +700,17 @@ function addItem(){
 
     items.push({
 
-      productId: product.id,
+      productId:
+        product.id,
 
-      name: product.name,
+      name:
+        product.name,
 
-      price: Number(product.price),
+      price:
+        Number(product.price),
 
-      quantity: quantity,
+      quantity:
+        quantity,
 
       total:
         quantity *
@@ -508,6 +719,7 @@ function addItem(){
     });
 
   }
+
 
   renderCurrentInvoice();
 
@@ -520,7 +732,7 @@ function addItem(){
 
 function removeItem(index){
 
-  items.splice(index, 1);
+  items.splice(index,1);
 
   renderCurrentInvoice();
 
@@ -538,75 +750,113 @@ function renderCurrentInvoice(){
 
   body.innerHTML = "";
 
+
   let total = 0;
+
 
   items.forEach((item,index) => {
 
-    total += Number(item.total);
+    total +=
+      Number(item.total);
+
 
     const row =
       document.createElement("tr");
 
+
     row.innerHTML = `
 
-      <td>${escapeHTML(item.name)}</td>
+      <td>
+        ${escapeHTML(item.name)}
+      </td>
 
-      <td>${item.quantity}</td>
+      <td>
+        ${item.quantity}
+      </td>
 
-      <td>MVR ${Number(item.price).toFixed(2)}</td>
+      <td>
+        MVR ${Number(item.price).toFixed(2)}
+      </td>
 
-      <td>MVR ${Number(item.total).toFixed(2)}</td>
+      <td>
+        MVR ${Number(item.total).toFixed(2)}
+      </td>
 
       <td class="invoice-item-buttons">
+
         <button
           class="danger"
           onclick="removeItem(${index})">
+
           ✕
+
         </button>
+
       </td>
 
     `;
+
 
     body.appendChild(row);
 
   });
 
+
   document.getElementById("grandTotal")
     .textContent =
     total.toFixed(2);
 
+
   const customerId =
-    document.getElementById("customerSelect").value;
+    document.getElementById(
+      "customerSelect"
+    ).value;
+
 
   const customer =
     customers.find(
-      c => String(c.id) === String(customerId)
+      c =>
+        String(c.id) ===
+        String(customerId)
     );
+
 
   document.getElementById("invoiceInfo")
     .innerHTML = `
 
       <p>
+
         <strong>Customer:</strong>
+
         ${escapeHTML(
-          customer ? customer.name : "Walk-in Customer"
+          customer
+          ? customer.name
+          : "Walk-in Customer"
         )}
+
       </p>
+
 
       ${
         customer
         ?
         `<p>
           <strong>Phone:</strong>
-          ${escapeHTML(customer.phone || "")}
+          ${escapeHTML(
+            customer.phone || ""
+          )}
         </p>`
         :
         ""
       }
 
+
       <p>
+
         <strong>Date:</strong>
+
         ${new Date().toLocaleString()}
+
       </p>
 
     `;
@@ -621,9 +871,15 @@ function renderCurrentInvoice(){
 function saveInvoice(){
 
   if(items.length === 0){
-    alert("Please add at least one product.");
+
+    alert(
+      "Please add at least one product."
+    );
+
     return;
+
   }
+
 
   products =
     read(PRODUCTS_KEY, []);
@@ -631,21 +887,37 @@ function saveInvoice(){
   invoices =
     read(INVOICES_KEY, []);
 
+
   const customerId =
-    document.getElementById("customerSelect").value;
+    document.getElementById(
+      "customerSelect"
+    ).value;
+
 
   const customer =
     customers.find(
-      c => String(c.id) === String(customerId)
+      c =>
+        String(c.id) ===
+        String(customerId)
     );
+
+
+  const paymentMethod =
+    getPaymentMethod();
+
 
   let total = 0;
 
+
   items.forEach(item => {
-    total += Number(item.total);
+
+    total +=
+      Number(item.total);
+
   });
 
-  /* Check stock one more time */
+
+  /* Check stock again */
 
   for(const item of items){
 
@@ -656,6 +928,7 @@ function saveInvoice(){
           String(item.productId)
       );
 
+
     if(!product){
 
       alert(
@@ -663,18 +936,27 @@ function saveInvoice(){
       );
 
       return;
+
     }
 
-    if(Number(item.quantity) >
-       Number(product.stock)){
+
+    if(
+      Number(item.quantity) >
+      Number(product.stock)
+    ){
 
       alert(
+
         `Not enough stock for ${item.name}.\n\n` +
+
         `Available: ${product.stock}\n` +
+
         `Requested: ${item.quantity}`
+
       );
 
       return;
+
     }
 
   }
@@ -682,7 +964,9 @@ function saveInvoice(){
 
   const invoice = {
 
-    id: Date.now(),
+    id:
+      Date.now(),
+
 
     invoiceNumber:
       "INV-" +
@@ -691,40 +975,60 @@ function saveInvoice(){
         Math.random() * 900000
       ),
 
+
     date:
       new Date().toISOString(),
 
+
     customerId:
-      customer ? customer.id : null,
+      customer
+      ? customer.id
+      : null,
+
 
     customerName:
       customer
       ? customer.name
       : "Walk-in Customer",
 
+
     customerPhone:
       customer
       ? customer.phone || ""
       : "",
 
+
+    paymentMethod:
+      paymentMethod,
+
+
     items:
       items.map(item => ({
 
-        productId: item.productId,
+        productId:
+          item.productId,
 
-        name: item.name,
+        name:
+          item.name,
 
-        price: Number(item.price),
+        price:
+          Number(item.price),
 
-        quantity: Number(item.quantity),
+        quantity:
+          Number(item.quantity),
 
-        total: Number(item.total)
+        total:
+          Number(item.total)
 
       })),
 
-    total: total,
 
-    stockDeducted: true
+    total:
+      total,
+
+
+    stockDeducted:
+      true
 
   };
 
@@ -740,6 +1044,7 @@ function saveInvoice(){
           String(item.productId)
       );
 
+
     product.stock =
       Number(product.stock) -
       Number(item.quantity);
@@ -747,56 +1052,84 @@ function saveInvoice(){
   });
 
 
-  save(PRODUCTS_KEY, products);
+  save(
+    PRODUCTS_KEY,
+    products
+  );
 
 
   /* Save invoice */
 
   invoices.unshift(invoice);
 
-  save(INVOICES_KEY, invoices);
+  save(
+    INVOICES_KEY,
+    invoices
+  );
 
 
-  /* Add to sales so Reports updates */
+  /* Add sale for Reports */
 
   const sales =
     read(SALES_KEY, []);
 
+
   sales.unshift({
 
-    id: Date.now() + 1,
+    id:
+      Date.now() + 1,
+
 
     date:
       new Date().toISOString(),
 
+
+    paymentMethod:
+      paymentMethod,
+
+
     items:
       invoice.items.map(item => ({
 
-        productId: item.productId,
+        productId:
+          item.productId,
 
-        name: item.name,
+        name:
+          item.name,
 
-        price: item.price,
+        price:
+          item.price,
 
-        quantity: item.quantity,
+        quantity:
+          item.quantity,
 
-        total: item.total
+        total:
+          item.total
 
       })),
 
-    total: invoice.total
+
+    total:
+      invoice.total
 
   });
 
-  save(SALES_KEY, sales);
+
+  save(
+    SALES_KEY,
+    sales
+  );
 
 
   alert(
+
     `Invoice ${invoice.invoiceNumber} saved successfully!`
+
   );
 
 
   items = [];
+
 
   loadProducts();
 
@@ -814,17 +1147,27 @@ function saveInvoice(){
 function renderSavedInvoices(){
 
   invoices =
-    read(INVOICES_KEY, []);
+    read(
+      INVOICES_KEY,
+      []
+    );
+
 
   const container =
-    document.getElementById("savedInvoices");
+    document.getElementById(
+      "savedInvoices"
+    );
+
 
   container.innerHTML = "";
+
 
   if(invoices.length === 0){
 
     container.innerHTML =
-      `<div class="empty">No saved invoices yet.</div>`;
+      `<div class="empty">
+        No saved invoices yet.
+      </div>`;
 
     return;
 
@@ -836,59 +1179,105 @@ function renderSavedInvoices(){
     const div =
       document.createElement("div");
 
+
     div.className =
       "saved-invoice";
+
 
     const date =
       new Date(invoice.date);
 
+
+    const method =
+      invoice.paymentMethod ||
+      "Previous / Unspecified";
+
+
     div.innerHTML = `
 
       <div>
+
         <strong>
-          ${escapeHTML(invoice.invoiceNumber)}
+          ${escapeHTML(
+            invoice.invoiceNumber
+          )}
         </strong>
+
       </div>
 
-      <div>
-        ${escapeHTML(invoice.customerName)}
-      </div>
 
       <div>
+        ${escapeHTML(
+          invoice.customerName
+        )}
+      </div>
+
+
+      <div>
+
         ${date.toLocaleDateString()}
+
         —
-        MVR ${Number(invoice.total).toFixed(2)}
+
+        MVR ${Number(
+          invoice.total
+        ).toFixed(2)}
+
       </div>
+
+
+      <div>
+
+        <span class="method-badge">
+
+          ${escapeHTML(method)}
+
+        </span>
+
+      </div>
+
 
       <div class="saved-actions">
 
         <button
           class="secondary"
           onclick="viewInvoice(${invoice.id})">
+
           👁️ View
+
         </button>
+
 
         <button
           class="success"
           onclick="printSavedInvoice(${invoice.id})">
+
           🖨️ Print
+
         </button>
+
 
         <button
           class="secondary"
           onclick="downloadSavedInvoice(${invoice.id})">
+
           📥 Save
+
         </button>
+
 
         <button
           class="danger"
           onclick="deleteInvoice(${invoice.id})">
+
           🗑️ Delete
+
         </button>
 
       </div>
 
     `;
+
 
     container.appendChild(div);
 
@@ -905,38 +1294,69 @@ function viewInvoice(id){
 
   const invoice =
     invoices.find(
-      inv => Number(inv.id) === Number(id)
+      inv =>
+        Number(inv.id) ===
+        Number(id)
     );
 
+
   if(!invoice){
+
     alert("Invoice not found.");
+
     return;
+
   }
+
 
   let text =
     `${invoice.invoiceNumber}\n\n`;
 
+
   text +=
     `Customer: ${invoice.customerName}\n`;
 
+
   if(invoice.customerPhone){
+
     text +=
       `Phone: ${invoice.customerPhone}\n`;
+
   }
 
+
   text +=
-    `Date: ${new Date(invoice.date).toLocaleString()}\n\n`;
+    `Date: ${new Date(
+      invoice.date
+    ).toLocaleString()}\n`;
+
+
+  text +=
+    `Payment Method: ${
+      invoice.paymentMethod ||
+      "Previous / Unspecified"
+    }\n\n`;
+
 
   invoice.items.forEach(item => {
 
     text +=
+
       `${item.name} × ${item.quantity} — ` +
-      `MVR ${Number(item.total).toFixed(2)}\n`;
+
+      `MVR ${Number(
+        item.total
+      ).toFixed(2)}\n`;
 
   });
 
+
   text +=
-    `\nGrand Total: MVR ${Number(invoice.total).toFixed(2)}`;
+
+    `\nGrand Total: MVR ${
+      Number(invoice.total).toFixed(2)
+    }`;
+
 
   alert(text);
 
@@ -951,29 +1371,45 @@ function deleteInvoice(id){
 
   const invoice =
     invoices.find(
-      inv => Number(inv.id) === Number(id)
+      inv =>
+        Number(inv.id) ===
+        Number(id)
     );
+
 
   if(!invoice){
     return;
   }
 
+
   const confirmed =
     confirm(
+
       `Delete ${invoice.invoiceNumber}?\n\n` +
+
       `Deleting the invoice will NOT restore stock or remove the sale record.`
+
     );
+
 
   if(!confirmed){
     return;
   }
 
+
   invoices =
     invoices.filter(
-      inv => Number(inv.id) !== Number(id)
+      inv =>
+        Number(inv.id) !==
+        Number(id)
     );
 
-  save(INVOICES_KEY, invoices);
+
+  save(
+    INVOICES_KEY,
+    invoices
+  );
+
 
   renderSavedInvoices();
 
@@ -987,38 +1423,59 @@ function deleteInvoice(id){
 function printCurrentInvoice(){
 
   if(items.length === 0){
-    alert("Please add at least one product.");
+
+    alert(
+      "Please add at least one product."
+    );
+
     return;
+
   }
 
+
   const customerId =
-    document.getElementById("customerSelect").value;
+    document.getElementById(
+      "customerSelect"
+    ).value;
+
 
   const customer =
     customers.find(
-      c => String(c.id) === String(customerId)
+      c =>
+        String(c.id) ===
+        String(customerId)
     );
+
 
   const temporaryInvoice = {
 
     invoiceNumber:
       "DRAFT",
 
+
     date:
       new Date().toISOString(),
+
 
     customerName:
       customer
       ? customer.name
       : "Walk-in Customer",
 
+
     customerPhone:
       customer
       ? customer.phone || ""
       : "",
 
+
+    paymentMethod:
+      getPaymentMethod(),
+
+
     items:
       items,
+
 
     total:
       items.reduce(
@@ -1029,7 +1486,10 @@ function printCurrentInvoice(){
 
   };
 
-  openPrintWindow(temporaryInvoice);
+
+  openPrintWindow(
+    temporaryInvoice
+  );
 
 }
 
@@ -1042,13 +1502,20 @@ function printSavedInvoice(id){
 
   const invoice =
     invoices.find(
-      inv => Number(inv.id) === Number(id)
+      inv =>
+        Number(inv.id) ===
+        Number(id)
     );
 
+
   if(!invoice){
+
     alert("Invoice not found.");
+
     return;
+
   }
+
 
   openPrintWindow(invoice);
 
@@ -1063,19 +1530,32 @@ function openPrintWindow(invoice){
 
   let rows = "";
 
+
   invoice.items.forEach(item => {
 
     rows += `
 
       <tr>
 
-        <td>${escapeHTML(item.name)}</td>
+        <td>
+          ${escapeHTML(item.name)}
+        </td>
 
-        <td>${item.quantity}</td>
+        <td>
+          ${item.quantity}
+        </td>
 
-        <td>MVR ${Number(item.price).toFixed(2)}</td>
+        <td>
+          MVR ${Number(
+            item.price
+          ).toFixed(2)}
+        </td>
 
-        <td>MVR ${Number(item.total).toFixed(2)}</td>
+        <td>
+          MVR ${Number(
+            item.total
+          ).toFixed(2)}
+        </td>
 
       </tr>
 
@@ -1094,7 +1574,10 @@ function openPrintWindow(invoice){
 
 <meta charset="UTF-8">
 
-<title>${escapeHTML(invoice.invoiceNumber)}</title>
+<title>
+${escapeHTML(invoice.invoiceNumber)}
+</title>
+
 
 <style>
 
@@ -1161,6 +1644,13 @@ th{
   color:#7b1e2b;
 }
 
+.payment-method{
+  margin-top:15px;
+  padding:12px;
+  border:1px solid #d8c1b0;
+  background:#fffaf5;
+}
+
 .payment{
   margin-top:25px;
   padding:15px;
@@ -1169,16 +1659,20 @@ th{
 }
 
 @media print{
+
   body{
     margin:15mm;
   }
+
 }
 
 </style>
 
 </head>
 
+
 <body>
+
 
 <div class="header">
 
@@ -1197,18 +1691,42 @@ th{
 
 <div class="info">
 
+
 <div class="box">
 
 <h3>Invoice Details</h3>
 
 <p>
+
 <strong>Invoice No:</strong>
-${escapeHTML(invoice.invoiceNumber)}
+
+${escapeHTML(
+  invoice.invoiceNumber
+)}
+
 </p>
 
+
 <p>
+
 <strong>Date:</strong>
-${new Date(invoice.date).toLocaleString()}
+
+${new Date(
+  invoice.date
+).toLocaleString()}
+
+</p>
+
+
+<p>
+
+<strong>Payment Method:</strong>
+
+${escapeHTML(
+  invoice.paymentMethod ||
+  "Previous / Unspecified"
+)}
+
 </p>
 
 </div>
@@ -1219,17 +1737,28 @@ ${new Date(invoice.date).toLocaleString()}
 <h3>Customer Details</h3>
 
 <p>
+
 <strong>Name:</strong>
-${escapeHTML(invoice.customerName)}
+
+${escapeHTML(
+  invoice.customerName
+)}
+
 </p>
+
 
 ${
 invoice.customerPhone
 ?
 `
 <p>
+
 <strong>Phone:</strong>
-${escapeHTML(invoice.customerPhone)}
+
+${escapeHTML(
+  invoice.customerPhone
+)}
+
 </p>
 `
 :
@@ -1259,6 +1788,7 @@ ${escapeHTML(invoice.customerPhone)}
 
 </thead>
 
+
 <tbody>
 
 ${rows}
@@ -1271,7 +1801,22 @@ ${rows}
 <div class="total">
 
 Grand Total:
-MVR ${Number(invoice.total).toFixed(2)}
+
+MVR ${Number(
+  invoice.total
+).toFixed(2)}
+
+</div>
+
+
+<div class="payment-method">
+
+<strong>💳 Payment Method:</strong>
+
+${escapeHTML(
+  invoice.paymentMethod ||
+  "Previous / Unspecified"
+)}
 
 </div>
 
@@ -1281,28 +1826,47 @@ MVR ${Number(invoice.total).toFixed(2)}
 <h3>Payment Details</h3>
 
 <p>
+
 <strong>Bank:</strong>
+
 ${PAYMENT.bank}
+
 </p>
 
+
 <p>
+
 <strong>Account Name:</strong>
+
 ${PAYMENT.accountName}
+
 </p>
 
+
 <p>
+
 <strong>Account Number:</strong>
+
 ${PAYMENT.accountNumber}
+
 </p>
 
+
 <p>
+
 <strong>Payment Slip:</strong>
+
 ${PAYMENT.slip}
+
 </p>
 
+
 <p>
+
 <strong>Contact:</strong>
+
 ${PAYMENT.slipContacts}
+
 </p>
 
 </div>
@@ -1321,6 +1885,7 @@ ${PAYMENT.slipContacts}
       "_blank"
     );
 
+
   if(!win){
 
     alert(
@@ -1331,11 +1896,13 @@ ${PAYMENT.slipContacts}
 
   }
 
+
   win.document.open();
 
   win.document.write(html);
 
   win.document.close();
+
 
   setTimeout(() => {
 
@@ -1350,41 +1917,64 @@ ${PAYMENT.slipContacts}
 
 /* -------------------------
    SAVE TO DEVICE
-   (HTML file that can be printed as PDF)
 ------------------------- */
 
 function downloadCurrentInvoice(){
 
   if(items.length === 0){
-    alert("Please add at least one product.");
+
+    alert(
+      "Please add at least one product."
+    );
+
     return;
+
   }
 
+
   const customerId =
-    document.getElementById("customerSelect").value;
+    document.getElementById(
+      "customerSelect"
+    ).value;
+
 
   const customer =
     customers.find(
-      c => String(c.id) === String(customerId)
+      c =>
+        String(c.id) ===
+        String(customerId)
     );
+
 
   const invoice = {
 
-    invoiceNumber:"DRAFT",
+    invoiceNumber:
+      "DRAFT",
 
-    date:new Date().toISOString(),
+
+    date:
+      new Date().toISOString(),
+
 
     customerName:
       customer
       ? customer.name
       : "Walk-in Customer",
 
+
     customerPhone:
       customer
       ? customer.phone || ""
       : "",
 
-    items:items,
+
+    paymentMethod:
+      getPaymentMethod(),
+
+
+    items:
+      items,
+
 
     total:
       items.reduce(
@@ -1395,6 +1985,7 @@ function downloadCurrentInvoice(){
 
   };
 
+
   downloadInvoiceFile(invoice);
 
 }
@@ -1404,13 +1995,22 @@ function downloadSavedInvoice(id){
 
   const invoice =
     invoices.find(
-      inv => Number(inv.id) === Number(id)
+      inv =>
+        Number(inv.id) ===
+        Number(id)
     );
 
+
   if(!invoice){
-    alert("Invoice not found.");
+
+    alert(
+      "Invoice not found."
+    );
+
     return;
+
   }
+
 
   downloadInvoiceFile(invoice);
 
@@ -1422,22 +2022,29 @@ function downloadInvoiceFile(invoice){
   const html =
     createInvoiceHTML(invoice);
 
+
   const blob =
     new Blob(
       [html],
       {type:"text/html"}
     );
 
+
   const url =
     URL.createObjectURL(blob);
+
 
   const a =
     document.createElement("a");
 
-  a.href = url;
+
+  a.href =
+    url;
+
 
   a.download =
     `${invoice.invoiceNumber}.html`;
+
 
   document.body.appendChild(a);
 
@@ -1445,18 +2052,20 @@ function downloadInvoiceFile(invoice){
 
   a.remove();
 
+
   URL.revokeObjectURL(url);
 
 }
 
 
 /* -------------------------
-   CREATE HTML
+   CREATE DOWNLOAD HTML
 ------------------------- */
 
 function createInvoiceHTML(invoice){
 
   let rows = "";
+
 
   invoice.items.forEach(item => {
 
@@ -1464,13 +2073,25 @@ function createInvoiceHTML(invoice){
 
       <tr>
 
-        <td>${escapeHTML(item.name)}</td>
+        <td>
+          ${escapeHTML(item.name)}
+        </td>
 
-        <td>${item.quantity}</td>
+        <td>
+          ${item.quantity}
+        </td>
 
-        <td>MVR ${Number(item.price).toFixed(2)}</td>
+        <td>
+          MVR ${Number(
+            item.price
+          ).toFixed(2)}
+        </td>
 
-        <td>MVR ${Number(item.total).toFixed(2)}</td>
+        <td>
+          MVR ${Number(
+            item.total
+          ).toFixed(2)}
+        </td>
 
       </tr>
 
@@ -1487,7 +2108,12 @@ function createInvoiceHTML(invoice){
 
 <meta charset="UTF-8">
 
-<title>${escapeHTML(invoice.invoiceNumber)}</title>
+<title>
+${escapeHTML(
+  invoice.invoiceNumber
+)}
+</title>
+
 
 <style>
 
@@ -1551,6 +2177,13 @@ margin-top:15px;
 color:#7b1e2b;
 }
 
+.payment-method{
+margin-top:15px;
+padding:12px;
+border:1px solid #d8c1b0;
+background:#fffaf5;
+}
+
 .payment{
 margin-top:25px;
 padding:15px;
@@ -1562,7 +2195,9 @@ border-left:5px solid #7b1e2b;
 
 </head>
 
+
 <body>
+
 
 <div class="header">
 
@@ -1581,18 +2216,42 @@ border-left:5px solid #7b1e2b;
 
 <div class="info">
 
+
 <div class="box">
 
 <h3>Invoice Details</h3>
 
 <p>
+
 <strong>Invoice No:</strong>
-${escapeHTML(invoice.invoiceNumber)}
+
+${escapeHTML(
+  invoice.invoiceNumber
+)}
+
 </p>
 
+
 <p>
+
 <strong>Date:</strong>
-${new Date(invoice.date).toLocaleString()}
+
+${new Date(
+  invoice.date
+).toLocaleString()}
+
+</p>
+
+
+<p>
+
+<strong>Payment Method:</strong>
+
+${escapeHTML(
+  invoice.paymentMethod ||
+  "Previous / Unspecified"
+)}
+
 </p>
 
 </div>
@@ -1603,17 +2262,28 @@ ${new Date(invoice.date).toLocaleString()}
 <h3>Customer Details</h3>
 
 <p>
+
 <strong>Name:</strong>
-${escapeHTML(invoice.customerName)}
+
+${escapeHTML(
+  invoice.customerName
+)}
+
 </p>
+
 
 ${
 invoice.customerPhone
 ?
 `
 <p>
+
 <strong>Phone:</strong>
-${escapeHTML(invoice.customerPhone)}
+
+${escapeHTML(
+  invoice.customerPhone
+)}
+
 </p>
 `
 :
@@ -1630,13 +2300,19 @@ ${escapeHTML(invoice.customerPhone)}
 <thead>
 
 <tr>
+
 <th>Product</th>
+
 <th>Qty</th>
+
 <th>Price</th>
+
 <th>Total</th>
+
 </tr>
 
 </thead>
+
 
 <tbody>
 
@@ -1650,7 +2326,22 @@ ${rows}
 <div class="total">
 
 Grand Total:
-MVR ${Number(invoice.total).toFixed(2)}
+
+MVR ${Number(
+  invoice.total
+).toFixed(2)}
+
+</div>
+
+
+<div class="payment-method">
+
+<strong>💳 Payment Method:</strong>
+
+${escapeHTML(
+  invoice.paymentMethod ||
+  "Previous / Unspecified"
+)}
 
 </div>
 
@@ -1660,31 +2351,51 @@ MVR ${Number(invoice.total).toFixed(2)}
 <h3>Payment Details</h3>
 
 <p>
+
 <strong>Bank:</strong>
+
 ${PAYMENT.bank}
+
 </p>
 
+
 <p>
+
 <strong>Account Name:</strong>
+
 ${PAYMENT.accountName}
+
 </p>
 
+
 <p>
+
 <strong>Account Number:</strong>
+
 ${PAYMENT.accountNumber}
+
 </p>
 
+
 <p>
+
 <strong>Payment Slip:</strong>
+
 ${PAYMENT.slip}
+
 </p>
 
+
 <p>
+
 <strong>Contact:</strong>
+
 ${PAYMENT.slipContacts}
+
 </p>
 
 </div>
+
 
 </body>
 
@@ -1694,16 +2405,21 @@ ${PAYMENT.slipContacts}
 
 
 /* -------------------------
-   SECURITY / TEXT
+   ESCAPE HTML
 ------------------------- */
 
 function escapeHTML(value){
 
   return String(value ?? "")
+
     .replace(/&/g,"&amp;")
+
     .replace(/</g,"&lt;")
+
     .replace(/>/g,"&gt;")
+
     .replace(/"/g,"&quot;")
+
     .replace(/'/g,"&#039;");
 
 }
@@ -1726,3 +2442,4 @@ renderSavedInvoices();
 </body>
 </html>
 ```
+
