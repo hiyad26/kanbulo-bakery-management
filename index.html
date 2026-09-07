@@ -23,7 +23,7 @@
     header {
       background: #8B4513;
       color: white;
-      padding: 20px;
+      padding: 22px 15px;
       text-align: center;
     }
 
@@ -38,9 +38,9 @@
     }
 
     main {
-      padding: 20px;
       max-width: 900px;
       margin: auto;
+      padding: 20px;
     }
 
     .welcome {
@@ -59,29 +59,34 @@
 
     .card {
       background: white;
+      border: none;
       border-radius: 15px;
       padding: 20px;
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      text-align: left;
+      width: 100%;
+      color: #3b2415;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .card:active {
+      transform: scale(0.97);
     }
 
     .card .icon {
-      font-size: 30px;
+      font-size: 32px;
       margin-bottom: 10px;
     }
 
     .card h3 {
       margin-bottom: 5px;
+      font-size: 18px;
     }
 
     .card p {
       color: #777;
       font-size: 14px;
-    }
-
-    @media (max-width: 500px) {
-      .cards {
-        grid-template-columns: 1fr;
-      }
     }
 
     footer {
@@ -90,68 +95,86 @@
       color: #888;
       font-size: 13px;
     }
+
+    @media (max-width: 500px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>🥐 Kanbulo Bakery</h1>
-    <p>Bakery Management System</p>
-  </header>
+<header>
+  <h1>🥐 Kanbulo Bakery</h1>
+  <p>Bakery Management System</p>
+</header>
 
-  <main>
+<main>
 
-    <section class="welcome">
-      <h2>Dashboard</h2>
-      <p>Welcome to Kanbulo Bakery Management.</p>
-    </section>
+  <section class="welcome">
+    <h2>Dashboard</h2>
+    <p>Welcome to Kanbulo Bakery Management.</p>
+  </section>
 
-    <section class="cards">
+  <section class="cards">
 
-      <div class="card">
-        <div class="icon">🛒</div>
-        <h3>Sales</h3>
-        <p>Record and manage bakery sales.</p>
-      </div>
+    <button class="card" onclick="openPage('sales.html')">
+      <div class="icon">🛒</div>
+      <h3>Sales</h3>
+      <p>Record and manage bakery sales.</p>
+    </button>
 
-      <div class="card">
-        <div class="icon">📦</div>
-        <h3>Products</h3>
-        <p>Manage your bakery products and prices.</p>
-      </div>
+    <button class="card" onclick="openPage('products.html')">
+      <div class="icon">🍞</div>
+      <h3>Products</h3>
+      <p>Manage bakery products and prices.</p>
+    </button>
 
-      <div class="card">
-        <div class="icon">📊</div>
-        <h3>Reports</h3>
-        <p>View daily and monthly business reports.</p>
-      </div>
+    <button class="card" onclick="comingSoon('Reports')">
+      <div class="icon">📊</div>
+      <h3>Reports</h3>
+      <p>View daily and monthly business reports.</p>
+    </button>
 
-      <div class="card">
-        <div class="icon">💰</div>
-        <h3>Expenses</h3>
-        <p>Track bakery expenses and costs.</p>
-      </div>
+    <button class="card" onclick="comingSoon('Expenses')">
+      <div class="icon">💰</div>
+      <h3>Expenses</h3>
+      <p>Track bakery expenses and costs.</p>
+    </button>
 
-      <div class="card">
-        <div class="icon">📦</div>
-        <h3>Inventory</h3>
-        <p>Keep track of your stock.</p>
-      </div>
+    <button class="card" onclick="comingSoon('Inventory')">
+      <div class="icon">📦</div>
+      <h3>Inventory</h3>
+      <p>Keep track of your stock.</p>
+    </button>
 
-      <div class="card">
-        <div class="icon">👥</div>
-        <h3>Customers</h3>
-        <p>Manage customer information.</p>
-      </div>
+    <button class="card" onclick="comingSoon('Customers')">
+      <div class="icon">👥</div>
+      <h3>Customers</h3>
+      <p>Manage customer information.</p>
+    </button>
 
-    </section>
+  </section>
 
-  </main>
+</main>
 
-  <footer>
-    Kanbulo Bakery Management © 2026
-  </footer>
+<footer>
+  Kanbulo Bakery Management © 2026
+</footer>
+
+<script>
+
+  function openPage(page) {
+    window.location.href = page;
+  }
+
+  function comingSoon(feature) {
+    alert(feature + " section is coming next.");
+  }
+
+</script>
 
 </body>
 </html>
