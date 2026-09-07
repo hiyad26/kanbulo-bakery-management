@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#8B4513">
-
   <title>Sales - Kanbulo Bakery</title>
 
   <style>
@@ -23,7 +22,7 @@
     header {
       background: #8B4513;
       color: white;
-      padding: 18px;
+      padding: 20px;
       text-align: center;
     }
 
@@ -35,17 +34,23 @@
 
     .top {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
       margin-bottom: 20px;
+      gap: 10px;
+    }
+
+    button,
+    select,
+    input {
+      font-size: 16px;
     }
 
     button {
       border: none;
       border-radius: 10px;
-      padding: 11px 16px;
+      padding: 12px 16px;
       cursor: pointer;
-      font-size: 14px;
     }
 
     .back {
@@ -57,44 +62,51 @@
       background: white;
       padding: 20px;
       border-radius: 15px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     }
 
     label {
       display: block;
-      margin-top: 12px;
-      margin-bottom: 6px;
       font-weight: bold;
+      margin: 15px 0 7px;
     }
 
     select,
     input {
       width: 100%;
-      padding: 12px;
+      padding: 13px;
       border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 9px;
+      background: white;
     }
 
     .add {
       width: 100%;
       background: #8B4513;
       color: white;
-      margin-top: 15px;
+      margin-top: 18px;
     }
 
-    .sale-item {
-      border-bottom: 1px solid #eee;
-      padding: 12px 0;
+    .sale-row {
       display: flex;
       justify-content: space-between;
+      gap: 15px;
+      padding: 15px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .remove {
+      background: #f3d6d6;
+      color: #900;
+      padding: 7px 10px;
+      margin-top: 5px;
     }
 
     .total {
+      text-align: right;
       font-size: 22px;
       font-weight: bold;
-      text-align: right;
       margin-top: 20px;
     }
 
@@ -103,17 +115,12 @@
       background: #228B22;
       color: white;
       margin-top: 15px;
-      font-size: 16px;
     }
 
     .empty {
       text-align: center;
       color: #888;
-      padding: 20px;
-    }
-
-    .history {
-      margin-top: 20px;
+      padding: 25px 5px;
     }
 
     .history-item {
@@ -124,9 +131,18 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
+    .error {
+      background: #ffe5e5;
+      color: #900;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
     @media (max-width: 500px) {
-      .top {
-        gap: 10px;
+      .top h2 {
+        font-size: 20px;
       }
     }
   </style>
@@ -142,28 +158,32 @@
 <main>
 
   <div class="top">
-    <button class="back" onclick="goBack()">← Dashboard</button>
+    <button class="back" onclick="goDashboard()">← Dashboard</button>
     <h2>New Sale</h2>
   </div>
 
+  <div id="errorBox" class="error"></div>
+
   <div class="box">
 
-    <label for="product">Product</label>
+    <h2>Make a Sale</h2>
 
-    <select id="product">
-      <option value="">Select product</option>
+    <label for="productSelect">Product</label>
+
+    <select id="productSelect">
+      <option value="">Loading products...</option>
     </select>
 
     <label for="quantity">Quantity</label>
 
     <input
-      type="number"
       id="quantity"
+      type="number"
       min="1"
       value="1"
     >
 
-    <button class="add" onclick="addToSale()">
+    <button class="add" onclick="addItem()">
       ＋ Add to Sale
     </button>
 
@@ -173,99 +193,126 @@
 
     <h2>Current Sale</h2>
 
-    <div id="saleItems">
+    <div id="currentSale">
       <div class="empty">
         No items added yet.
       </div>
     </div>
 
     <div class="total">
-      Total: MVR <span id="total">0.00</span>
+      Total: MVR <span id="grandTotal">0.00</span>
     </div>
 
-    <button class="record" onclick="recordSale()">
+    <button class="record" onclick="completeSale()">
       ✓ Record Sale
     </button>
 
   </div>
 
-  <div class="history">
+  <h2 style="margin-bottom:12px;">Recent Sales</h2>
 
-    <h2>Recent Sales</h2>
-
-    <div id="salesHistory">
-      <div class="empty">
-        No sales recorded yet.
-      </div>
+  <div id="history">
+    <div class="empty">
+      No sales recorded yet.
     </div>
-
   </div>
 
 </main>
 
 <script>
 
-const PRODUCT_KEY = "kanbulo_products";
+const PRODUCTS_KEY = "kanbulo_products";
 const SALES_KEY = "kanbulo_sales";
 
-let currentSale = [];
+let products = [];
+let cart = [];
 
-function getProducts() {
-  try {
-    return JSON.parse(localStorage.getItem(PRODUCT_KEY)) || [];
-  } catch {
-    return [];
-  }
+
+function showError(message) {
+  const box = document.getElementById("errorBox");
+  box.textContent = message;
+  box.style.display = "block";
 }
 
-function getSales() {
-  try {
-    return JSON.parse(localStorage.getItem(SALES_KEY)) || [];
-  } catch {
-    return [];
-  }
-}
-
-function saveProducts(products) {
-  localStorage.setItem(
-    PRODUCT_KEY,
-    JSON.stringify(products)
-  );
-}
-
-function saveSales(sales) {
-  localStorage.setItem(
-    SALES_KEY,
-    JSON.stringify(sales)
-  );
-}
 
 function loadProducts() {
 
-  const select = document.getElementById("product");
-  const products = getProducts();
+  try {
 
-  select.innerHTML =
-    '<option value="">Select product</option>';
+    const saved = localStorage.getItem(PRODUCTS_KEY);
+
+    if (!saved) {
+      products = [];
+    } else {
+      products = JSON.parse(saved);
+    }
+
+    if (!Array.isArray(products)) {
+      products = [];
+    }
+
+  } catch (error) {
+
+    products = [];
+
+    showError(
+      "Could not read your products from this browser."
+    );
+
+  }
+
+  const select =
+    document.getElementById("productSelect");
+
+  select.innerHTML = "";
+
+  if (products.length === 0) {
+
+    select.innerHTML =
+      '<option value="">No products found</option>';
+
+    showError(
+      "No products were found. Open Products and make sure your Bun is saved."
+    );
+
+    return;
+  }
+
+  const first =
+    document.createElement("option");
+
+  first.value = "";
+  first.textContent = "Select product";
+
+  select.appendChild(first);
 
   products.forEach(product => {
 
-    const option = document.createElement("option");
+    const option =
+      document.createElement("option");
 
-    option.value = product.id;
+    option.value = String(product.id);
 
     option.textContent =
-      `${product.name} — MVR ${product.price.toFixed(2)} (Stock: ${product.stock})`;
+      product.name +
+      " — MVR " +
+      Number(product.price).toFixed(2) +
+      " — Stock: " +
+      Number(product.stock);
 
     select.appendChild(option);
 
   });
 }
 
-function addToSale() {
+
+function addItem() {
+
+  const select =
+    document.getElementById("productSelect");
 
   const productId =
-    Number(document.getElementById("product").value);
+    Number(select.value);
 
   const quantity =
     Number(document.getElementById("quantity").value);
@@ -275,15 +322,13 @@ function addToSale() {
     return;
   }
 
-  if (!quantity || quantity < 1) {
+  if (!Number.isInteger(quantity) || quantity < 1) {
     alert("Please enter a valid quantity.");
     return;
   }
 
-  const products = getProducts();
-
   const product =
-    products.find(p => p.id === productId);
+    products.find(p => Number(p.id) === productId);
 
   if (!product) {
     alert("Product not found.");
@@ -291,14 +336,18 @@ function addToSale() {
   }
 
   const existing =
-    currentSale.find(item => item.productId === productId);
+    cart.find(item => Number(item.productId) === productId);
 
-  const alreadyAdded =
+  const currentQuantity =
     existing ? existing.quantity : 0;
 
-  if (alreadyAdded + quantity > product.stock) {
+  if (
+    currentQuantity + quantity >
+    Number(product.stock)
+  ) {
     alert(
-      `Not enough stock. Available: ${product.stock}`
+      "Not enough stock. Available stock: " +
+      product.stock
     );
     return;
   }
@@ -306,61 +355,69 @@ function addToSale() {
   if (existing) {
 
     existing.quantity += quantity;
+
     existing.total =
-      existing.quantity * existing.price;
+      existing.quantity *
+      Number(existing.price);
 
   } else {
 
-    currentSale.push({
+    cart.push({
       productId: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       quantity: quantity,
-      total: product.price * quantity
+      total:
+        Number(product.price) * quantity
     });
 
   }
 
-  displayCurrentSale();
+  renderCart();
 
   document.getElementById("quantity").value = 1;
 }
 
-function displayCurrentSale() {
+
+function removeItem(index) {
+
+  cart.splice(index, 1);
+
+  renderCart();
+}
+
+
+function renderCart() {
 
   const container =
-    document.getElementById("saleItems");
+    document.getElementById("currentSale");
 
-  const totalElement =
-    document.getElementById("total");
+  let total = 0;
 
-  if (currentSale.length === 0) {
+  if (cart.length === 0) {
 
-    container.innerHTML = `
-      <div class="empty">
-        No items added yet.
-      </div>
-    `;
+    container.innerHTML =
+      '<div class="empty">No items added yet.</div>';
 
-    totalElement.textContent = "0.00";
+    document.getElementById("grandTotal")
+      .textContent = "0.00";
 
     return;
   }
 
-  let grandTotal = 0;
-
   container.innerHTML =
-    currentSale.map((item, index) => {
+    cart.map((item, index) => {
 
-      grandTotal += item.total;
+      total += item.total;
 
       return `
-        <div class="sale-item">
+        <div class="sale-row">
 
           <div>
             <strong>${escapeHTML(item.name)}</strong>
             <br>
-            ${item.quantity} × MVR ${item.price.toFixed(2)}
+            ${item.quantity} ×
+            MVR ${item.price.toFixed(2)}
           </div>
 
           <div>
@@ -368,7 +425,10 @@ function displayCurrentSale() {
               MVR ${item.total.toFixed(2)}
             </strong>
             <br>
-            <button onclick="removeItem(${index})">
+
+            <button
+              class="remove"
+              onclick="removeItem(${index})">
               Remove
             </button>
           </div>
@@ -378,81 +438,199 @@ function displayCurrentSale() {
 
     }).join("");
 
-  totalElement.textContent =
-    grandTotal.toFixed(2);
+  document.getElementById("grandTotal")
+    .textContent = total.toFixed(2);
 }
 
-function removeItem(index) {
 
-  currentSale.splice(index, 1);
+function completeSale() {
 
-  displayCurrentSale();
-}
-
-function recordSale() {
-
-  if (currentSale.length === 0) {
-    alert("Please add at least one product.");
+  if (cart.length === 0) {
+    alert("Please add a product first.");
     return;
   }
 
-  const products = getProducts();
+  /*
+    Reload products directly from localStorage
+    so we always use the newest stock.
+  */
 
-  currentSale.forEach(item => {
+  let latestProducts;
+
+  try {
+
+    latestProducts =
+      JSON.parse(
+        localStorage.getItem(PRODUCTS_KEY)
+      ) || [];
+
+  } catch {
+
+    alert("Could not read your products.");
+    return;
+  }
+
+  /*
+    Check stock one final time.
+  */
+
+  for (const item of cart) {
 
     const product =
-      products.find(p => p.id === item.productId);
+      latestProducts.find(
+        p => Number(p.id) === Number(item.productId)
+      );
 
-    if (product) {
-      product.stock -= item.quantity;
+    if (!product) {
+      alert(
+        "Product " + item.name +
+        " could not be found."
+      );
+      return;
     }
+
+    if (Number(product.stock) < item.quantity) {
+      alert(
+        "Not enough stock for " +
+        item.name +
+        ". Available: " +
+        product.stock
+      );
+      return;
+    }
+
+  }
+
+  /*
+    Reduce stock.
+  */
+
+  cart.forEach(item => {
+
+    const product =
+      latestProducts.find(
+        p => Number(p.id) === Number(item.productId)
+      );
+
+    product.stock =
+      Number(product.stock) -
+      Number(item.quantity);
 
   });
 
-  saveProducts(products);
+  /*
+    Save updated products.
+  */
+
+  localStorage.setItem(
+    PRODUCTS_KEY,
+    JSON.stringify(latestProducts)
+  );
+
+  /*
+    Calculate total.
+  */
 
   const total =
-    currentSale.reduce(
+    cart.reduce(
       (sum, item) => sum + item.total,
       0
     );
 
-  const sales = getSales();
+  /*
+    Save sale.
+  */
+
+  let sales = [];
+
+  try {
+
+    sales =
+      JSON.parse(
+        localStorage.getItem(SALES_KEY)
+      ) || [];
+
+    if (!Array.isArray(sales)) {
+      sales = [];
+    }
+
+  } catch {
+
+    sales = [];
+
+  }
 
   sales.push({
+
     id: Date.now(),
-    date: new Date().toISOString(),
-    items: currentSale,
+
+    date:
+      new Date().toISOString(),
+
+    items:
+      cart.map(item => ({
+        productId: item.productId,
+        name: item.name,
+        price: item.price,
+        quantity: item.quantity,
+        total: item.total
+      })),
+
     total: total
+
   });
 
-  saveSales(sales);
-
-  alert(
-    `Sale recorded successfully!\nTotal: MVR ${total.toFixed(2)}`
+  localStorage.setItem(
+    SALES_KEY,
+    JSON.stringify(sales)
   );
 
-  currentSale = [];
+  alert(
+    "Sale recorded successfully!\n\n" +
+    "Total: MVR " +
+    total.toFixed(2)
+  );
+
+  /*
+    Reset page.
+  */
+
+  products = latestProducts;
+
+  cart = [];
 
   loadProducts();
-  displayCurrentSale();
-  displayHistory();
+
+  renderCart();
+
+  renderHistory();
 }
 
-function displayHistory() {
+
+function renderHistory() {
 
   const container =
-    document.getElementById("salesHistory");
+    document.getElementById("history");
 
-  const sales = getSales();
+  let sales = [];
 
-  if (sales.length === 0) {
+  try {
 
-    container.innerHTML = `
-      <div class="empty">
-        No sales recorded yet.
-      </div>
-    `;
+    sales =
+      JSON.parse(
+        localStorage.getItem(SALES_KEY)
+      ) || [];
+
+  } catch {
+
+    sales = [];
+
+  }
+
+  if (!Array.isArray(sales) || sales.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No sales recorded yet.</div>';
 
     return;
   }
@@ -464,13 +642,21 @@ function displayHistory() {
     recent.map(sale => {
 
       const date =
-        new Date(sale.date).toLocaleString();
+        new Date(sale.date)
+          .toLocaleString();
+
+      const items =
+        sale.items.map(item =>
+          escapeHTML(item.name) +
+          " × " +
+          item.quantity
+        ).join("<br>");
 
       return `
         <div class="history-item">
 
           <strong>
-            MVR ${sale.total.toFixed(2)}
+            MVR ${Number(sale.total).toFixed(2)}
           </strong>
 
           <br>
@@ -479,9 +665,7 @@ function displayHistory() {
 
           <br><br>
 
-          ${sale.items.map(item =>
-            `${escapeHTML(item.name)} × ${item.quantity}`
-          ).join("<br>")}
+          ${items}
 
         </div>
       `;
@@ -489,23 +673,33 @@ function displayHistory() {
     }).join("");
 }
 
-function escapeHTML(text) {
+
+function escapeHTML(value) {
 
   const div =
     document.createElement("div");
 
-  div.textContent = text;
+  div.textContent =
+    String(value);
 
   return div.innerHTML;
 }
 
-function goBack() {
+
+function goDashboard() {
   window.location.href = "index.html";
 }
 
+
+/*
+  Start the page.
+*/
+
 loadProducts();
-displayCurrentSale();
-displayHistory();
+
+renderCart();
+
+renderHistory();
 
 </script>
 
