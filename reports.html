@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#8B4513">
+  <meta name="theme-color" content="#7B1E2B">
 
   <title>Kanbulo Bakery - Reports</title>
 
@@ -21,7 +21,7 @@
     }
 
     header {
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
       padding: 22px 15px;
       text-align: center;
@@ -39,7 +39,7 @@
     }
 
     main {
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
       padding: 20px;
     }
@@ -59,6 +59,28 @@
       margin-bottom: 20px;
     }
 
+    .filter-box {
+      background: white;
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .filter-box label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .filter-box input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
     .cards {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -74,13 +96,14 @@
 
     .card h3 {
       margin: 0 0 10px;
-      font-size: 16px;
+      font-size: 15px;
       color: #777;
     }
 
     .value {
       font-size: 25px;
       font-weight: bold;
+      color: #7B1E2B;
     }
 
     .profit {
@@ -91,6 +114,10 @@
       font-size: 30px;
     }
 
+    .payment-card {
+      border-top: 4px solid #7B1E2B;
+    }
+
     .section {
       background: white;
       border-radius: 15px;
@@ -99,9 +126,33 @@
       box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     }
 
+    .section h3 {
+      margin-top: 0;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .summary-item {
+      background: #fff8f0;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+    }
+
+    .summary-item strong {
+      display: block;
+      font-size: 20px;
+      color: #7B1E2B;
+      margin-top: 5px;
+    }
+
     .sale-row,
     .expense-row {
-      padding: 12px 0;
+      padding: 14px 0;
       border-bottom: 1px solid #eee;
     }
 
@@ -110,19 +161,39 @@
       border-bottom: none;
     }
 
+    .payment-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 20px;
+      background: #f2e2e2;
+      color: #7B1E2B;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+
     .empty {
       color: #777;
       text-align: center;
       padding: 15px;
     }
 
-    @media (max-width: 500px) {
+    .month-title {
+      color: #7B1E2B;
+      margin-top: 0;
+    }
+
+    @media (max-width: 650px) {
       .cards {
         grid-template-columns: 1fr;
       }
 
       .profit {
         grid-column: auto;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -143,38 +214,186 @@
 
   <h2>📊 Reports</h2>
 
-  <div class="cards">
+  <!-- DATE FILTER -->
 
-    <div class="card">
-      <h3>Total Sales</h3>
-      <div class="value">
-        MVR <span id="salesTotal">0.00</span>
-      </div>
-    </div>
+  <div class="filter-box">
 
-    <div class="card">
-      <h3>Total Expenses</h3>
-      <div class="value">
-        MVR <span id="expenseTotal">0.00</span>
-      </div>
-    </div>
+    <label for="reportDate">
+      📅 Select Date
+    </label>
 
-    <div class="card profit">
-      <h3>Profit / Loss</h3>
-      <div class="value">
-        MVR <span id="profitTotal">0.00</span>
+    <input
+      type="date"
+      id="reportDate"
+      onchange="loadReports()"
+    >
+
+  </div>
+
+
+  <!-- DAILY REPORT -->
+
+  <div class="section">
+
+    <h3>📅 Daily Sales</h3>
+
+    <div class="summary-grid">
+
+      <div class="summary-item">
+        💰 Total Sales
+        <strong>
+          MVR <span id="dailySales">0.00</span>
+        </strong>
       </div>
+
+      <div class="summary-item">
+        🧾 Sales
+        <strong id="dailyCount">0</strong>
+      </div>
+
+      <div class="summary-item">
+        🍞 Products Sold
+        <strong id="dailyProducts">0</strong>
+      </div>
+
     </div>
 
   </div>
 
+
+  <!-- PAYMENT METHODS -->
+
+  <div class="cards">
+
+    <div class="card payment-card">
+
+      <h3>💵 Cash Sales</h3>
+
+      <div class="value">
+        MVR <span id="cashTotal">0.00</span>
+      </div>
+
+    </div>
+
+
+    <div class="card payment-card">
+
+      <h3>💳 Card Sales</h3>
+
+      <div class="value">
+        MVR <span id="cardTotal">0.00</span>
+      </div>
+
+    </div>
+
+
+    <div class="card payment-card">
+
+      <h3>🏦 Bank Transfer</h3>
+
+      <div class="value">
+        MVR <span id="transferTotal">0.00</span>
+      </div>
+
+    </div>
+
+
+    <div class="card payment-card">
+
+      <h3>❓ Previous / Unspecified</h3>
+
+      <div class="value">
+        MVR <span id="otherTotal">0.00</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MONTHLY REPORT -->
+
   <div class="section">
 
-    <h3>🛒 Sales</h3>
+    <h3 class="month-title">
+      📆 Monthly Sales
+    </h3>
+
+    <div class="summary-grid">
+
+      <div class="summary-item">
+        💰 Monthly Sales
+        <strong>
+          MVR <span id="monthlySales">0.00</span>
+        </strong>
+      </div>
+
+      <div class="summary-item">
+        🧾 Number of Sales
+        <strong id="monthlyCount">0</strong>
+      </div>
+
+      <div class="summary-item">
+        🍞 Products Sold
+        <strong id="monthlyProducts">0</strong>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MAIN FINANCIAL SUMMARY -->
+
+  <div class="cards">
+
+    <div class="card">
+
+      <h3>Total Sales</h3>
+
+      <div class="value">
+        MVR <span id="salesTotal">0.00</span>
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h3>Total Expenses</h3>
+
+      <div class="value">
+        MVR <span id="expenseTotal">0.00</span>
+      </div>
+
+    </div>
+
+
+    <div class="card profit">
+
+      <h3>Profit / Loss</h3>
+
+      <div class="value">
+        MVR <span id="profitTotal">0.00</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- SALES HISTORY -->
+
+  <div class="section">
+
+    <h3>🛒 Sales History</h3>
 
     <div id="salesList"></div>
 
   </div>
+
+
+  <!-- EXPENSE HISTORY -->
 
   <div class="section">
 
@@ -185,6 +404,7 @@
   </div>
 
 </main>
+
 
 <script>
 
@@ -210,36 +430,261 @@ function getData(key) {
 }
 
 
+/*
+  Converts a Date object into YYYY-MM-DD
+*/
+
+function dateKey(date) {
+
+  const year = date.getFullYear();
+
+  const month =
+    String(date.getMonth() + 1).padStart(2, "0");
+
+  const day =
+    String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+/*
+  Converts an ISO sale date into
+  the user's local YYYY-MM-DD.
+*/
+
+function saleDateKey(dateString) {
+
+  if (!dateString) return "";
+
+  const date = new Date(dateString);
+
+  if (isNaN(date.getTime())) return "";
+
+  return dateKey(date);
+
+}
+
+
+/*
+  Get selected date.
+*/
+
+function getSelectedDate() {
+
+  const input =
+    document.getElementById("reportDate");
+
+  return input.value;
+
+}
+
+
+/*
+  Main report loader.
+*/
+
 function loadReports() {
 
   const sales = getData(SALES_KEY);
   const expenses = getData(EXPENSES_KEY);
 
+  const selectedDate =
+    getSelectedDate();
+
+
+  /*
+    DAILY SALES
+  */
+
+  const dailySalesList =
+    sales.filter(sale =>
+      saleDateKey(sale.date) === selectedDate
+    );
+
+
+  let dailySales = 0;
+  let dailyProducts = 0;
+
+
+  dailySalesList.forEach(sale => {
+
+    dailySales += Number(sale.total || 0);
+
+
+    if (Array.isArray(sale.items)) {
+
+      sale.items.forEach(item => {
+
+        dailyProducts +=
+          Number(item.quantity || 0);
+
+      });
+
+    }
+
+  });
+
+
+  document.getElementById("dailySales")
+    .textContent =
+    dailySales.toFixed(2);
+
+
+  document.getElementById("dailyCount")
+    .textContent =
+    dailySalesList.length;
+
+
+  document.getElementById("dailyProducts")
+    .textContent =
+    dailyProducts;
+
+
+  /*
+    PAYMENT METHODS FOR SELECTED DAY
+  */
+
+  let cashTotal = 0;
+  let cardTotal = 0;
+  let transferTotal = 0;
+  let otherTotal = 0;
+
+
+  dailySalesList.forEach(sale => {
+
+    const amount =
+      Number(sale.total || 0);
+
+    const method =
+      String(sale.paymentMethod || "")
+        .toLowerCase();
+
+
+    if (method === "cash") {
+
+      cashTotal += amount;
+
+    } else if (method === "card") {
+
+      cardTotal += amount;
+
+    } else if (
+      method === "bank transfer" ||
+      method === "transfer"
+    ) {
+
+      transferTotal += amount;
+
+    } else {
+
+      /*
+        Old sales created before
+        payment method was added.
+      */
+
+      otherTotal += amount;
+
+    }
+
+  });
+
+
+  document.getElementById("cashTotal")
+    .textContent =
+    cashTotal.toFixed(2);
+
+
+  document.getElementById("cardTotal")
+    .textContent =
+    cardTotal.toFixed(2);
+
+
+  document.getElementById("transferTotal")
+    .textContent =
+    transferTotal.toFixed(2);
+
+
+  document.getElementById("otherTotal")
+    .textContent =
+    otherTotal.toFixed(2);
+
+
+  /*
+    MONTHLY SALES
+  */
+
+  const selectedMonth =
+    selectedDate.substring(0, 7);
+
+
+  const monthlySalesList =
+    sales.filter(sale =>
+      saleDateKey(sale.date).substring(0, 7)
+      === selectedMonth
+    );
+
+
+  let monthlySales = 0;
+  let monthlyProducts = 0;
+
+
+  monthlySalesList.forEach(sale => {
+
+    monthlySales +=
+      Number(sale.total || 0);
+
+
+    if (Array.isArray(sale.items)) {
+
+      sale.items.forEach(item => {
+
+        monthlyProducts +=
+          Number(item.quantity || 0);
+
+      });
+
+    }
+
+  });
+
+
+  document.getElementById("monthlySales")
+    .textContent =
+    monthlySales.toFixed(2);
+
+
+  document.getElementById("monthlyCount")
+    .textContent =
+    monthlySalesList.length;
+
+
+  document.getElementById("monthlyProducts")
+    .textContent =
+    monthlyProducts;
+
+
+  /*
+    ALL-TIME FINANCIAL SUMMARY
+  */
+
   let salesTotal = 0;
   let expenseTotal = 0;
 
 
-  /*
-    Sales are saved like this:
-
-    {
-      items: [...],
-      total: 5
-    }
-
-    So we read the sale.total value.
-  */
-
   sales.forEach(sale => {
 
-    salesTotal += Number(sale.total || 0);
+    salesTotal +=
+      Number(sale.total || 0);
 
   });
 
 
   expenses.forEach(expense => {
 
-    expenseTotal += Number(expense.amount || 0);
+    expenseTotal +=
+      Number(expense.amount || 0);
 
   });
 
@@ -249,21 +694,39 @@ function loadReports() {
 
 
   document.getElementById("salesTotal")
-    .textContent = salesTotal.toFixed(2);
+    .textContent =
+    salesTotal.toFixed(2);
+
 
   document.getElementById("expenseTotal")
-    .textContent = expenseTotal.toFixed(2);
+    .textContent =
+    expenseTotal.toFixed(2);
+
 
   document.getElementById("profitTotal")
-    .textContent = profit.toFixed(2);
+    .textContent =
+    profit.toFixed(2);
 
 
-  displaySales(sales);
+  /*
+    DISPLAY SELECTED DAY SALES
+  */
+
+  displaySales(dailySalesList);
+
+
+  /*
+    DISPLAY EXPENSES
+  */
 
   displayExpenses(expenses);
 
 }
 
+
+/*
+  Display sales for selected day.
+*/
 
 function displaySales(sales) {
 
@@ -274,7 +737,7 @@ function displaySales(sales) {
   if (sales.length === 0) {
 
     list.innerHTML =
-      '<div class="empty">No sales recorded yet.</div>';
+      '<div class="empty">No sales recorded for this date.</div>';
 
     return;
 
@@ -311,6 +774,11 @@ function displaySales(sales) {
       }
 
 
+      const method =
+        sale.paymentMethod ||
+        "Previous / Unspecified";
+
+
       return `
         <div class="sale-row">
 
@@ -320,7 +788,13 @@ function displaySales(sales) {
 
           <br>
 
-          <small>${date}</small>
+          <span class="payment-badge">
+            ${escapeHTML(method)}
+          </span>
+
+          <br>
+
+          <small>${escapeHTML(date)}</small>
 
           <br><br>
 
@@ -333,6 +807,10 @@ function displaySales(sales) {
 
 }
 
+
+/*
+  Display expenses.
+*/
 
 function displayExpenses(expenses) {
 
@@ -378,6 +856,10 @@ function displayExpenses(expenses) {
 }
 
 
+/*
+  Prevent HTML injection.
+*/
+
 function escapeHTML(value) {
 
   const div =
@@ -391,6 +873,27 @@ function escapeHTML(value) {
 }
 
 
+/*
+  Set today's date automatically.
+*/
+
+function setToday() {
+
+  const input =
+    document.getElementById("reportDate");
+
+  input.value =
+    dateKey(new Date());
+
+}
+
+
+/*
+  Start report.
+*/
+
+setToday();
+
 loadReports();
 
 </script>
@@ -398,4 +901,5 @@ loadReports();
 </body>
 </html>
 ```
+
 
