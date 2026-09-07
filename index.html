@@ -1,10 +1,10 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#8B4513">
+  <meta name="theme-color" content="#7B1E2B">
 
   <title>Kanbulo Bakery Management</title>
 
@@ -18,24 +18,24 @@
     body {
       font-family: Arial, sans-serif;
       background: #fff8f0;
-      color: #3b2415;
+      color: #4b1f1f;
     }
 
     header {
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
-      padding: 22px 15px;
+      padding: 24px 15px;
       text-align: center;
     }
 
     header h1 {
-      font-size: 25px;
-      margin-bottom: 5px;
+      font-size: 26px;
+      margin-bottom: 6px;
     }
 
     header p {
       font-size: 14px;
-      opacity: 0.9;
+      opacity: 0.92;
     }
 
     main {
@@ -49,7 +49,13 @@
     }
 
     .welcome h2 {
-      margin-bottom: 5px;
+      color: #7B1E2B;
+      margin-bottom: 6px;
+    }
+
+    .welcome p {
+      color: #777;
+      font-size: 14px;
     }
 
     .cards {
@@ -61,20 +67,24 @@
     .card {
       display: block;
       background: white;
-      border: none;
+      border: 1px solid #f0dfd2;
       border-radius: 15px;
       padding: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
       text-align: left;
       width: 100%;
-      color: #3b2415;
+      color: #4b1f1f;
       text-decoration: none;
       cursor: pointer;
-      transition: transform 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s;
     }
 
     .card:active {
       transform: scale(0.97);
+    }
+
+    .card:hover {
+      box-shadow: 0 5px 14px rgba(0,0,0,0.10);
     }
 
     .card .icon {
@@ -85,11 +95,13 @@
     .card h3 {
       margin-bottom: 5px;
       font-size: 18px;
+      color: #7B1E2B;
     }
 
     .card p {
       color: #777;
       font-size: 14px;
+      line-height: 1.4;
     }
 
     footer {
@@ -102,6 +114,10 @@
     @media (max-width: 500px) {
       .cards {
         grid-template-columns: 1fr;
+      }
+
+      main {
+        padding: 15px;
       }
     }
   </style>
@@ -123,48 +139,56 @@
 
   <section class="cards">
 
+    <!-- SALES -->
     <a class="card" href="sales.html">
       <div class="icon">🛒</div>
       <h3>Sales</h3>
       <p>Record and manage bakery sales.</p>
     </a>
 
+    <!-- PRODUCTS -->
     <a class="card" href="products.html">
       <div class="icon">🍞</div>
       <h3>Products</h3>
       <p>Manage bakery products and prices.</p>
     </a>
 
+    <!-- REPORTS -->
     <a class="card" href="reports.html">
       <div class="icon">📊</div>
       <h3>Reports</h3>
       <p>View daily and monthly business reports.</p>
     </a>
 
+    <!-- EXPENSES -->
     <a class="card" href="expenses.html">
       <div class="icon">💰</div>
       <h3>Expenses</h3>
       <p>Track bakery expenses and costs.</p>
     </a>
 
+    <!-- INVENTORY -->
     <a class="card" href="inventory.html">
       <div class="icon">📦</div>
       <h3>Inventory</h3>
       <p>Keep track of your stock.</p>
     </a>
 
+    <!-- CUSTOMERS -->
     <a class="card" href="customers.html">
       <div class="icon">👥</div>
       <h3>Customers</h3>
       <p>Manage customer information.</p>
     </a>
 
+    <!-- QUOTATIONS -->
     <a class="card" href="quotations.html">
       <div class="icon">📝</div>
       <h3>Quotations</h3>
       <p>Create and manage customer quotations.</p>
     </a>
 
+    <!-- INVOICES -->
     <a class="card" href="invoices.html">
       <div class="icon">🧾</div>
       <h3>Invoices</h3>
@@ -181,3 +205,5 @@
 
 </body>
 </html>
+```
+
