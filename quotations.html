@@ -1,211 +1,322 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Kanbulo Bakery - Quotations</title>
+<title>Kanbulo Bakery - Quotations</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #fff8f0;
-      color: #3b2415;
-      padding-bottom: 40px;
-    }
+:root{
+  --maroon:#7b1e2b;
+  --maroon-dark:#5c1520;
+  --cream:#fff8ef;
+  --cream-dark:#f7eadb;
+  --brown:#43251d;
+  --gold:#c99a4a;
+  --white:#ffffff;
+}
 
-    header {
-      background: #8B4513;
-      color: white;
-      padding: 18px 15px;
-      text-align: center;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:var(--cream);
+  color:var(--brown);
+  padding-bottom:40px;
+}
 
-    header h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
+/* HEADER */
 
-    header p {
-      font-size: 14px;
-    }
+header{
+  background:linear-gradient(135deg,var(--maroon-dark),var(--maroon));
+  color:white;
+  padding:25px 15px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
 
-    main {
-      max-width: 850px;
-      margin: auto;
-      padding: 20px;
-    }
+header:after{
+  content:"🥐  🍞  🧁  🥐  🍪";
+  position:absolute;
+  bottom:5px;
+  left:0;
+  width:100%;
+  font-size:13px;
+  opacity:.25;
+  letter-spacing:8px;
+}
 
-    .back {
-      display: inline-block;
-      margin-bottom: 15px;
-      color: #8B4513;
-      text-decoration: none;
-      font-weight: bold;
-    }
+header h1{
+  font-family:Georgia,serif;
+  font-size:28px;
+  margin-bottom:6px;
+}
 
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    }
+header p{
+  font-size:14px;
+  opacity:.9;
+}
 
-    h2 {
-      margin-bottom: 15px;
-    }
+/* MAIN */
 
-    label {
-      display: block;
-      margin-top: 12px;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
+main{
+  max-width:850px;
+  margin:auto;
+  padding:20px;
+}
 
-    select,
-    input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      font-size: 16px;
-    }
+.back{
+  display:inline-block;
+  margin-bottom:15px;
+  color:var(--maroon);
+  text-decoration:none;
+  font-weight:bold;
+}
 
-    button {
-      border: none;
-      border-radius: 8px;
-      padding: 12px 15px;
-      font-size: 15px;
-      cursor: pointer;
-      margin-top: 12px;
-    }
+/* CARDS */
 
-    .primary {
-      background: #8B4513;
-      color: white;
-    }
+.card{
+  background:white;
+  padding:20px;
+  border-radius:18px;
+  margin-bottom:20px;
+  box-shadow:0 5px 18px rgba(92,21,32,.10);
+  border:1px solid #f0dfcf;
+}
 
-    .save {
-      background: #2e7d32;
-      color: white;
-    }
+h2{
+  color:var(--maroon);
+  font-family:Georgia,serif;
+  margin-bottom:15px;
+}
 
-    .download {
-      background: #1565c0;
-      color: white;
-    }
+/* FORM */
 
-    .print {
-      background: #555;
-      color: white;
-    }
+label{
+  display:block;
+  margin-top:12px;
+  margin-bottom:6px;
+  font-weight:bold;
+  color:var(--brown);
+}
 
-    .danger {
-      background: #c62828;
-      color: white;
-    }
+select,
+input{
+  width:100%;
+  padding:13px;
+  border:1px solid #dfcabb;
+  border-radius:10px;
+  font-size:16px;
+  background:#fffdf9;
+  color:var(--brown);
+}
 
-    .items {
-      margin-top: 15px;
-    }
+select:focus,
+input:focus{
+  outline:none;
+  border-color:var(--maroon);
+  box-shadow:0 0 0 3px rgba(123,30,43,.10);
+}
 
-    .item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #eee;
-      padding: 12px 0;
-      gap: 10px;
-    }
+/* BUTTONS */
 
-    .item button {
-      margin: 0;
-      padding: 7px 10px;
-    }
+button{
+  border:none;
+  border-radius:10px;
+  padding:12px 15px;
+  font-size:15px;
+  cursor:pointer;
+  margin-top:12px;
+  font-weight:bold;
+}
 
-    .total {
-      text-align: right;
-      font-size: 20px;
-      font-weight: bold;
-      margin-top: 15px;
-    }
+.primary{
+  background:var(--maroon);
+  color:white;
+}
 
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 15px;
-    }
+.primary:active{
+  background:var(--maroon-dark);
+}
 
-    .actions button {
-      margin: 0;
-    }
+.save{
+  background:#8b5a2b;
+  color:white;
+}
 
-    .quotation-number {
-      background: #fff3e0;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-    }
+.download{
+  background:var(--maroon);
+  color:white;
+}
 
-    .saved {
-      border: 1px solid #eee;
-      padding: 15px;
-      border-radius: 10px;
-      margin-top: 12px;
-    }
+.print{
+  background:#4f403b;
+  color:white;
+}
 
-    .saved strong {
-      font-size: 17px;
-    }
+.danger{
+  background:#b32635;
+  color:white;
+}
 
-    .saved-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      margin-top: 10px;
-    }
+/* QUOTATION NUMBER */
 
-    .saved-actions button {
-      margin: 0;
-      padding: 8px 11px;
-    }
+.quotation-number{
+  background:var(--cream-dark);
+  border-left:5px solid var(--maroon);
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:18px;
+  line-height:1.8;
+}
 
-    .details {
-      display: none;
-      background: #fafafa;
-      padding: 12px;
-      margin-top: 10px;
-      border-radius: 8px;
-    }
+.quotation-number strong{
+  color:var(--maroon);
+}
 
-    .details.show {
-      display: block;
-    }
+/* CUSTOMER */
 
-    .empty {
-      color: #777;
-      text-align: center;
-      padding: 15px;
-    }
+#customerDisplay{
+  background:#fffaf4;
+  border:1px solid #f0dfcf;
+  padding:12px;
+  border-radius:10px;
+  font-weight:bold;
+  color:var(--maroon);
+}
 
-    @media (max-width: 600px) {
-      .actions {
-        grid-template-columns: 1fr;
-      }
+/* ITEMS */
 
-      .item {
-        align-items: flex-start;
-      }
-    }
-  </style>
+.items{
+  margin-top:15px;
+}
+
+.item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px dashed #dfcabb;
+  padding:14px 0;
+  gap:10px;
+}
+
+.item strong{
+  color:var(--maroon);
+}
+
+.item button{
+  margin:0;
+  padding:7px 10px;
+}
+
+/* TOTAL */
+
+.total{
+  text-align:right;
+  font-size:21px;
+  font-weight:bold;
+  margin-top:18px;
+  padding:15px;
+  background:var(--cream-dark);
+  color:var(--maroon);
+  border-radius:10px;
+}
+
+/* ACTIONS */
+
+.actions{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:15px;
+}
+
+.actions button{
+  margin:0;
+}
+
+/* SAVED */
+
+.saved{
+  background:#fffaf4;
+  border:1px solid #ead7c6;
+  padding:16px;
+  border-radius:12px;
+  margin-top:12px;
+}
+
+.saved strong{
+  font-size:17px;
+  color:var(--maroon);
+}
+
+.saved-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:10px;
+}
+
+.saved-actions button{
+  margin:0;
+  padding:8px 11px;
+}
+
+.details{
+  display:none;
+  background:white;
+  padding:12px;
+  margin-top:10px;
+  border-radius:8px;
+  border-left:3px solid var(--gold);
+}
+
+.details.show{
+  display:block;
+}
+
+.empty{
+  color:#777;
+  text-align:center;
+  padding:15px;
+}
+
+/* FOOTER */
+
+footer{
+  text-align:center;
+  color:#9a8177;
+  font-size:13px;
+  padding:20px;
+}
+
+.footer-heart{
+  color:var(--maroon);
+}
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  .actions{
+    grid-template-columns:1fr;
+  }
+
+  .item{
+    align-items:flex-start;
+  }
+
+  header h1{
+    font-size:25px;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -217,115 +328,149 @@
 
 <main>
 
-  <a class="back" href="index.html">← Dashboard</a>
+<a class="back" href="index.html">← Dashboard</a>
 
-  <!-- CREATE QUOTATION -->
-  <div class="card">
+<!-- CREATE -->
 
-    <h2>📝 Create New Quotation</h2>
+<div class="card">
 
-    <div class="quotation-number">
-      <strong>Quotation No:</strong>
-      <span id="quotationNumber"></span>
-      <br>
-      <strong>Date:</strong>
-      <span id="quotationDate"></span>
-    </div>
+<h2>📝 Create New Quotation</h2>
 
-    <label>Customer</label>
-    <select id="customer">
-      <option value="">Walk-in Customer</option>
-    </select>
+<div class="quotation-number">
 
-    <label>Product</label>
-    <select id="product">
-      <option value="">Select Product</option>
-    </select>
+<strong>Quotation No:</strong>
+<span id="quotationNumber"></span>
 
-    <label>Quantity</label>
-    <input id="quantity" type="number" min="1" value="1">
+<br>
 
-    <button class="primary" onclick="addItem()">➕ Add Product</button>
+<strong>Date:</strong>
+<span id="quotationDate"></span>
 
-  </div>
+</div>
 
-  <!-- CURRENT QUOTATION -->
-  <div class="card">
+<label>Customer</label>
 
-    <h2>📄 Current Quotation</h2>
+<select id="customer">
+<option value="">Walk-in Customer</option>
+</select>
 
-    <div id="customerDisplay">
-      Customer: Walk-in Customer
-    </div>
+<label>Product</label>
 
-    <div class="items" id="items"></div>
+<select id="product">
+<option value="">Select Product</option>
+</select>
 
-    <div class="total">
-      Total: MVR <span id="total">0.00</span>
-    </div>
+<label>Quantity</label>
 
-    <div class="actions">
-      <button class="save" onclick="saveQuotation()">
-        💾 Save Quotation
-      </button>
+<input
+id="quantity"
+type="number"
+min="1"
+value="1"
+>
 
-      <button class="download" onclick="saveCurrentQuotationToDevice()">
-        📥 Save to Device
-      </button>
+<button class="primary" onclick="addItem()">
+➕ Add Product
+</button>
 
-      <button class="print" onclick="printCurrentQuotation()">
-        🖨️ Print
-      </button>
-    </div>
+</div>
 
-  </div>
 
-  <!-- SAVED QUOTATIONS -->
-  <div class="card">
+<!-- CURRENT QUOTATION -->
 
-    <h2>📋 Saved Quotations <span id="savedCount">0</span></h2>
+<div class="card">
 
-    <div id="savedQuotations"></div>
+<h2>📄 Current Quotation</h2>
 
-  </div>
+<div id="customerDisplay">
+Customer: Walk-in Customer
+</div>
+
+<div class="items" id="items"></div>
+
+<div class="total">
+Total: MVR <span id="total">0.00</span>
+</div>
+
+<div class="actions">
+
+<button class="save" onclick="saveQuotation()">
+💾 Save Quotation
+</button>
+
+<button class="download" onclick="saveCurrentQuotationToDevice()">
+📥 Save to Device
+</button>
+
+<button class="print" onclick="printCurrentQuotation()">
+🖨️ Print
+</button>
+
+</div>
+
+</div>
+
+
+<!-- SAVED -->
+
+<div class="card">
+
+<h2>
+📋 Saved Quotations
+<span id="savedCount">0</span>
+</h2>
+
+<div id="savedQuotations"></div>
+
+</div>
 
 </main>
 
+<footer>
+🥐 Freshly made for Kanbulo Bakery
+<br>
+<span class="footer-heart">♥</span> Thank you for choosing us
+</footer>
+
+
 <script>
 
-const PRODUCTS_KEY = "kanbulo_products";
-const CUSTOMERS_KEY = "kanbulo_customers";
-const QUOTATIONS_KEY = "kanbulo_quotations";
+const PRODUCTS_KEY="kanbulo_products";
+const CUSTOMERS_KEY="kanbulo_customers";
+const QUOTATIONS_KEY="kanbulo_quotations";
 
-let items = [];
+let items=[];
 
-function getData(key, fallback) {
-  try {
+
+/* DATA */
+
+function getData(key,fallback){
+
+  try{
     return JSON.parse(localStorage.getItem(key)) || fallback;
-  } catch {
+  }catch{
     return fallback;
   }
+
 }
 
 
-/* =========================
-   LOAD CUSTOMERS
-========================= */
+/* CUSTOMERS */
 
-function loadCustomers() {
+function loadCustomers(){
 
-  const customers = getData(CUSTOMERS_KEY, []);
-  const select = document.getElementById("customer");
+  const customers=getData(CUSTOMERS_KEY,[]);
+  const select=document.getElementById("customer");
 
-  customers.forEach(customer => {
+  customers.forEach(customer=>{
 
-    const option = document.createElement("option");
+    const option=document.createElement("option");
 
-    option.value = customer.id;
+    option.value=customer.id;
 
-    option.textContent =
-      customer.name +
-      (customer.phone ? " - " + customer.phone : "");
+    option.textContent=
+      customer.name+
+      (customer.phone ? " - "+customer.phone : "");
 
     select.appendChild(option);
 
@@ -334,26 +479,24 @@ function loadCustomers() {
 }
 
 
-/* =========================
-   LOAD PRODUCTS
-========================= */
+/* PRODUCTS */
 
-function loadProducts() {
+function loadProducts(){
 
-  const products = getData(PRODUCTS_KEY, []);
-  const select = document.getElementById("product");
+  const products=getData(PRODUCTS_KEY,[]);
+  const select=document.getElementById("product");
 
-  products.forEach(product => {
+  products.forEach(product=>{
 
-    const option = document.createElement("option");
+    const option=document.createElement("option");
 
-    option.value = product.id;
+    option.value=product.id;
 
-    option.textContent =
-      product.name +
-      " — MVR " +
-      Number(product.price).toFixed(2) +
-      " — Stock: " +
+    option.textContent=
+      product.name+
+      " — MVR "+
+      Number(product.price).toFixed(2)+
+      " — Stock: "+
       product.stock;
 
     select.appendChild(option);
@@ -363,84 +506,85 @@ function loadProducts() {
 }
 
 
-/* =========================
-   QUOTATION NUMBER
-========================= */
+/* QUOTATION NUMBER */
 
-function generateQuotationNumber() {
+function generateQuotationNumber(){
 
-  return "QT-" + Math.floor(100000 + Math.random() * 900000);
+  return "QT-"+Math.floor(100000+Math.random()*900000);
 
 }
 
 
-/* =========================
-   DATE
-========================= */
+/* DATE */
 
-function setDate() {
+function setDate(){
 
-  const now = new Date();
+  const now=new Date();
 
-  document.getElementById("quotationNumber").textContent =
+  document.getElementById("quotationNumber").textContent=
     generateQuotationNumber();
 
-  document.getElementById("quotationDate").textContent =
+  document.getElementById("quotationDate").textContent=
     now.toLocaleString();
 
 }
 
 
-/* =========================
-   ADD ITEM
-========================= */
+/* ADD */
 
-function addItem() {
+function addItem(){
 
-  const productId =
+  const productId=
     Number(document.getElementById("product").value);
 
-  const quantity =
+  const quantity=
     Number(document.getElementById("quantity").value);
 
-  if (!productId) {
+  if(!productId){
+
     alert("Please select a product.");
     return;
+
   }
 
-  if (!quantity || quantity < 1) {
+  if(!quantity || quantity<1){
+
     alert("Please enter a valid quantity.");
     return;
+
   }
 
-  const products = getData(PRODUCTS_KEY, []);
+  const products=getData(PRODUCTS_KEY,[]);
 
-  const product =
-    products.find(p => Number(p.id) === productId);
+  const product=
+    products.find(p=>Number(p.id)===productId);
 
-  if (!product) {
+  if(!product){
+
     alert("Product not found.");
     return;
+
   }
 
-  const existing =
-    items.find(item => item.productId === productId);
+  const existing=
+    items.find(item=>item.productId===productId);
 
-  if (existing) {
+  if(existing){
 
-    existing.quantity += quantity;
-    existing.total =
-      existing.quantity * existing.price;
+    existing.quantity+=quantity;
 
-  } else {
+    existing.total=
+      existing.quantity*existing.price;
+
+  }else{
 
     items.push({
 
-      productId: product.id,
-      name: product.name,
-      price: Number(product.price),
-      quantity: quantity,
-      total: Number(product.price) * quantity
+      productId:product.id,
+      name:product.name,
+      price:Number(product.price),
+      quantity:quantity,
+      total:Number(product.price)*quantity
 
     });
 
@@ -451,56 +595,53 @@ function addItem() {
 }
 
 
-/* =========================
-   REMOVE ITEM
-========================= */
+/* REMOVE */
 
-function removeItem(index) {
+function removeItem(index){
 
-  items.splice(index, 1);
+  items.splice(index,1);
 
   renderItems();
 
 }
 
 
-/* =========================
-   RENDER ITEMS
-========================= */
+/* RENDER */
 
-function renderItems() {
+function renderItems(){
 
-  const container =
-    document.getElementById("items");
+  const container=document.getElementById("items");
 
-  container.innerHTML = "";
+  container.innerHTML="";
 
-  let total = 0;
+  let total=0;
 
-  if (items.length === 0) {
+  if(items.length===0){
 
-    container.innerHTML =
+    container.innerHTML=
       '<div class="empty">No products added yet.</div>';
 
   }
 
-  items.forEach((item, index) => {
+  items.forEach((item,index)=>{
 
-    total += item.total;
+    total+=item.total;
 
-    const div = document.createElement("div");
+    const div=document.createElement("div");
 
-    div.className = "item";
+    div.className="item";
 
-    div.innerHTML = `
+    div.innerHTML=`
 
       <div>
-        <strong>${escapeHTML(item.name)}</strong><br>
+        <strong>${escapeHTML(item.name)}</strong>
+        <br>
         ${item.quantity} × MVR ${item.price.toFixed(2)}
       </div>
 
       <div>
         <strong>MVR ${item.total.toFixed(2)}</strong>
+
         <button class="danger"
           onclick="removeItem(${index})">
           ✕
@@ -513,37 +654,35 @@ function renderItems() {
 
   });
 
-  document.getElementById("total").textContent =
+  document.getElementById("total").textContent=
     total.toFixed(2);
 
 }
 
 
-/* =========================
-   CUSTOMER DISPLAY
-========================= */
+/* CUSTOMER DISPLAY */
 
-function updateCustomerDisplay() {
+function updateCustomerDisplay(){
 
-  const customerId =
+  const customerId=
     Number(document.getElementById("customer").value);
 
-  const customers =
-    getData(CUSTOMERS_KEY, []);
+  const customers=
+    getData(CUSTOMERS_KEY,[]);
 
-  const customer =
-    customers.find(c => Number(c.id) === customerId);
+  const customer=
+    customers.find(c=>Number(c.id)===customerId);
 
-  if (customer) {
+  if(customer){
 
-    document.getElementById("customerDisplay").textContent =
-      "Customer: " +
-      customer.name +
-      (customer.phone ? " — " + customer.phone : "");
+    document.getElementById("customerDisplay").textContent=
+      "Customer: "+
+      customer.name+
+      (customer.phone ? " — "+customer.phone : "");
 
-  } else {
+  }else{
 
-    document.getElementById("customerDisplay").textContent =
+    document.getElementById("customerDisplay").textContent=
       "Customer: Walk-in Customer";
 
   }
@@ -551,43 +690,35 @@ function updateCustomerDisplay() {
 }
 
 document
-  .getElementById("customer")
-  .addEventListener("change", updateCustomerDisplay);
+.getElementById("customer")
+.addEventListener("change",updateCustomerDisplay);
 
 
-/* =========================
-   GET CURRENT QUOTATION
-========================= */
+/* CURRENT QUOTATION */
 
-function getCurrentQuotation() {
+function getCurrentQuotation(){
 
-  const customerId =
+  const customerId=
     Number(document.getElementById("customer").value);
 
-  const customers =
-    getData(CUSTOMERS_KEY, []);
+  const customers=
+    getData(CUSTOMERS_KEY,[]);
 
-  const customer =
-    customers.find(c => Number(c.id) === customerId);
+  const customer=
+    customers.find(c=>Number(c.id)===customerId);
 
-  const quotationNumber =
-    document.getElementById("quotationNumber").textContent;
+  const total=
+    items.reduce((sum,item)=>sum+item.total,0);
 
-  const date =
-    new Date().toISOString();
+  return{
 
-  const total =
-    items.reduce((sum, item) => sum + item.total, 0);
-
-  return {
-
-    id: Date.now(),
+    id:Date.now(),
 
     quotationNumber:
-      quotationNumber,
+      document.getElementById("quotationNumber").textContent,
 
     date:
-      date,
+      new Date().toISOString(),
 
     customerId:
       customer ? customer.id : null,
@@ -599,43 +730,37 @@ function getCurrentQuotation() {
       customer ? customer.phone : "",
 
     items:
-      items.map(item => ({
+      items.map(item=>({
 
-        productId: item.productId,
-        name: item.name,
-        price: item.price,
-        quantity: item.quantity,
-        total: item.total
+        productId:item.productId,
+        name:item.name,
+        price:item.price,
+        quantity:item.quantity,
+        total:item.total
 
       })),
 
-    total:
-      total
+    total:total
 
   };
 
 }
 
 
-/* =========================
-   SAVE QUOTATION
-========================= */
+/* SAVE */
 
-function saveQuotation() {
+function saveQuotation(){
 
-  if (items.length === 0) {
+  if(items.length===0){
 
     alert("Please add at least one product.");
-
     return;
 
   }
 
-  const quotation =
-    getCurrentQuotation();
+  const quotation=getCurrentQuotation();
 
-  const quotations =
-    getData(QUOTATIONS_KEY, []);
+  const quotations=getData(QUOTATIONS_KEY,[]);
 
   quotations.push(quotation);
 
@@ -647,156 +772,143 @@ function saveQuotation() {
   renderSavedQuotations();
 
   alert(
-    "Quotation " +
-    quotation.quotationNumber +
+    "Quotation "+
+    quotation.quotationNumber+
     " saved successfully!"
   );
 
 }
 
 
-/* =========================
-   SAVED QUOTATIONS
-========================= */
+/* SAVED LIST */
 
-function renderSavedQuotations() {
+function renderSavedQuotations(){
 
-  const quotations =
-    getData(QUOTATIONS_KEY, []);
+  const quotations=getData(QUOTATIONS_KEY,[]);
 
-  const container =
+  const container=
     document.getElementById("savedQuotations");
 
-  document.getElementById("savedCount").textContent =
+  document.getElementById("savedCount").textContent=
     quotations.length;
 
-  container.innerHTML = "";
+  container.innerHTML="";
 
-  if (quotations.length === 0) {
+  if(quotations.length===0){
 
-    container.innerHTML =
+    container.innerHTML=
       '<div class="empty">No saved quotations yet.</div>';
 
     return;
 
   }
 
-  quotations
-    .slice()
-    .reverse()
-    .forEach(quotation => {
+  quotations.slice().reverse().forEach(quotation=>{
 
-      const div =
-        document.createElement("div");
+    const div=document.createElement("div");
 
-      div.className = "saved";
+    div.className="saved";
 
-      const date =
-        new Date(quotation.date).toLocaleString();
+    const date=
+      new Date(quotation.date).toLocaleString();
 
-      div.innerHTML = `
+    div.innerHTML=`
+
+      <strong>
+        ${escapeHTML(quotation.quotationNumber)}
+      </strong>
+
+      <br>
+
+      MVR ${Number(quotation.total).toFixed(2)}
+
+      <br>
+
+      ${escapeHTML(quotation.customerName)}
+
+      <br>
+
+      <small>${date}</small>
+
+      <div class="saved-actions">
+
+        <button class="primary"
+          onclick="toggleDetails(${quotation.id})">
+          👁️ View
+        </button>
+
+        <button class="download"
+          onclick="downloadQuotationPDF(${quotation.id})">
+          📥 Save
+        </button>
+
+        <button class="print"
+          onclick="printQuotation(${quotation.id})">
+          🖨️ Print
+        </button>
+
+        <button class="danger"
+          onclick="deleteQuotation(${quotation.id})">
+          🗑️ Delete
+        </button>
+
+      </div>
+
+      <div
+        class="details"
+        id="details-${quotation.id}">
+
+        ${quotation.items.map(item=>`
+
+          <div>
+            ${escapeHTML(item.name)}
+            × ${item.quantity}
+            — MVR ${Number(item.total).toFixed(2)}
+          </div>
+
+        `).join("")}
+
+        <hr style="margin:10px 0;">
 
         <strong>
-          ${escapeHTML(quotation.quotationNumber)}
+          Total: MVR
+          ${Number(quotation.total).toFixed(2)}
         </strong>
 
-        <br>
+      </div>
 
-        MVR ${Number(quotation.total).toFixed(2)}
+    `;
 
-        <br>
+    container.appendChild(div);
 
-        ${escapeHTML(quotation.customerName)}
-
-        <br>
-
-        <small>${date}</small>
-
-        <div class="saved-actions">
-
-          <button class="primary"
-            onclick="toggleDetails(${quotation.id})">
-            👁️ View
-          </button>
-
-          <button class="download"
-            onclick="downloadQuotationPDF(${quotation.id})">
-            📥 Save
-          </button>
-
-          <button class="print"
-            onclick="printQuotation(${quotation.id})">
-            🖨️ Print
-          </button>
-
-          <button class="danger"
-            onclick="deleteQuotation(${quotation.id})">
-            🗑️ Delete
-          </button>
-
-        </div>
-
-        <div
-          class="details"
-          id="details-${quotation.id}">
-
-          ${quotation.items.map(item => `
-
-            <div>
-              ${escapeHTML(item.name)}
-              × ${item.quantity}
-              — MVR ${Number(item.total).toFixed(2)}
-            </div>
-
-          `).join("")}
-
-          <hr style="margin:10px 0;">
-
-          <strong>
-            Total: MVR
-            ${Number(quotation.total).toFixed(2)}
-          </strong>
-
-        </div>
-
-      `;
-
-      container.appendChild(div);
-
-    });
+  });
 
 }
 
 
-/* =========================
-   VIEW DETAILS
-========================= */
+/* DETAILS */
 
-function toggleDetails(id) {
+function toggleDetails(id){
 
-  const element =
-    document.getElementById("details-" + id);
-
-  element.classList.toggle("show");
+  document
+    .getElementById("details-"+id)
+    .classList.toggle("show");
 
 }
 
 
-/* =========================
-   DELETE
-========================= */
+/* DELETE */
 
-function deleteQuotation(id) {
+function deleteQuotation(id){
 
-  if (!confirm("Delete this quotation?")) {
+  if(!confirm("Delete this quotation?")){
     return;
   }
 
-  let quotations =
-    getData(QUOTATIONS_KEY, []);
+  let quotations=getData(QUOTATIONS_KEY,[]);
 
-  quotations =
-    quotations.filter(q => q.id !== id);
+  quotations=
+    quotations.filter(q=>q.id!==id);
 
   localStorage.setItem(
     QUOTATIONS_KEY,
@@ -808,55 +920,47 @@ function deleteQuotation(id) {
 }
 
 
-/* =========================
-   PRINT CURRENT
-========================= */
+/* PRINT CURRENT */
 
-function printCurrentQuotation() {
+function printCurrentQuotation(){
 
-  if (items.length === 0) {
+  if(items.length===0){
 
     alert("Please add at least one product.");
-
     return;
 
   }
 
-  const quotation =
-    getCurrentQuotation();
+  printQuotationObject(
+    getCurrentQuotation()
+  );
+
+}
+
+
+/* PRINT SAVED */
+
+function printQuotation(id){
+
+  const quotations=
+    getData(QUOTATIONS_KEY,[]);
+
+  const quotation=
+    quotations.find(q=>q.id===id);
+
+  if(!quotation)return;
 
   printQuotationObject(quotation);
 
 }
 
 
-/* =========================
-   PRINT SAVED
-========================= */
+/* PRINT */
 
-function printQuotation(id) {
+function printQuotationObject(quotation){
 
-  const quotations =
-    getData(QUOTATIONS_KEY, []);
-
-  const quotation =
-    quotations.find(q => q.id === id);
-
-  if (!quotation) return;
-
-  printQuotationObject(quotation);
-
-}
-
-
-/* =========================
-   PRINT FUNCTION
-========================= */
-
-function printQuotationObject(quotation) {
-
-  const rows =
-    quotation.items.map(item => `
+  const rows=
+    quotation.items.map(item=>`
 
       <tr>
         <td>${escapeHTML(item.name)}</td>
@@ -867,106 +971,168 @@ function printQuotationObject(quotation) {
 
     `).join("");
 
-  const html = `
+  const html=`
 
-    <!DOCTYPE html>
-    <html>
+<!DOCTYPE html>
+<html>
+<head>
 
-    <head>
+<title>Kanbulo Bakery - ${escapeHTML(quotation.quotationNumber)}</title>
 
-      <title>${escapeHTML(quotation.quotationNumber)}</title>
+<style>
 
-      <style>
+body{
+  font-family:Arial;
+  background:#fff8ef;
+  color:#43251d;
+  padding:30px;
+}
 
-        body {
-          font-family: Arial;
-          padding: 30px;
-          color: #333;
-        }
+.sheet{
+  max-width:800px;
+  margin:auto;
+  background:white;
+  padding:40px;
+  border-radius:18px;
+  border-top:12px solid #7b1e2b;
+  box-shadow:0 5px 20px rgba(0,0,0,.1);
+}
 
-        h1 {
-          color: #8B4513;
-        }
+.header{
+  text-align:center;
+  border-bottom:2px solid #ead7c6;
+  padding-bottom:20px;
+}
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 25px;
-        }
+.header h1{
+  color:#7b1e2b;
+  font-family:Georgia,serif;
+  font-size:30px;
+}
 
-        th, td {
-          border: 1px solid #ddd;
-          padding: 10px;
-          text-align: left;
-        }
+.header p{
+  color:#777;
+}
 
-        th {
-          background: #f5f5f5;
-        }
+.info{
+  background:#fff4e7;
+  padding:15px;
+  border-radius:10px;
+  margin-top:20px;
+  line-height:1.8;
+}
 
-        .total {
-          text-align: right;
-          font-size: 20px;
-          font-weight: bold;
-          margin-top: 20px;
-        }
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:25px;
+}
 
-      </style>
+th{
+  background:#7b1e2b;
+  color:white;
+  padding:12px;
+}
 
-    </head>
+td{
+  border-bottom:1px solid #ead7c6;
+  padding:12px;
+}
 
-    <body>
+.total{
+  margin-top:25px;
+  background:#7b1e2b;
+  color:white;
+  padding:18px;
+  text-align:right;
+  font-size:22px;
+  font-weight:bold;
+  border-radius:10px;
+}
 
-      <h1>🥐 Kanbulo Bakery</h1>
+.thanks{
+  text-align:center;
+  margin-top:30px;
+  color:#7b1e2b;
+  font-family:Georgia,serif;
+}
 
-      <h2>QUOTATION</h2>
+</style>
 
-      <p>
-        <strong>Quotation No:</strong>
-        ${escapeHTML(quotation.quotationNumber)}
-      </p>
+</head>
 
-      <p>
-        <strong>Date:</strong>
-        ${new Date(quotation.date).toLocaleString()}
-      </p>
+<body>
 
-      <p>
-        <strong>Customer:</strong>
-        ${escapeHTML(quotation.customerName)}
-      </p>
+<div class="sheet">
 
-      ${
-        quotation.customerPhone
-          ? `<p><strong>Phone:</strong> ${escapeHTML(quotation.customerPhone)}</p>`
-          : ""
-      }
+<div class="header">
 
-      <table>
+<h1>🥐 Kanbulo Bakery</h1>
 
-        <tr>
-          <th>Product</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Total</th>
-        </tr>
+<p>Freshly baked with love</p>
 
-        ${rows}
+<h2 style="margin-top:15px;color:#7b1e2b;">
+QUOTATION
+</h2>
 
-      </table>
+</div>
 
-      <div class="total">
-        Total: MVR ${Number(quotation.total).toFixed(2)}
-      </div>
+<div class="info">
 
-    </body>
+<strong>Quotation No:</strong>
+${escapeHTML(quotation.quotationNumber)}
 
-    </html>
+<br>
 
-  `;
+<strong>Date:</strong>
+${new Date(quotation.date).toLocaleString()}
 
-  const win =
-    window.open("", "_blank");
+<br>
+
+<strong>Customer:</strong>
+${escapeHTML(quotation.customerName)}
+
+${
+quotation.customerPhone
+?
+`<br><strong>Phone:</strong> ${escapeHTML(quotation.customerPhone)}`
+:""
+}
+
+</div>
+
+<table>
+
+<tr>
+<th>Product</th>
+<th>Qty</th>
+<th>Price</th>
+<th>Total</th>
+</tr>
+
+${rows}
+
+</table>
+
+<div class="total">
+
+TOTAL: MVR ${Number(quotation.total).toFixed(2)}
+
+</div>
+
+<div class="thanks">
+
+🥐 Thank you for choosing Kanbulo Bakery! ❤️
+
+</div>
+
+</div>
+
+</body>
+</html>
+`;
+
+  const win=window.open("","_blank");
 
   win.document.write(html);
 
@@ -974,84 +1140,78 @@ function printQuotationObject(quotation) {
 
   win.focus();
 
-  setTimeout(() => {
+  setTimeout(()=>{
     win.print();
-  }, 300);
+  },300);
 
 }
 
 
-/* =========================
-   SAVE CURRENT TO DEVICE
-========================= */
+/* SAVE CURRENT */
 
-function saveCurrentQuotationToDevice() {
+function saveCurrentQuotationToDevice(){
 
-  if (items.length === 0) {
+  if(items.length===0){
 
     alert("Please add at least one product.");
-
     return;
 
   }
 
-  const quotation =
-    getCurrentQuotation();
+  downloadQuotationPDFObject(
+    getCurrentQuotation()
+  );
+
+}
+
+
+/* SAVE SAVED */
+
+function downloadQuotationPDF(id){
+
+  const quotations=
+    getData(QUOTATIONS_KEY,[]);
+
+  const quotation=
+    quotations.find(q=>q.id===id);
+
+  if(!quotation)return;
 
   downloadQuotationPDFObject(quotation);
 
 }
 
 
-/* =========================
-   SAVE QUOTATION TO DEVICE
-========================= */
+/* PDF */
 
-function downloadQuotationPDF(id) {
+function downloadQuotationPDFObject(quotation){
 
-  const quotations =
-    getData(QUOTATIONS_KEY, []);
-
-  const quotation =
-    quotations.find(q => q.id === id);
-
-  if (!quotation) return;
-
-  downloadQuotationPDFObject(quotation);
-
-}
-
-
-/* =========================
-   CREATE SIMPLE PDF
-========================= */
-
-function downloadQuotationPDFObject(quotation) {
-
-  const lines = [];
+  const lines=[];
 
   lines.push("KANBULO BAKERY");
+  lines.push("Freshly baked with love");
+  lines.push("");
   lines.push("QUOTATION");
   lines.push("");
   lines.push(
-    "Quotation No: " +
+    "Quotation No: "+
     quotation.quotationNumber
   );
 
   lines.push(
-    "Date: " +
+    "Date: "+
     new Date(quotation.date).toLocaleString()
   );
 
   lines.push(
-    "Customer: " +
+    "Customer: "+
     quotation.customerName
   );
 
-  if (quotation.customerPhone) {
+  if(quotation.customerPhone){
 
     lines.push(
-      "Phone: " +
+      "Phone: "+
       quotation.customerPhone
     );
 
@@ -1062,28 +1222,28 @@ function downloadQuotationPDFObject(quotation) {
   lines.push("Product              Qty       Total");
   lines.push("----------------------------------------");
 
-  quotation.items.forEach(item => {
+  quotation.items.forEach(item=>{
 
-    let name =
+    let name=
       String(item.name)
-        .replace(/[^\x20-\x7E]/g, "?");
+      .replace(/[^\x20-\x7E]/g,"?");
 
-    if (name.length > 20) {
-      name = name.substring(0, 20);
+    if(name.length>20){
+      name=name.substring(0,20);
     }
 
-    const product =
-      name.padEnd(20, " ");
+    const product=name.padEnd(20," ");
 
-    const qty =
-      String(item.quantity).padStart(5, " ");
+    const qty=
+      String(item.quantity).padStart(5," ");
 
-    const total =
-      ("MVR " + Number(item.total).toFixed(2))
-        .padStart(14, " ");
+    const total=
+      ("MVR "+
+      Number(item.total).toFixed(2))
+      .padStart(14," ");
 
     lines.push(
-      product + qty + "  " + total
+      product+qty+"  "+total
     );
 
   });
@@ -1091,32 +1251,34 @@ function downloadQuotationPDFObject(quotation) {
   lines.push("----------------------------------------");
 
   lines.push(
-    "TOTAL: MVR " +
+    "TOTAL: MVR "+
     Number(quotation.total).toFixed(2)
   );
 
   lines.push("");
-  lines.push("Thank you for choosing Kanbulo Bakery!");
 
-  const pdf =
-    createSimplePDF(lines);
+  lines.push(
+    "Thank you for choosing Kanbulo Bakery!"
+  );
 
-  const blob =
-    new Blob([pdf], {
-      type: "application/pdf"
+  const pdf=createSimplePDF(lines);
+
+  const blob=
+    new Blob([pdf],{
+      type:"application/pdf"
     });
 
-  const url =
+  const url=
     URL.createObjectURL(blob);
 
-  const a =
+  const a=
     document.createElement("a");
 
-  a.href = url;
+  a.href=url;
 
-  a.download =
-    "Kanbulo-Quotation-" +
-    quotation.quotationNumber +
+  a.download=
+    "Kanbulo-Quotation-"+
+    quotation.quotationNumber+
     ".pdf";
 
   document.body.appendChild(a);
@@ -1125,65 +1287,61 @@ function downloadQuotationPDFObject(quotation) {
 
   a.remove();
 
-  setTimeout(() => {
-
+  setTimeout(()=>{
     URL.revokeObjectURL(url);
-
-  }, 1000);
+  },1000);
 
   alert(
-    "Quotation saved to your device's Downloads folder."
+    "Quotation saved to your Downloads folder."
   );
 
 }
 
 
-/* =========================
-   SIMPLE PDF GENERATOR
-========================= */
+/* SIMPLE PDF */
 
-function createSimplePDF(lines) {
+function createSimplePDF(lines){
 
-  function escapePDF(text) {
+  function escapePDF(text){
 
     return String(text)
-      .replace(/\\/g, "\\\\")
-      .replace(/\(/g, "\\(")
-      .replace(/\)/g, "\\)");
+      .replace(/\\/g,"\\\\")
+      .replace(/\(/g,"\\(")
+      .replace(/\)/g,"\\)");
 
   }
 
-  let content =
-    "BT\n" +
-    "/F1 16 Tf\n" +
+  let content=
+    "BT\n"+
+    "/F1 16 Tf\n"+
     "50 780 Td\n";
 
-  lines.forEach((line, index) => {
+  lines.forEach((line,index)=>{
 
-    const size =
-      index === 0 ? 18 : 10;
+    const size=
+      index===0 ? 20 : 10;
 
-    content +=
-      "/F1 " +
-      size +
+    content+=
+      "/F1 "+
+      size+
       " Tf\n";
 
-    content +=
-      "(" +
+    content+=
+      "("+
       escapePDF(
         String(line)
-          .replace(/[^\x20-\x7E]/g, "?")
-      ) +
+        .replace(/[^\x20-\x7E]/g,"?")
+      )+
       ") Tj\n";
 
-    content +=
+    content+=
       "0 -18 Td\n";
 
   });
 
-  content += "ET";
+  content+="ET";
 
-  const objects = [];
+  const objects=[];
 
   objects.push(
     "<< /Type /Catalog /Pages 2 0 R >>"
@@ -1194,71 +1352,72 @@ function createSimplePDF(lines) {
   );
 
   objects.push(
-    "<< /Type /Page /Parent 2 0 R " +
-    "/MediaBox [0 0 612 792] " +
-    "/Resources << /Font << /F1 4 0 R >> >> " +
+    "<< /Type /Page /Parent 2 0 R "+
+    "/MediaBox [0 0 612 792] "+
+    "/Resources << /Font << /F1 4 0 R >> >> "+
     "/Contents 5 0 R >>"
   );
 
   objects.push(
-    "<< /Type /Font /Subtype /Type1 " +
+    "<< /Type /Font /Subtype /Type1 "+
     "/BaseFont /Helvetica >>"
   );
 
   objects.push(
-    "<< /Length " +
-    content.length +
-    " >>\nstream\n" +
-    content +
+    "<< /Length "+
+    content.length+
+    " >>\nstream\n"+
+    content+
     "\nendstream"
   );
 
-  let pdf =
-    "%PDF-1.4\n";
+  let pdf="%PDF-1.4\n";
 
-  const offsets = [0];
+  const offsets=[0];
 
-  objects.forEach((object, index) => {
+  objects.forEach((object,index)=>{
 
-    offsets[index + 1] =
-      pdf.length;
+    offsets[index+1]=pdf.length;
 
-    pdf +=
-      (index + 1) +
-      " 0 obj\n" +
-      object +
+    pdf+=
+      (index+1)+
+      " 0 obj\n"+
+      object+
       "\nendobj\n";
 
   });
 
-  const xref =
-    pdf.length;
+  const xref=pdf.length;
 
-  pdf +=
-    "xref\n" +
-    "0 " +
-    (objects.length + 1) +
+  pdf+=
+    "xref\n"+
+    "0 "+
+    (objects.length+1)+
     "\n";
 
-  pdf +=
+  pdf+=
     "0000000000 65535 f \n";
 
-  for (let i = 1; i <= objects.length; i++) {
+  for(
+    let i=1;
+    i<=objects.length;
+    i++
+  ){
 
-    pdf +=
+    pdf+=
       String(offsets[i])
-        .padStart(10, "0") +
+      .padStart(10,"0")+
       " 00000 n \n";
 
   }
 
-  pdf +=
-    "trailer\n" +
-    "<< /Size " +
-    (objects.length + 1) +
-    " /Root 1 0 R >>\n" +
-    "startxref\n" +
-    xref +
+  pdf+=
+    "trailer\n"+
+    "<< /Size "+
+    (objects.length+1)+
+    " /Root 1 0 R >>\n"+
+    "startxref\n"+
+    xref+
     "\n%%EOF";
 
   return pdf;
@@ -1266,25 +1425,21 @@ function createSimplePDF(lines) {
 }
 
 
-/* =========================
-   HTML ESCAPE
-========================= */
+/* ESCAPE */
 
-function escapeHTML(value) {
+function escapeHTML(value){
 
   return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 
 }
 
 
-/* =========================
-   START
-========================= */
+/* START */
 
 loadCustomers();
 loadProducts();
