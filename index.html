@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#8B4513">
 
+  <title>Kanbulo Bakery Management</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff8f0;
+      color: #3b2415;
+    }
+
+    header {
+      background: #8B4513;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    main {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .welcome {
+      margin-bottom: 20px;
+    }
+
+    .welcome h2 {
+      margin-bottom: 5px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .card .icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      margin-bottom: 5px;
+    }
+
+    .card p {
+      color: #777;
+      font-size: 14px;
+    }
+
+    @media (max-width: 500px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    footer {
+      text-align: center;
+      padding: 30px 10px;
+      color: #888;
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🥐 Kanbulo Bakery</h1>
+    <p>Bakery Management System</p>
+  </header>
+
+  <main>
+
+    <section class="welcome">
+      <h2>Dashboard</h2>
+      <p>Welcome to Kanbulo Bakery Management.</p>
+    </section>
+
+    <section class="cards">
+
+      <div class="card">
+        <div class="icon">🛒</div>
+        <h3>Sales</h3>
+        <p>Record and manage bakery sales.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Products</h3>
+        <p>Manage your bakery products and prices.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Reports</h3>
+        <p>View daily and monthly business reports.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">💰</div>
+        <h3>Expenses</h3>
+        <p>Track bakery expenses and costs.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Inventory</h3>
+        <p>Keep track of your stock.</p>
+      </div>
+
+      <div class="card">
+        <div class="icon">👥</div>
+        <h3>Customers</h3>
+        <p>Manage customer information.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    Kanbulo Bakery Management © 2026
+  </footer>
+
+</body>
+</html>
