@@ -1,10 +1,10 @@
-```html
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#8B4513">
+  <meta name="theme-color" content="#7B1E2B">
 
   <title>Kanbulo Bakery - Customers</title>
 
@@ -22,7 +22,7 @@
     }
 
     header {
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
       padding: 22px 15px;
       text-align: center;
@@ -59,7 +59,9 @@
       margin-bottom: 20px;
     }
 
-    .box {
+    .box,
+    .customer,
+    .summary {
       background: white;
       padding: 20px;
       border-radius: 15px;
@@ -73,17 +75,19 @@
       margin: 14px 0 7px;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
       padding: 13px;
       border: 1px solid #ddd;
       border-radius: 9px;
       font-size: 16px;
+      background: white;
     }
 
     .add {
       width: 100%;
-      background: #8B4513;
+      background: #7B1E2B;
       color: white;
       border: none;
       border-radius: 10px;
@@ -94,11 +98,7 @@
     }
 
     .customer {
-      background: white;
       padding: 18px;
-      border-radius: 15px;
-      margin-bottom: 12px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
     }
 
     .customer-top {
@@ -118,13 +118,90 @@
       margin-top: 7px;
     }
 
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .edit,
+    .pricing,
+    .delete {
+      border: none;
+      border-radius: 8px;
+      padding: 9px 11px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .edit {
+      background: #eee;
+      color: #333;
+    }
+
+    .pricing {
+      background: #f4e0c8;
+      color: #7B4513;
+    }
+
     .delete {
       background: #f3d6d6;
       color: #900;
+    }
+
+    .price-box {
+      display: none;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+    }
+
+    .price-box.open {
+      display: block;
+    }
+
+    .price-row {
+      background: #fffaf5;
+      border: 1px solid #eee0d5;
+      border-radius: 10px;
+      padding: 13px;
+      margin-top: 10px;
+    }
+
+    .price-row strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .normal-price {
+      color: #777;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+
+    .save-price {
+      width: 100%;
+      background: #7B1E2B;
+      color: white;
       border: none;
-      border-radius: 8px;
-      padding: 8px 10px;
+      border-radius: 9px;
+      padding: 11px;
+      margin-top: 12px;
       cursor: pointer;
+      font-size: 15px;
+    }
+
+    .clear-price {
+      width: 100%;
+      background: #eee;
+      color: #555;
+      border: none;
+      border-radius: 9px;
+      padding: 10px;
+      margin-top: 8px;
+      cursor: pointer;
+      font-size: 14px;
     }
 
     .empty {
@@ -137,12 +214,30 @@
     }
 
     .summary {
-      background: white;
-      padding: 18px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
       font-size: 17px;
+    }
+
+    .edit-box {
+      display: none;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid #eee;
+    }
+
+    .edit-box.open {
+      display: block;
+    }
+
+    .save-edit {
+      width: 100%;
+      background: #7B1E2B;
+      color: white;
+      border: none;
+      border-radius: 9px;
+      padding: 12px;
+      margin-top: 12px;
+      cursor: pointer;
+      font-size: 15px;
     }
 
     @media (max-width: 500px) {
@@ -151,6 +246,7 @@
       }
     }
   </style>
+
 </head>
 
 <body>
@@ -170,31 +266,33 @@
 
   <div class="box">
 
-    <h3>Add Customer</h3>
+```
+<h3>Add Customer</h3>
 
-    <label for="customerName">
-      Customer Name
-    </label>
+<label for="customerName">
+  Customer Name
+</label>
 
-    <input
-      id="customerName"
-      type="text"
-      placeholder="Enter customer name"
-    >
+<input
+  id="customerName"
+  type="text"
+  placeholder="Enter customer name"
+>
 
-    <label for="customerPhone">
-      Phone Number
-    </label>
+<label for="customerPhone">
+  Phone Number
+</label>
 
-    <input
-      id="customerPhone"
-      type="tel"
-      placeholder="Enter phone number"
-    >
+<input
+  id="customerPhone"
+  type="tel"
+  placeholder="Enter phone number"
+>
 
-    <button class="add" onclick="addCustomer()">
-      ＋ Add Customer
-    </button>
+<button class="add" onclick="addCustomer()">
+  ＋ Add Customer
+</button>
+```
 
   </div>
 
@@ -210,6 +308,7 @@
 <script>
 
 const CUSTOMERS_KEY = "kanbulo_customers";
+const PRODUCTS_KEY = "kanbulo_products";
 
 
 function getCustomers() {
@@ -240,6 +339,39 @@ function saveCustomers(customers) {
   localStorage.setItem(
     CUSTOMERS_KEY,
     JSON.stringify(customers)
+  );
+
+}
+
+
+function getProducts() {
+
+  try {
+
+    const saved =
+      localStorage.getItem(PRODUCTS_KEY);
+
+    const products =
+      saved ? JSON.parse(saved) : [];
+
+    return Array.isArray(products)
+      ? products
+      : [];
+
+  } catch (error) {
+
+    return [];
+
+  }
+
+}
+
+
+function saveProducts(products) {
+
+  localStorage.setItem(
+    PRODUCTS_KEY,
+    JSON.stringify(products)
   );
 
 }
@@ -277,6 +409,8 @@ function addCustomer() {
 
     phone: phone,
 
+    prices: {},
+
     date:
       new Date().toISOString()
 
@@ -300,6 +434,13 @@ function addCustomer() {
 
 function deleteCustomer(id) {
 
+  if (!confirm(
+    "Delete this customer?\n\nTheir customer-specific prices will also be removed."
+  )) {
+    return;
+  }
+
+
   const customers =
     getCustomers();
 
@@ -317,10 +458,179 @@ function deleteCustomer(id) {
 }
 
 
+function editCustomer(id) {
+
+  const box =
+    document.getElementById("edit-" + id);
+
+  if (!box) return;
+
+  box.classList.toggle("open");
+
+}
+
+
+function saveCustomerEdit(id) {
+
+  const customers =
+    getCustomers();
+
+  const customer =
+    customers.find(
+      c => Number(c.id) === Number(id)
+    );
+
+  if (!customer) return;
+
+
+  const nameInput =
+    document.getElementById("edit-name-" + id);
+
+  const phoneInput =
+    document.getElementById("edit-phone-" + id);
+
+
+  const name =
+    nameInput.value.trim();
+
+  const phone =
+    phoneInput.value.trim();
+
+
+  if (!name) {
+
+    alert("Please enter the customer name.");
+
+    return;
+
+  }
+
+
+  customer.name = name;
+  customer.phone = phone;
+
+
+  saveCustomers(customers);
+
+  renderCustomers();
+
+}
+
+
+function togglePricing(id) {
+
+  const box =
+    document.getElementById("pricing-" + id);
+
+  if (!box) return;
+
+  box.classList.toggle("open");
+
+}
+
+
+function saveCustomerPrice(customerId, productId) {
+
+  const input =
+    document.getElementById(
+      "price-" + customerId + "-" + productId
+    );
+
+  if (!input) return;
+
+
+  const value =
+    input.value.trim();
+
+
+  const customers =
+    getCustomers();
+
+  const customer =
+    customers.find(
+      c => Number(c.id) === Number(customerId)
+    );
+
+  if (!customer) return;
+
+
+  if (!customer.prices ||
+      typeof customer.prices !== "object") {
+
+    customer.prices = {};
+
+  }
+
+
+  if (value === "") {
+
+    delete customer.prices[productId];
+
+  } else {
+
+    const price =
+      Number(value);
+
+
+    if (!Number.isFinite(price) ||
+        price < 0) {
+
+      alert("Please enter a valid price.");
+
+      return;
+
+    }
+
+
+    customer.prices[productId] =
+      price;
+
+  }
+
+
+  saveCustomers(customers);
+
+  renderCustomers();
+
+  alert("Customer price saved.");
+
+}
+
+
+function clearCustomerPrice(customerId, productId) {
+
+  const customers =
+    getCustomers();
+
+  const customer =
+    customers.find(
+      c => Number(c.id) === Number(customerId)
+    );
+
+  if (!customer) return;
+
+
+  if (customer.prices) {
+
+    delete customer.prices[productId];
+
+  }
+
+
+  saveCustomers(customers);
+
+  renderCustomers();
+
+}
+
+
 function renderCustomers() {
 
   const customers =
     getCustomers();
+
+  const products =
+    getProducts();
 
   const list =
     document.getElementById("customerList");
@@ -343,6 +653,14 @@ function renderCustomers() {
   list.innerHTML =
     customers.slice().reverse().map(customer => {
 
+      if (!customer.prices ||
+          typeof customer.prices !== "object") {
+
+        customer.prices = {};
+
+      }
+
+
       return `
         <div class="customer">
 
@@ -364,11 +682,145 @@ function renderCustomers() {
 
             </div>
 
+          </div>
+
+          <div class="actions">
+
+            <button
+              class="edit"
+              onclick="editCustomer(${customer.id})">
+              ✏️ Edit
+            </button>
+
+            <button
+              class="pricing"
+              onclick="togglePricing(${customer.id})">
+              💰 Customer Prices
+            </button>
+
             <button
               class="delete"
               onclick="deleteCustomer(${customer.id})">
-              Delete
+              🗑️ Delete
             </button>
+
+          </div>
+
+          <div
+            id="edit-${customer.id}"
+            class="edit-box">
+
+            <label>
+              Customer Name
+            </label>
+
+            <input
+              id="edit-name-${customer.id}"
+              type="text"
+              value="${escapeAttribute(customer.name)}"
+            >
+
+            <label>
+              Phone Number
+            </label>
+
+            <input
+              id="edit-phone-${customer.id}"
+              type="tel"
+              value="${escapeAttribute(customer.phone || "")}"
+            >
+
+            <button
+              class="save-edit"
+              onclick="saveCustomerEdit(${customer.id})">
+              💾 Save Customer
+            </button>
+
+          </div>
+
+          <div
+            id="pricing-${customer.id}"
+            class="price-box">
+
+            <h3>
+              💰 Special Prices for
+              ${escapeHTML(customer.name)}
+            </h3>
+
+            <p style="color:#777;margin-top:6px;font-size:14px;">
+              Set a special price for this customer.
+              Leave blank to use the normal product price.
+            </p>
+
+            ${
+              products.length === 0
+              ? `
+                <div style="margin-top:15px;color:#777;">
+                  No products found.
+                  Add products first in Inventory or Products.
+                </div>
+              `
+              : products.map(product => {
+
+                  const savedPrice =
+                    customer.prices &&
+                    Object.prototype.hasOwnProperty.call(
+                      customer.prices,
+                      product.id
+                    )
+                    ? customer.prices[product.id]
+                    : "";
+
+
+                  return `
+                    <div class="price-row">
+
+                      <strong>
+                        🍞 ${escapeHTML(product.name)}
+                      </strong>
+
+                      <div class="normal-price">
+                        Normal price:
+                        MVR ${Number(product.price || 0).toFixed(2)}
+                      </div>
+
+                      <label
+                        for="price-${customer.id}-${product.id}">
+                        Customer Price
+                      </label>
+
+                      <input
+                        id="price-${customer.id}-${product.id}"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="${savedPrice}"
+                        placeholder="Example: 4.00"
+                      >
+
+                      <button
+                        class="save-price"
+                        onclick="saveCustomerPrice(${customer.id}, ${product.id})">
+                        💾 Save Price
+                      </button>
+
+                      ${
+                        savedPrice !== ""
+                        ? `
+                          <button
+                            class="clear-price"
+                            onclick="clearCustomerPrice(${customer.id}, ${product.id})">
+                            ↩️ Use Normal Price
+                          </button>
+                        `
+                        : ""
+                      }
+
+                    </div>
+                  `;
+
+                }).join("")
+            }
 
           </div>
 
@@ -376,6 +828,9 @@ function renderCustomers() {
       `;
 
     }).join("");
+
+
+  saveCustomers(customers);
 
 }
 
@@ -389,6 +844,17 @@ function escapeHTML(value) {
     String(value);
 
   return div.innerHTML;
+
+}
+
+
+function escapeAttribute(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 
 }
 
@@ -407,4 +873,4 @@ renderCustomers();
 
 </body>
 </html>
-```
+
