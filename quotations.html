@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -347,6 +348,7 @@ value="1"
 
 </div>
 
+
 <div class="card">
 
 <h2>📄 Current Quotation</h2>
@@ -379,6 +381,7 @@ Total: MVR <span id="total">0.00</span>
 
 </div>
 
+
 <div class="card">
 
 <h2>
@@ -391,6 +394,7 @@ Total: MVR <span id="total">0.00</span>
 </div>
 
 </main>
+
 
 <footer>
 🥐 Freshly made for Kanbulo Bakery
@@ -507,7 +511,7 @@ function setDate(){
 }
 
 
-/* ADD */
+/* ADD PRODUCT */
 
 function addItem(){
 
@@ -583,7 +587,7 @@ function removeItem(index){
 }
 
 
-/* RENDER */
+/* RENDER ITEMS */
 
 function renderItems(){
 
@@ -724,7 +728,7 @@ function getCurrentQuotation(){
 }
 
 
-/* SAVE */
+/* SAVE QUOTATION */
 
 function saveQuotation(){
 
@@ -757,7 +761,7 @@ function saveQuotation(){
 }
 
 
-/* SAVED LIST */
+/* SAVED QUOTATIONS */
 
 function renderSavedQuotations(){
 
@@ -867,9 +871,12 @@ function renderSavedQuotations(){
 
 function toggleDetails(id){
 
-  document
-    .getElementById("details-"+id)
-    .classList.toggle("show");
+  const box=
+    document.getElementById("details-"+id);
+
+  if(box){
+    box.classList.toggle("show");
+  }
 
 }
 
@@ -932,7 +939,7 @@ function printQuotation(id){
 }
 
 
-/* PRINT */
+/* PRINT QUOTATION */
 
 function printQuotationObject(quotation){
 
@@ -959,7 +966,7 @@ function printQuotationObject(quotation){
 <style>
 
 body{
-  font-family:Arial;
+  font-family:Arial,sans-serif;
   background:#fff8ef;
   color:#43251d;
   padding:30px;
@@ -977,7 +984,7 @@ body{
 
 .header{
   text-align:center;
-  border-bottom:2px solid #ead7c6;
+  border-bottom:1px solid #ead7c6;
   padding-bottom:20px;
 }
 
@@ -1124,6 +1131,14 @@ Thank you for choosing Kanbulo Bakery!
 
   const win=window.open("","_blank");
 
+  if(!win){
+
+    alert("Please allow pop-ups for this page.");
+
+    return;
+
+  }
+
   win.document.write(html);
 
   win.document.close();
@@ -1137,7 +1152,7 @@ Thank you for choosing Kanbulo Bakery!
 }
 
 
-/* SAVE CURRENT */
+/* SAVE CURRENT TO DEVICE */
 
 function saveCurrentQuotationToDevice(){
 
@@ -1155,7 +1170,7 @@ function saveCurrentQuotationToDevice(){
 }
 
 
-/* SAVE SAVED */
+/* SAVE SAVED QUOTATION */
 
 function downloadQuotationPDF(id){
 
@@ -1172,16 +1187,18 @@ function downloadQuotationPDF(id){
 }
 
 
-/* ACTUAL THEMED PDF */
+/* DOWNLOAD PDF */
 
 function downloadQuotationPDFObject(quotation){
 
-  const pdf=createThemedQuotationPDF(quotation);
+  const pdf=
+    createThemedQuotationPDF(quotation);
 
   const blob=
-    new Blob([pdf],{
-      type:"application/pdf"
-    });
+    new Blob(
+      [pdf],
+      {type:"application/pdf"}
+    );
 
   const url=
     URL.createObjectURL(blob);
@@ -1204,7 +1221,7 @@ function downloadQuotationPDFObject(quotation){
 
   setTimeout(()=>{
     URL.revokeObjectURL(url);
-  },1000);
+  },1500);
 
   alert(
     "Quotation saved to your Downloads folder."
@@ -1213,13 +1230,15 @@ function downloadQuotationPDFObject(quotation){
 }
 
 
-/* THEMED PDF GENERATOR */
+/* ==================================================
+   CLEAN THEMED PDF GENERATOR
+   ================================================== */
 
 function createThemedQuotationPDF(quotation){
 
-  function escapePDF(text){
+  function escapePDF(value){
 
-    return String(text)
+    return String(value)
       .replace(/\\/g,"\\\\")
       .replace(/\(/g,"\\(")
       .replace(/\)/g,"\\)")
@@ -1227,72 +1246,140 @@ function createThemedQuotationPDF(quotation){
 
   }
 
-  function text(x,y,size,text,font="/F1",color="0.20 0.10 0.08"){
 
-    return (
+  /* TEXT */
+
+  function pdfText(
+    x,
+    y,
+    size,
+    value,
+    font="/F1",
+    color="0.20 0.10 0.08"
+  ){
+
+    return(
       color+" rg\n"+
       "BT\n"+
       font+" "+size+" Tf\n"+
       x+" "+y+" Td\n"+
-      "("+escapePDF(text)+") Tj\n"+
+      "("+escapePDF(value)+") Tj\n"+
       "ET\n"
     );
 
   }
 
-  function rect(x,y,w,h,color){
 
-    return (
+  /* FILLED RECTANGLE */
+
+  function pdfRect(
+    x,
+    y,
+    width,
+    height,
+    color
+  ){
+
+    return(
       color+" rg\n"+
-      x+" "+y+" "+w+" "+h+" re\n"+
+      x+" "+y+" "+width+" "+height+" re\n"+
       "f\n"
     );
 
   }
 
+
+  /* VERY THIN LINE */
+
+  function pdfLine(
+    x1,
+    y1,
+    x2,
+    y2,
+    color="0.86 0.80 0.75"
+  ){
+
+    return(
+      color+" RG\n"+
+      "0.35 w\n"+
+      x1+" "+y1+" m\n"+
+      x2+" "+y2+" l\n"+
+      "S\n"
+    );
+
+  }
+
+
   let content="";
 
-  /* PAGE BACKGROUND */
 
-  content+=rect(
-    0,0,612,792,
-    "1 0.97 0.93"
+  /* ================================================
+     BACKGROUND
+     ================================================ */
+
+  content+=pdfRect(
+    0,
+    0,
+    612,
+    792,
+    "1 0.975 0.94"
   );
 
-  /* TOP MAROON HEADER */
 
-  content+=rect(
-    0,610,612,182,
+  /* ================================================
+     HEADER
+     ================================================ */
+
+  content+=pdfRect(
+    0,
+    620,
+    612,
+    172,
     "0.36 0.08 0.13"
   );
 
-  /* DECORATIVE CREAM STRIPE */
 
-  content+=rect(
-    0,606,612,4,
+  /* Gold accent */
+
+  content+=pdfRect(
+    0,
+    616,
+    612,
+    4,
     "0.79 0.60 0.29"
   );
 
-  /* BAKERY NAME */
 
-  content+=text(
-    50,735,25,
+  /* Bakery name */
+
+  content+=pdfText(
+    50,
+    744,
+    25,
     BAKERY.name,
     "/F2",
     "1 1 1"
   );
 
-  content+=text(
-    50,708,12,
+
+  /* Tagline */
+
+  content+=pdfText(
+    50,
+    717,
+    12,
     BAKERY.tagline,
     "/F1",
     "1 0.92 0.82"
   );
 
-  /* BAKERY INFORMATION */
 
-  content+=text(
-    50,680,10,
+  /* Address */
+
+  content+=pdfText(
+    50,
+    692,
+    10,
     BAKERY.location+
     "   |   "+
     BAKERY.island+
@@ -1302,199 +1389,319 @@ function createThemedQuotationPDF(quotation){
     "1 0.92 0.82"
   );
 
-  /* QUOTATION TITLE */
 
-  content+=text(
-    50,630,22,
+  /* Quotation title */
+
+  content+=pdfText(
+    50,
+    648,
+    22,
     "QUOTATION",
     "/F2",
     "1 1 1"
   );
 
-  /* INFO BOX */
 
-  content+=rect(
-    45,515,522,78,
+  /* ================================================
+     INFORMATION BOX
+     ================================================ */
+
+  content+=pdfRect(
+    45,
+    520,
+    522,
+    78,
     "1 0.96 0.90"
   );
 
-  content+=text(
-    60,570,10,
-    "QUOTATION NO:",
+
+  /* Very thin border */
+
+  content+=pdfLine(45,520,567,520);
+  content+=pdfLine(45,598,567,598);
+  content+=pdfLine(45,520,45,598);
+  content+=pdfLine(567,520,567,598);
+
+
+  /* Left side */
+
+  content+=pdfText(
+    60,
+    573,
+    9,
+    "QUOTATION NO.",
     "/F2",
     "0.36 0.08 0.13"
   );
 
-  content+=text(
-    155,570,10,
+  content+=pdfText(
+    155,
+    573,
+    10,
     quotation.quotationNumber,
-    "/F1",
-    "0.20 0.10 0.08"
+    "/F1"
   );
 
-  content+=text(
-    60,545,10,
-    "DATE:",
+
+  content+=pdfText(
+    60,
+    547,
+    9,
+    "DATE",
     "/F2",
     "0.36 0.08 0.13"
   );
 
-  content+=text(
-    155,545,10,
+  content+=pdfText(
+    155,
+    547,
+    9,
     new Date(quotation.date).toLocaleString(),
-    "/F1",
-    "0.20 0.10 0.08"
+    "/F1"
   );
 
-  content+=text(
-    320,570,10,
-    "CUSTOMER:",
+
+  /* Right side */
+
+  content+=pdfText(
+    325,
+    573,
+    9,
+    "CUSTOMER",
     "/F2",
     "0.36 0.08 0.13"
   );
 
-  content+=text(
-    400,570,10,
-    quotation.customerName,
-    "/F1",
-    "0.20 0.10 0.08"
+  content+=pdfText(
+    405,
+    573,
+    10,
+    quotation.customerName || "Walk-in Customer",
+    "/F1"
   );
+
 
   if(quotation.customerPhone){
 
-    content+=text(
-      320,545,10,
-      "PHONE:",
+    content+=pdfText(
+      325,
+      547,
+      9,
+      "PHONE",
       "/F2",
       "0.36 0.08 0.13"
     );
 
-    content+=text(
-      400,545,10,
+    content+=pdfText(
+      405,
+      547,
+      10,
       quotation.customerPhone,
-      "/F1",
-      "0.20 0.10 0.08"
+      "/F1"
     );
 
   }
 
-  /* TABLE HEADER */
 
-  content+=rect(
-    45,480,522,30,
+  /* ================================================
+     TABLE HEADER
+     ================================================ */
+
+  const tableLeft=45;
+  const tableRight=567;
+
+  content+=pdfRect(
+    tableLeft,
+    475,
+    522,
+    32,
     "0.48 0.12 0.17"
   );
 
-  content+=text(
-    60,490,10,
+
+  /* Header labels */
+
+  content+=pdfText(
+    60,
+    486,
+    9,
     "PRODUCT",
     "/F2",
     "1 1 1"
   );
 
-  content+=text(
-    345,490,10,
+  content+=pdfText(
+    345,
+    486,
+    9,
     "QTY",
     "/F2",
     "1 1 1"
   );
 
-  content+=text(
-    405,490,10,
+  content+=pdfText(
+    395,
+    486,
+    9,
     "PRICE",
     "/F2",
     "1 1 1"
   );
 
-  content+=text(
-    495,490,10,
+  content+=pdfText(
+    490,
+    486,
+    9,
     "TOTAL",
     "/F2",
     "1 1 1"
   );
 
-  /* TABLE ROWS */
 
-  let y=455;
+  /* ================================================
+     TABLE ROWS
+     ================================================ */
+
+  let y=448;
 
   quotation.items.forEach((item,index)=>{
 
+    /* Alternating background */
+
     if(index%2===0){
 
-      content+=rect(
-        45,y-8,522,28,
-        "1 0.985 0.96"
+      content+=pdfRect(
+        tableLeft,
+        y-9,
+        522,
+        28,
+        "1 0.99 0.98"
       );
 
     }
 
-    content+=text(
-      60,y,10,
-      String(item.name).substring(0,30),
+
+    /* Product */
+
+    content+=pdfText(
+      60,
+      y,
+      9,
+      String(item.name).substring(0,32),
       "/F1",
       "0.20 0.10 0.08"
     );
 
-    content+=text(
-      350,y,10,
+
+    /* Quantity */
+
+    content+=pdfText(
+      345,
+      y,
+      9,
       String(item.quantity),
       "/F1",
       "0.20 0.10 0.08"
     );
 
-    content+=text(
-      400,y,10,
+
+    /* Price */
+
+    content+=pdfText(
+      395,
+      y,
+      9,
       "MVR "+
       Number(item.price).toFixed(2),
       "/F1",
       "0.20 0.10 0.08"
     );
 
-    content+=text(
-      490,y,10,
+
+    /* Total */
+
+    content+=pdfText(
+      490,
+      y,
+      9,
       "MVR "+
       Number(item.total).toFixed(2),
       "/F1",
       "0.20 0.10 0.08"
     );
 
-    y-=30;
+
+    /* VERY THIN row line */
+
+    content+=pdfLine(
+      tableLeft,
+      y-9,
+      tableRight,
+      y-9,
+      "0.88 0.83 0.79"
+    );
+
+
+    y-=28;
 
   });
 
-  /* TOTAL BOX */
 
-  content+=rect(
-    350,y-5,217,48,
+  /* ================================================
+     GRAND TOTAL
+     ================================================ */
+
+  y-=12;
+
+
+  content+=pdfRect(
+    350,
+    y-5,
+    217,
+    42,
     "0.48 0.12 0.17"
   );
 
-  content+=text(
-    365,y+12,11,
+
+  content+=pdfText(
+    370,
+    y+9,
+    11,
     "TOTAL",
     "/F2",
     "1 0.92 0.82"
   );
 
-  content+=text(
-    435,y+12,14,
+
+  content+=pdfText(
+    450,
+    y+9,
+    12,
     "MVR "+
     Number(quotation.total).toFixed(2),
     "/F2",
     "1 1 1"
   );
 
-  /* FOOTER */
 
-  content+=text(
-    45,75,11,
+  /* ================================================
+     FOOTER
+     ================================================ */
+
+  content+=pdfText(
+    45,
+    72,
+    11,
     "Thank you for choosing Kanbulo Bakery!",
     "/F2",
     "0.48 0.12 0.17"
   );
 
-  content+=text(
-    45,55,9,
+
+  content+=pdfText(
+    45,
+    52,
+    9,
     BAKERY.location+
     "   |   "+
     BAKERY.island+
@@ -1504,33 +1711,46 @@ function createThemedQuotationPDF(quotation){
     "0.45 0.36 0.32"
   );
 
-  content+=rect(
-    45,38,522,3,
+
+  content+=pdfRect(
+    45,
+    35,
+    522,
+    2,
     "0.79 0.60 0.29"
   );
 
 
-  /* PDF OBJECTS */
+  /* ================================================
+     PDF OBJECTS
+     ================================================ */
 
   const objects=[];
+
 
   objects.push(
     "<< /Type /Catalog /Pages 2 0 R >>"
   );
 
+
   objects.push(
     "<< /Type /Pages /Kids [3 0 R] /Count 1 >>"
   );
 
+
   objects.push(
-    "<< /Type /Page /Parent 2 0 R "+
+    "<< /Type /Page "+
+    "/Parent 2 0 R "+
     "/MediaBox [0 0 612 792] "+
-    "/Resources << /Font << "+
+    "/Resources << "+
+    "/Font << "+
     "/F1 4 0 R "+
     "/F2 5 0 R "+
-    ">> >> "+
+    ">> "+
+    ">> "+
     "/Contents 6 0 R >>"
   );
+
 
   objects.push(
     "<< /Type /Font "+
@@ -1538,11 +1758,13 @@ function createThemedQuotationPDF(quotation){
     "/BaseFont /Helvetica >>"
   );
 
+
   objects.push(
     "<< /Type /Font "+
     "/Subtype /Type1 "+
     "/BaseFont /Helvetica-Bold >>"
   );
+
 
   objects.push(
     "<< /Length "+
@@ -1553,9 +1775,15 @@ function createThemedQuotationPDF(quotation){
     "\nendstream"
   );
 
+
+  /* ================================================
+     BUILD PDF
+     ================================================ */
+
   let pdf="%PDF-1.4\n";
 
   const offsets=[0];
+
 
   objects.forEach((object,index)=>{
 
@@ -1569,7 +1797,9 @@ function createThemedQuotationPDF(quotation){
 
   });
 
+
   const xref=pdf.length;
+
 
   pdf+=
     "xref\n"+
@@ -1577,8 +1807,10 @@ function createThemedQuotationPDF(quotation){
     (objects.length+1)+
     "\n";
 
+
   pdf+=
     "0000000000 65535 f \n";
+
 
   for(
     let i=1;
@@ -1593,6 +1825,7 @@ function createThemedQuotationPDF(quotation){
 
   }
 
+
   pdf+=
     "trailer\n"+
     "<< /Size "+
@@ -1602,12 +1835,13 @@ function createThemedQuotationPDF(quotation){
     xref+
     "\n%%EOF";
 
+
   return pdf;
 
 }
 
 
-/* ESCAPE */
+/* ESCAPE HTML */
 
 function escapeHTML(value){
 
@@ -1634,3 +1868,5 @@ updateCustomerDisplay();
 
 </body>
 </html>
+```
+
