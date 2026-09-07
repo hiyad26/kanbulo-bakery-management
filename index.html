@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta name="theme-color" content="#7B1E2B">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Kanbulo Bakery">
 
   <link rel="manifest" href="./manifest.json">
 
@@ -142,56 +146,48 @@
 
   <section class="cards">
 
-    <!-- SALES -->
     <a class="card" href="./sales.html">
       <div class="icon">🛒</div>
       <h3>Sales</h3>
       <p>Record and manage bakery sales.</p>
     </a>
 
-    <!-- PRODUCTS -->
     <a class="card" href="./products.html">
       <div class="icon">🍞</div>
       <h3>Products</h3>
       <p>Manage bakery products and prices.</p>
     </a>
 
-    <!-- REPORTS -->
     <a class="card" href="./reports.html">
       <div class="icon">📊</div>
       <h3>Reports</h3>
       <p>View daily and monthly business reports.</p>
     </a>
 
-    <!-- EXPENSES -->
     <a class="card" href="./expenses.html">
       <div class="icon">💰</div>
       <h3>Expenses</h3>
       <p>Track bakery expenses and costs.</p>
     </a>
 
-    <!-- INVENTORY -->
     <a class="card" href="./inventory.html">
       <div class="icon">📦</div>
       <h3>Inventory</h3>
       <p>Keep track of your stock.</p>
     </a>
 
-    <!-- CUSTOMERS -->
     <a class="card" href="./customers.html">
       <div class="icon">👥</div>
       <h3>Customers</h3>
       <p>Manage customer information.</p>
     </a>
 
-    <!-- QUOTATIONS -->
     <a class="card" href="./quotations.html">
       <div class="icon">📝</div>
       <h3>Quotations</h3>
       <p>Create and manage customer quotations.</p>
     </a>
 
-    <!-- INVOICES -->
     <a class="card" href="./invoices.html">
       <div class="icon">🧾</div>
       <h3>Invoices</h3>
@@ -208,14 +204,22 @@
 
 <script>
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js")
-        .then(() => {
-          console.log("Kanbulo service worker registered");
-        })
-        .catch((error) => {
-          console.error("Service worker registration failed:", error);
-        });
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("./sw.js", {
+        scope: "./"
+      })
+      .then(function (registration) {
+        console.log(
+          "Kanbulo service worker registered:",
+          registration.scope
+        );
+      })
+      .catch(function (error) {
+        console.error(
+          "Service worker registration failed:",
+          error
+        );
+      });
     });
   }
 </script>
@@ -223,4 +227,5 @@
 </body>
 </html>
 ```
+
 
