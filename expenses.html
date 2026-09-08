@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +21,7 @@
     }
 
     .container {
-      max-width: 650px;
+      max-width: 700px;
       margin: auto;
     }
 
@@ -78,6 +77,73 @@
       font-size: 16px;
     }
 
+    .form-title {
+      color: #7B1E2B;
+      margin-top: 0;
+    }
+
+    .date-box {
+      background: #fff8f0;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    .date-box input {
+      margin-bottom: 0;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 1fr 150px 45px;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 10px;
+    }
+
+    .item-row input {
+      margin: 0;
+    }
+
+    .remove-item {
+      background: #c0392b;
+      padding: 11px 10px;
+      font-size: 18px;
+    }
+
+    .add-item {
+      background: #3b2415;
+      width: 100%;
+      margin-top: 5px;
+    }
+
+    .grand-total {
+      background: #fff8f0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 15px;
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      color: #7B1E2B;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    .save-all {
+      flex: 1;
+    }
+
+    .cancel {
+      background: #ddd;
+      color: #333;
+      flex: 1;
+    }
+
     .expense {
       border-top: 1px solid #eee;
       padding: 15px 0;
@@ -115,13 +181,6 @@
       margin-top: 9px;
     }
 
-    .cancel {
-      background: #ddd;
-      color: #333;
-      padding: 12px 16px;
-      margin-left: 6px;
-    }
-
     .total {
       font-size: 20px;
       font-weight: bold;
@@ -137,17 +196,17 @@
       padding: 20px;
     }
 
-    .form-title {
+    .day-total {
+      background: #f8eee7;
+      padding: 10px;
+      border-radius: 8px;
+      margin-top: 8px;
       color: #7B1E2B;
-      margin-top: 0;
-    }
-
-    .form-buttons {
-      display: flex;
-      gap: 8px;
+      font-weight: bold;
     }
 
     @media (max-width: 600px) {
+
       body {
         padding: 15px;
       }
@@ -159,6 +218,10 @@
 
       .top button {
         width: 100%;
+      }
+
+      .item-row {
+        grid-template-columns: 1fr 110px 42px;
       }
 
       .form-buttons {
@@ -180,7 +243,10 @@
 
   <div class="top">
     <h2>Expenses</h2>
-    <button onclick="showForm()">＋ Add Expense</button>
+
+    <button onclick="showForm()">
+      ＋ Add Expenses
+    </button>
   </div>
 
   <button class="back" onclick="location.href='index.html'">
@@ -188,58 +254,58 @@
   </button>
 
 
-  <!-- EXPENSE FORM -->
+  <!-- MULTIPLE EXPENSE FORM -->
 
   <div id="form" class="card" style="display:none;">
 
-    <h3 id="formTitle" class="form-title">
-      New Expense
+    <h3 class="form-title">
+      🧾 Add Multiple Expenses
     </h3>
 
-    <label for="name">
-      Expense Name
-    </label>
+    <div class="date-box">
 
-    <input
-      id="name"
-      type="text"
-      placeholder="Example: Flour"
+      <label for="expenseDate">
+        📅 Expense Date
+      </label>
+
+      <input
+        id="expenseDate"
+        type="date"
+        onchange="updateFormTotal()"
+      >
+
+    </div>
+
+
+    <div id="expenseItems"></div>
+
+
+    <button
+      class="add-item"
+      onclick="addExpenseItem()"
     >
+      ＋ Add Another Item
+    </button>
 
 
-    <label for="amount">
-      Amount (MVR)
-    </label>
-
-    <input
-      id="amount"
-      type="number"
-      min="0"
-      step="0.01"
-      placeholder="Example: 500"
-    >
-
-
-    <label for="expenseDate">
-      📅 Date
-    </label>
-
-    <input
-      id="expenseDate"
-      type="date"
-    >
+    <div class="grand-total">
+      Total:
+      MVR <span id="formTotal">0.00</span>
+    </div>
 
 
     <div class="form-buttons">
 
-      <button onclick="saveExpense()">
-        💾 Save Expense
+      <button
+        class="save-all"
+        onclick="saveAllExpenses()"
+      >
+        💾 Save All Expenses
       </button>
 
       <button
-        id="cancelButton"
         class="cancel"
-        onclick="cancelEdit()"
+        onclick="cancelForm()"
       >
         Cancel
       </button>
@@ -269,7 +335,8 @@
 
 <script>
 
-const STORAGE_KEY = "kanbulo_expenses";
+const STORAGE_KEY =
+  "kanbulo_expenses";
 
 let editingId = null;
 
@@ -284,7 +351,9 @@ function getExpenses() {
 
     const data =
       JSON.parse(
-        localStorage.getItem(STORAGE_KEY) || "[]"
+        localStorage.getItem(
+          STORAGE_KEY
+        ) || "[]"
       );
 
     return Array.isArray(data)
@@ -315,23 +384,26 @@ function saveExpenses(expenses) {
 
 
 /*
-  TODAY AS YYYY-MM-DD
+  TODAY
 */
 
 function todayKey() {
 
-  const date = new Date();
+  const date =
+    new Date();
 
   const year =
     date.getFullYear();
 
   const month =
-    String(date.getMonth() + 1)
-      .padStart(2, "0");
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
 
   const day =
-    String(date.getDate())
-      .padStart(2, "0");
+    String(
+      date.getDate()
+    ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 
@@ -339,7 +411,7 @@ function todayKey() {
 
 
 /*
-  SHOW ADD FORM
+  SHOW MULTIPLE EXPENSE FORM
 */
 
 function showForm() {
@@ -347,79 +419,187 @@ function showForm() {
   editingId = null;
 
   document.getElementById(
-    "formTitle"
-  ).textContent =
-    "New Expense";
-
-  document.getElementById(
-    "name"
-  ).value = "";
-
-  document.getElementById(
-    "amount"
-  ).value = "";
-
-  document.getElementById(
     "expenseDate"
-  ).value =
-    todayKey();
+  ).value = todayKey();
+
+  document.getElementById(
+    "expenseItems"
+  ).innerHTML = "";
+
+  addExpenseItem();
 
   document.getElementById(
     "form"
-  ).style.display =
-    "block";
+  ).style.display = "block";
 
-  document.getElementById(
-    "name"
-  ).focus();
+  updateFormTotal();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
 }
 
 
 /*
-  SAVE NEW OR EDITED EXPENSE
+  ADD ANOTHER EXPENSE ITEM
 */
 
-function saveExpense() {
+function addExpenseItem(
+  name = "",
+  amount = ""
+) {
 
-  const name =
+  const container =
     document.getElementById(
-      "name"
-    ).value.trim();
-
-  const amount =
-    Number(
-      document.getElementById(
-        "amount"
-      ).value
+      "expenseItems"
     );
+
+  const row =
+    document.createElement(
+      "div"
+    );
+
+  row.className =
+    "item-row";
+
+  row.innerHTML = `
+
+    <input
+      type="text"
+      class="expense-name"
+      placeholder="Expense name"
+      value="${escapeAttribute(name)}"
+      oninput="updateFormTotal()"
+    >
+
+    <input
+      type="number"
+      class="expense-amount"
+      min="0"
+      step="0.01"
+      placeholder="MVR 0.00"
+      value="${amount}"
+      oninput="updateFormTotal()"
+    >
+
+    <button
+      type="button"
+      class="remove-item"
+      onclick="removeExpenseItem(this)"
+      title="Remove"
+    >
+      ×
+    </button>
+
+  `;
+
+  container.appendChild(
+    row
+  );
+
+  const names =
+    container.querySelectorAll(
+      ".expense-name"
+    );
+
+  names[names.length - 1].focus();
+
+  updateFormTotal();
+
+}
+
+
+/*
+  REMOVE EXPENSE ITEM
+*/
+
+function removeExpenseItem(button) {
+
+  const container =
+    document.getElementById(
+      "expenseItems"
+    );
+
+  const rows =
+    container.querySelectorAll(
+      ".item-row"
+    );
+
+
+  if (rows.length === 1) {
+
+    rows[0]
+      .querySelector(
+        ".expense-name"
+      ).value = "";
+
+    rows[0]
+      .querySelector(
+        ".expense-amount"
+      ).value = "";
+
+  } else {
+
+    button
+      .closest(
+        ".item-row"
+      )
+      .remove();
+
+  }
+
+
+  updateFormTotal();
+
+}
+
+
+/*
+  CALCULATE FORM TOTAL
+*/
+
+function updateFormTotal() {
+
+  const amounts =
+    document.querySelectorAll(
+      ".expense-amount"
+    );
+
+  let total = 0;
+
+
+  amounts.forEach(
+    input => {
+
+      total +=
+        Number(
+          input.value || 0
+        );
+
+    }
+  );
+
+
+  document.getElementById(
+    "formTotal"
+  ).textContent =
+    total.toFixed(2);
+
+}
+
+
+/*
+  SAVE ALL EXPENSES
+*/
+
+function saveAllExpenses() {
 
   const date =
     document.getElementById(
       "expenseDate"
     ).value;
-
-
-  if (!name) {
-
-    alert(
-      "Please enter the expense name."
-    );
-
-    return;
-
-  }
-
-
-  if (!amount || amount <= 0) {
-
-    alert(
-      "Please enter a valid amount."
-    );
-
-    return;
-
-  }
 
 
   if (!date) {
@@ -433,49 +613,78 @@ function saveExpense() {
   }
 
 
-  const expenses =
-    getExpenses();
+  const rows =
+    document.querySelectorAll(
+      ".item-row"
+    );
 
 
-  /*
-    EDIT EXISTING
-  */
+  const newExpenses = [];
 
-  if (editingId !== null) {
 
-    const index =
-      expenses.findIndex(
-        expense =>
-          String(expense.id)
-          === String(editingId)
+  for (
+    const row of rows
+  ) {
+
+    const name =
+      row.querySelector(
+        ".expense-name"
+      ).value.trim();
+
+    const amount =
+      Number(
+        row.querySelector(
+          ".expense-amount"
+        ).value || 0
       );
 
 
-    if (index !== -1) {
+    /*
+      Completely empty row
+      is ignored.
+    */
 
-      expenses[index].name =
-        name;
+    if (
+      !name &&
+      !amount
+    ) {
 
-      expenses[index].amount =
-        amount;
-
-      expenses[index].date =
-        date;
+      continue;
 
     }
 
-  }
 
-  /*
-    ADD NEW
-  */
+    if (!name) {
 
-  else {
+      alert(
+        "Please enter a name for every expense item."
+      );
 
-    expenses.push({
+      return;
+
+    }
+
+
+    if (
+      !amount ||
+      amount <= 0
+    ) {
+
+      alert(
+        "Please enter a valid amount for: " +
+        name
+      );
+
+      return;
+
+    }
+
+
+    newExpenses.push({
 
       id:
-        Date.now(),
+        Date.now() +
+        Math.random(),
 
       name:
         name,
@@ -491,20 +700,64 @@ function saveExpense() {
   }
 
 
+  if (
+    newExpenses.length === 0
+  ) {
+
+    alert(
+      "Please add at least one expense."
+    );
+
+    return;
+
+  }
+
+
+  const expenses =
+    getExpenses();
+
+
+  /*
+    ADD ALL ITEMS
+  */
+
+  newExpenses.forEach(
+    expense => {
+
+      expenses.push(
+        expense
+      );
+
+    }
+  );
+
+
   saveExpenses(
     expenses
   );
 
 
-  cancelEdit();
+  cancelForm();
 
   displayExpenses();
+
+
+  alert(
+    newExpenses.length +
+    " expense item" +
+    (
+      newExpenses.length === 1
+        ? ""
+        : "s"
+    ) +
+    " saved successfully! ❤️"
+  );
 
 }
 
 
 /*
-  EDIT EXPENSE
+  EDIT ONE EXPENSE
 */
 
 function editExpense(id) {
@@ -537,26 +790,6 @@ function editExpense(id) {
 
 
   document.getElementById(
-    "formTitle"
-  ).textContent =
-    "Edit Expense";
-
-
-  document.getElementById(
-    "name"
-  ).value =
-    expense.name || "";
-
-
-  document.getElementById(
-    "amount"
-  ).value =
-    Number(
-      expense.amount || 0
-    );
-
-
-  document.getElementById(
     "expenseDate"
   ).value =
     normalizeExpenseDate(
@@ -565,20 +798,155 @@ function editExpense(id) {
 
 
   document.getElementById(
-    "form"
-  ).style.display =
-    "block";
+    "expenseItems"
+  ).innerHTML = "";
+
+
+  addExpenseItem(
+    expense.name || "",
+    Number(
+      expense.amount || 0
+    )
+  );
+
+
+  /*
+    Change save button
+    temporarily to edit.
+  */
+
+  const saveButton =
+    document.querySelector(
+      ".save-all"
+    );
+
+  saveButton.textContent =
+    "💾 Save Changes";
+
+  saveButton.onclick =
+    saveEditedExpense;
 
 
   document.getElementById(
-    "name"
-  ).focus();
+    "form"
+  ).style.display =
+    "block";
 
 
   window.scrollTo({
     top: 0,
     behavior: "smooth"
   });
+
+}
+
+
+/*
+  SAVE EDITED EXPENSE
+*/
+
+function saveEditedExpense() {
+
+  if (editingId === null) {
+    return;
+  }
+
+
+  const name =
+    document.querySelector(
+      ".expense-name"
+    ).value.trim();
+
+  const amount =
+    Number(
+      document.querySelector(
+        ".expense-amount"
+      ).value || 0
+    );
+
+  const date =
+    document.getElementById(
+      "expenseDate"
+    ).value;
+
+
+  if (!name) {
+
+    alert(
+      "Please enter the expense name."
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !amount ||
+    amount <= 0
+  ) {
+
+    alert(
+      "Please enter a valid amount."
+    );
+
+    return;
+
+  }
+
+
+  if (!date) {
+
+    alert(
+      "Please select the expense date."
+    );
+
+    return;
+
+  }
+
+
+  const expenses =
+    getExpenses();
+
+
+  const index =
+    expenses.findIndex(
+      expense =>
+        String(expense.id)
+        === String(editingId)
+    );
+
+
+  if (index === -1) {
+
+    alert(
+      "Expense not found."
+    );
+
+    return;
+
+  }
+
+
+  expenses[index].name =
+    name;
+
+  expenses[index].amount =
+    amount;
+
+  expenses[index].date =
+    date;
+
+
+  saveExpenses(
+    expenses
+  );
+
+
+  cancelForm();
+
+  displayExpenses();
 
 }
 
@@ -640,45 +1008,63 @@ function deleteExpense(id) {
   CANCEL FORM
 */
 
-function cancelEdit() {
+function cancelForm() {
 
   editingId = null;
+
 
   document.getElementById(
     "form"
   ).style.display =
     "none";
 
-  document.getElementById(
-    "name"
-  ).value = "";
 
   document.getElementById(
-    "amount"
-  ).value = "";
+    "expenseItems"
+  ).innerHTML = "";
+
 
   document.getElementById(
     "expenseDate"
   ).value =
     todayKey();
 
+
+  /*
+    Restore save button
+  */
+
+  const saveButton =
+    document.querySelector(
+      ".save-all"
+    );
+
+  saveButton.textContent =
+    "💾 Save All Expenses";
+
+  saveButton.onclick =
+    saveAllExpenses;
+
+
+  updateFormTotal();
+
 }
 
 
 /*
-  NORMALIZE OLD / NEW DATES
+  NORMALIZE DATE
 */
 
-function normalizeExpenseDate(value) {
+function normalizeExpenseDate(
+  value
+) {
 
   if (!value) {
+
     return todayKey();
+
   }
 
-
-  /*
-    Already YYYY-MM-DD
-  */
 
   if (
     /^\d{4}-\d{2}-\d{2}$/.test(
@@ -690,10 +1076,6 @@ function normalizeExpenseDate(value) {
 
   }
 
-
-  /*
-    Try normal Date parsing
-  */
 
   const parsed =
     new Date(value);
@@ -718,6 +1100,7 @@ function normalizeExpenseDate(value) {
         parsed.getDate()
       ).padStart(2, "0");
 
+
     return `${year}-${month}-${day}`;
 
   }
@@ -729,7 +1112,7 @@ function normalizeExpenseDate(value) {
 
 
 /*
-  DISPLAY-FRIENDLY DATE
+  DISPLAY DATE
 */
 
 function displayDate(value) {
@@ -742,7 +1125,8 @@ function displayDate(value) {
 
   const date =
     new Date(
-      normalized + "T00:00:00"
+      normalized +
+      "T00:00:00"
     );
 
 
@@ -753,7 +1137,9 @@ function displayDate(value) {
   ) {
 
     return escapeHtml(
-      String(value || "")
+      String(
+        value || ""
+      )
     );
 
   }
@@ -856,18 +1242,18 @@ function displayExpenses() {
 
               <button
                 class="edit"
-                onclick="editExpense('${String(
-                  expense.id
-                ).replace(/'/g, "\\'")}')"
+                onclick="editExpense('${escapeAttribute(
+                  String(expense.id)
+                )}')"
               >
                 ✏️ Edit
               </button>
 
               <button
                 class="delete"
-                onclick="deleteExpense('${String(
-                  expense.id
-                ).replace(/'/g, "\\'")}')"
+                onclick="deleteExpense('${escapeAttribute(
+                  String(expense.id)
+                )}')"
               >
                 🗑️ Delete
               </button>
@@ -909,6 +1295,22 @@ function escapeHtml(text) {
 
 
 /*
+  ESCAPE ATTRIBUTE
+*/
+
+function escapeAttribute(text) {
+
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+}
+
+
+/*
   START
 */
 
@@ -923,5 +1325,4 @@ displayExpenses();
 
 </body>
 </html>
-```
 
