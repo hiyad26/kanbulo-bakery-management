@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,113 +31,11 @@
       color: #3b2416;
     }
 
-    /* =========================
-       APP LOCK
-    ========================= */
-
-    #lockScreen {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      background: linear-gradient(135deg, #7B1E2B, #9b3040);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .lock-box {
-      width: 100%;
-      max-width: 380px;
-      background: white;
-      border-radius: 24px;
-      padding: 30px 24px;
-      text-align: center;
-      box-shadow: 0 10px 35px rgba(0,0,0,0.25);
-    }
-
-    .lock-icon {
-      font-size: 55px;
-      margin-bottom: 10px;
-    }
-
-    .lock-box h1 {
-      margin: 0 0 8px;
-      color: #7B1E2B;
-      font-size: 25px;
-    }
-
-    .lock-box p {
-      margin: 0 0 22px;
-      color: #777;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .pin-input {
-      width: 100%;
-      padding: 15px;
-      border: 2px solid #eadbd2;
-      border-radius: 12px;
-      font-size: 25px;
-      text-align: center;
-      letter-spacing: 8px;
-      outline: none;
-    }
-
-    .pin-input:focus {
-      border-color: #7B1E2B;
-    }
-
-    .lock-button {
-      width: 100%;
-      margin-top: 14px;
-      padding: 15px;
-      border: none;
-      border-radius: 12px;
-      background: #7B1E2B;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .lock-button:active {
-      transform: scale(0.98);
-    }
-
-    .lock-error {
-      min-height: 20px;
-      margin-top: 12px;
-      color: #c0392b;
-      font-size: 13px;
-      font-weight: bold;
-    }
-
-    .lock-note {
-      margin-top: 18px !important;
-      margin-bottom: 0 !important;
-      font-size: 11px !important;
-      color: #999 !important;
-    }
-
-    /* =========================
-       MAIN APP
-    ========================= */
-
-    #app {
-      display: none;
-    }
-
     .container {
       max-width: 1000px;
       margin: auto;
       padding: 20px;
     }
-
-    /* =========================
-       HEADER
-    ========================= */
 
     .header {
       background: linear-gradient(135deg, #7B1E2B, #9b3040);
@@ -145,7 +44,6 @@
       border-radius: 20px;
       margin-bottom: 22px;
       box-shadow: 0 5px 18px rgba(123, 30, 43, 0.25);
-      position: relative;
     }
 
     .header h1 {
@@ -159,29 +57,6 @@
       opacity: 0.9;
       font-size: 15px;
     }
-
-    /* LOCK BUTTON */
-
-    .lock-app-button {
-      position: absolute;
-      right: 18px;
-      top: 18px;
-      border: none;
-      background: rgba(255,255,255,0.18);
-      color: white;
-      padding: 9px 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .lock-app-button:active {
-      transform: scale(0.96);
-    }
-
-    /* =========================
-       BUSINESS TOTALS
-    ========================= */
 
     .section-title {
       font-size: 18px;
@@ -247,10 +122,6 @@
       margin-top: 8px;
     }
 
-    /* =========================
-       MENU
-    ========================= */
-
     .menu-title {
       font-size: 20px;
       margin: 0 0 14px;
@@ -306,9 +177,18 @@
       line-height: 1.4;
     }
 
-    /* =========================
-       FOOTER
-    ========================= */
+    .lock-button {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #3b2416;
+      color: white;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
 
     .footer {
       text-align: center;
@@ -317,9 +197,69 @@
       margin: 28px 0 10px;
     }
 
-    /* =========================
-       MOBILE
-    ========================= */
+    /* PIN SCREEN */
+
+    #pinScreen {
+      position: fixed;
+      inset: 0;
+      background: #fff8f0;
+      z-index: 99999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .pin-box {
+      width: 100%;
+      max-width: 360px;
+      background: white;
+      padding: 28px;
+      border-radius: 20px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.12);
+      text-align: center;
+    }
+
+    .pin-box h2 {
+      margin-top: 0;
+      color: #7B1E2B;
+    }
+
+    .pin-box p {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pin-box input {
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 24px;
+      text-align: center;
+      letter-spacing: 8px;
+      margin: 12px 0;
+    }
+
+    .pin-box button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #7B1E2B;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #pinMessage {
+      min-height: 20px;
+      color: #c0392b;
+      font-size: 13px;
+      margin-top: 10px;
+    }
 
     @media (max-width: 700px) {
 
@@ -334,7 +274,6 @@
 
       .header h1 {
         font-size: 25px;
-        padding-right: 75px;
       }
 
       .live-totals {
@@ -359,10 +298,6 @@
         padding: 19px;
       }
 
-      .lock-app-button {
-        right: 12px;
-        top: 12px;
-      }
     }
 
   </style>
@@ -370,25 +305,22 @@
 
 <body>
 
-<!-- =========================
-     LOCK SCREEN
-========================= -->
+<!-- PIN SCREEN -->
 
-<div id="lockScreen">
+<div id="pinScreen">
 
-  <div class="lock-box">
+  <div class="pin-box">
 
-    <div class="lock-icon">🔐</div>
+    <div style="font-size:45px;">🥐</div>
 
-    <h1>Kanbulo Bakery</h1>
+    <h2>Kanbulo Bakery</h2>
 
-    <p id="lockMessage">
-      Enter your 4-digit PIN to access Management.
+    <p id="pinTitle">
+      Enter your 4-digit management PIN.
     </p>
 
     <input
       id="pinInput"
-      class="pin-input"
       type="password"
       inputmode="numeric"
       maxlength="4"
@@ -396,44 +328,20 @@
       placeholder="••••"
     >
 
-    <button
-      class="lock-button"
-      id="lockButton"
-      onclick="handlePin()">
-      Unlock Management
+    <button onclick="submitPIN()">
+      🔓 Unlock Management
     </button>
 
-    <div
-      class="lock-error"
-      id="lockError">
-    </div>
-
-    <p class="lock-note">
-      🔒 Your bakery data stays on this device.
-    </p>
+    <div id="pinMessage"></div>
 
   </div>
 
 </div>
 
 
-<!-- =========================
-     MAIN APP
-========================= -->
-
-<div id="app">
-
 <div class="container">
 
-  <!-- HEADER -->
-
   <div class="header">
-
-    <button
-      class="lock-app-button"
-      onclick="lockApp()">
-      🔒 Lock App
-    </button>
 
     <h1>🥐 Kanbulo Bakery</h1>
 
@@ -444,15 +352,12 @@
   </div>
 
 
-  <!-- BUSINESS OVERVIEW -->
-
   <div class="section-title">
     📊 Business Overview
   </div>
 
-  <div class="live-totals">
 
-    <!-- INCOME -->
+  <div class="live-totals">
 
     <div class="total-card income">
 
@@ -463,13 +368,11 @@
       </div>
 
       <div class="updated">
-        Live from Sales
+        Live from Daily Totals
       </div>
 
     </div>
 
-
-    <!-- EXPENSES -->
 
     <div class="total-card expense-total">
 
@@ -485,8 +388,6 @@
 
     </div>
 
-
-    <!-- PROFIT -->
 
     <div class="total-card profit">
 
@@ -505,118 +406,93 @@
   </div>
 
 
-  <!-- MANAGEMENT MENU -->
-
   <div class="menu-title">
     🏪 Management
   </div>
 
+
   <div class="cards">
 
     <a class="card" href="sales.html">
-
       <div class="icon">🛒</div>
-
       <h2>Sales</h2>
-
       <p>
         Record and manage bakery sales.
       </p>
-
     </a>
 
 
     <a class="card" href="products.html">
-
       <div class="icon">🍞</div>
-
       <h2>Products</h2>
-
       <p>
         Manage bakery products and prices.
       </p>
-
     </a>
 
 
     <a class="card" href="reports.html">
-
       <div class="icon">📊</div>
-
       <h2>Reports</h2>
-
       <p>
         View daily and monthly business reports.
       </p>
-
     </a>
 
 
     <a class="card" href="expenses.html">
-
       <div class="icon">💰</div>
-
       <h2>Expenses</h2>
-
       <p>
         Track bakery expenses and costs.
       </p>
-
     </a>
 
 
     <a class="card" href="inventory.html">
-
       <div class="icon">📦</div>
-
       <h2>Inventory</h2>
-
       <p>
         Keep track of your bakery stock.
       </p>
-
     </a>
 
 
     <a class="card" href="customers.html">
-
       <div class="icon">👥</div>
-
       <h2>Customers</h2>
-
       <p>
         Manage customer information.
       </p>
-
     </a>
 
 
     <a class="card" href="quotations.html">
-
       <div class="icon">📝</div>
-
       <h2>Quotations</h2>
-
       <p>
         Create and manage customer quotations.
       </p>
-
     </a>
 
 
     <a class="card" href="invoices.html">
-
       <div class="icon">🧾</div>
-
       <h2>Invoices</h2>
-
       <p>
         Create and manage customer invoices.
       </p>
-
     </a>
 
   </div>
+
+
+  <button
+    class="lock-button"
+    onclick="lockApp()"
+  >
+    🔒 Lock Management App
+  </button>
 
 
   <div class="footer">
@@ -625,114 +501,283 @@
 
 </div>
 
-</div>
-
 
 <script>
 
-const SALES_KEY = "kanbulo_sales";
-const EXPENSES_KEY = "kanbulo_expenses";
+/*
+  STORAGE KEYS
+*/
 
-/* APP LOCK KEY */
+const QUICK_TOTALS_KEY =
+  "kanbulo_quick_daily_totals";
 
-const PIN_KEY = "kanbulo_management_pin";
+const EXPENSES_KEY =
+  "kanbulo_expenses";
 
+const PIN_KEY =
+  "kanbulo_management_pin";
 
-/* =========================
-   APP LOCK
-========================= */
-
-function hasPin() {
-
-  return !!localStorage.getItem(PIN_KEY);
-
-}
+const UNLOCKED_KEY =
+  "kanbulo_management_unlocked";
 
 
-function showLockScreen() {
+/*
+  GET ARRAY FROM LOCAL STORAGE
+*/
 
-  document.getElementById("lockScreen").style.display = "flex";
-  document.getElementById("app").style.display = "none";
+function getData(key) {
 
-  const input = document.getElementById("pinInput");
+  try {
 
-  input.value = "";
-  input.focus();
+    const data =
+      JSON.parse(
+        localStorage.getItem(key) || "[]"
+      );
 
-  if (hasPin()) {
+    return Array.isArray(data)
+      ? data
+      : [];
 
-    document.getElementById("lockMessage").textContent =
-      "Enter your 4-digit PIN to access Management.";
+  } catch (error) {
 
-    document.getElementById("lockButton").textContent =
-      "Unlock Management";
-
-  } else {
-
-    document.getElementById("lockMessage").textContent =
-      "Create a 4-digit PIN to protect your Management app.";
-
-    document.getElementById("lockButton").textContent =
-      "Create PIN";
+    return [];
 
   }
 
 }
 
 
-function handlePin() {
+/*
+  UPDATE DASHBOARD TOTALS
+*/
+
+function updateDashboardTotals() {
+
+  /*
+    QUICK DAILY TOTALS
+    Cash + Card + Bank Transfer
+  */
+
+  const quickTotals =
+    getData(
+      QUICK_TOTALS_KEY
+    );
+
+
+  let income = 0;
+
+
+  quickTotals.forEach(
+    record => {
+
+      income +=
+        Number(
+          record.total || 0
+        );
+
+    }
+  );
+
+
+  /*
+    EXPENSES
+  */
+
+  const expenses =
+    getData(
+      EXPENSES_KEY
+    );
+
+
+  let expenseTotal = 0;
+
+
+  expenses.forEach(
+    expense => {
+
+      expenseTotal +=
+        Number(
+          expense.amount || 0
+        );
+
+    }
+  );
+
+
+  /*
+    NET PROFIT
+  */
+
+  const profit =
+    income -
+    expenseTotal;
+
+
+  document.getElementById(
+    "totalIncome"
+  ).textContent =
+    income.toFixed(2);
+
+
+  document.getElementById(
+    "totalExpenses"
+  ).textContent =
+    expenseTotal.toFixed(2);
+
+
+  document.getElementById(
+    "netProfit"
+  ).textContent =
+    profit.toFixed(2);
+
+}
+
+
+/*
+  PIN SETUP / LOCK
+*/
+
+function showPinScreen(message) {
+
+  const screen =
+    document.getElementById(
+      "pinScreen"
+    );
+
+  const title =
+    document.getElementById(
+      "pinTitle"
+    );
 
   const input =
-    document.getElementById("pinInput");
+    document.getElementById(
+      "pinInput"
+    );
 
-  const error =
-    document.getElementById("lockError");
-
-  const pin = input.value.trim();
-
-  error.textContent = "";
+  const pinMessage =
+    document.getElementById(
+      "pinMessage"
+    );
 
 
-  /* CHECK PIN LENGTH */
+  screen.style.display =
+    "flex";
 
-  if (!/^\d{4}$/.test(pin)) {
 
-    error.textContent =
+  if (
+    message
+  ) {
+
+    title.textContent =
+      message;
+
+  }
+
+
+  input.value = "";
+
+  pinMessage.textContent = "";
+
+  setTimeout(
+    function() {
+      input.focus();
+    },
+    100
+  );
+
+}
+
+
+function submitPIN() {
+
+  const input =
+    document.getElementById(
+      "pinInput"
+    );
+
+  const pin =
+    input.value.trim();
+
+
+  if (
+    !/^\d{4}$/.test(pin)
+  ) {
+
+    document.getElementById(
+      "pinMessage"
+    ).textContent =
       "Please enter exactly 4 numbers.";
 
-    input.focus();
+    return;
+
+  }
+
+
+  const existingPIN =
+    localStorage.getItem(
+      PIN_KEY
+    );
+
+
+  /*
+    FIRST TIME:
+    CREATE PIN
+  */
+
+  if (!existingPIN) {
+
+    localStorage.setItem(
+      PIN_KEY,
+      pin
+    );
+
+    localStorage.setItem(
+      UNLOCKED_KEY,
+      "true"
+    );
+
+    document.getElementById(
+      "pinScreen"
+    ).style.display =
+      "none";
+
+    alert(
+      "✅ Your 4-digit management PIN has been created."
+    );
 
     return;
 
   }
 
 
-  /* FIRST TIME SETUP */
+  /*
+    CHECK PIN
+  */
 
-  if (!hasPin()) {
+  if (
+    pin === existingPIN
+  ) {
 
-    localStorage.setItem(PIN_KEY, pin);
+    localStorage.setItem(
+      UNLOCKED_KEY,
+      "true"
+    );
 
-    unlockApp();
+    document.getElementById(
+      "pinScreen"
+    ).style.display =
+      "none";
 
-    return;
-
-  }
-
-
-  /* CHECK EXISTING PIN */
-
-  const savedPin =
-    localStorage.getItem(PIN_KEY);
-
-  if (pin === savedPin) {
-
-    unlockApp();
+    document.getElementById(
+      "pinMessage"
+    ).textContent = "";
 
   } else {
 
-    error.textContent =
-      "❌ Incorrect PIN. Try again.";
+    document.getElementById(
+      "pinMessage"
+    ).textContent =
+      "❌ Incorrect PIN.";
 
     input.value = "";
 
@@ -743,212 +788,149 @@ function handlePin() {
 }
 
 
-function unlockApp() {
-
-  document.getElementById("lockScreen").style.display =
-    "none";
-
-  document.getElementById("app").style.display =
-    "block";
-
-  document.getElementById("lockError").textContent = "";
-
-  updateDashboardTotals();
-
-}
-
+/*
+  LOCK APP
+*/
 
 function lockApp() {
 
-  document.getElementById("app").style.display =
-    "none";
+  localStorage.setItem(
+    UNLOCKED_KEY,
+    "false"
+  );
 
-  showLockScreen();
+  showPinScreen(
+    "Enter your 4-digit management PIN."
+  );
 
 }
 
 
-/* PRESS ENTER TO UNLOCK */
+/*
+  CHECK LOCK
+*/
 
-document.getElementById("pinInput")
-  .addEventListener("keydown", function(event) {
+function checkLock() {
 
-    if (event.key === "Enter") {
+  const pin =
+    localStorage.getItem(
+      PIN_KEY
+    );
 
-      handlePin();
+
+  const unlocked =
+    localStorage.getItem(
+      UNLOCKED_KEY
+    );
+
+
+  /*
+    FIRST VISIT
+  */
+
+  if (!pin) {
+
+    showPinScreen(
+      "Create a 4-digit management PIN."
+    );
+
+    return;
+
+  }
+
+
+  /*
+    LOCKED
+  */
+
+  if (
+    unlocked !== "true"
+  ) {
+
+    showPinScreen(
+      "Enter your 4-digit management PIN."
+    );
+
+  }
+
+}
+
+
+/*
+  UPDATE WHEN PAGE RETURNS
+*/
+
+window.addEventListener(
+  "pageshow",
+  function() {
+
+    updateDashboardTotals();
+
+  }
+);
+
+
+window.addEventListener(
+  "focus",
+  function() {
+
+    updateDashboardTotals();
+
+  }
+);
+
+
+/*
+  START
+*/
+
+updateDashboardTotals();
+
+checkLock();
+
+
+/*
+  SERVICE WORKER
+*/
+
+if (
+  "serviceWorker" in navigator
+) {
+
+  window.addEventListener(
+    "load",
+    function() {
+
+      navigator.serviceWorker
+        .register(
+          "./sw.js",
+          {
+            scope: "./"
+          }
+        )
+        .then(
+          function(registration) {
+
+            console.log(
+              "Kanbulo service worker registered:",
+              registration.scope
+            );
+
+          }
+        )
+        .catch(
+          function(error) {
+
+            console.error(
+              "Service worker registration failed:",
+              error
+            );
+
+          }
+        );
 
     }
-
-  });
-
-
-/* =========================
-   START LOCK
-========================= */
-
-showLockScreen();
-
-
-/* =========================
-   GET SALES
-========================= */
-
-function getSales() {
-
-  try {
-
-    return JSON.parse(
-      localStorage.getItem(SALES_KEY) || "[]"
-    );
-
-  } catch (error) {
-
-    return [];
-
-  }
-
-}
-
-
-/* =========================
-   GET EXPENSES
-========================= */
-
-function getExpenses() {
-
-  try {
-
-    return JSON.parse(
-      localStorage.getItem(EXPENSES_KEY) || "[]"
-    );
-
-  } catch (error) {
-
-    return [];
-
-  }
-
-}
-
-
-/* =========================
-   UPDATE LIVE TOTALS
-========================= */
-
-function updateDashboardTotals() {
-
-  const sales = getSales();
-  const expenses = getExpenses();
-
-
-  /* TOTAL INCOME */
-
-  let income = 0;
-
-  sales.forEach(function(sale) {
-
-    income += Number(sale.total || 0);
-
-  });
-
-
-  /* TOTAL EXPENSES */
-
-  let expenseTotal = 0;
-
-  expenses.forEach(function(expense) {
-
-    expenseTotal += Number(expense.amount || 0);
-
-  });
-
-
-  /* NET PROFIT */
-
-  const profit = income - expenseTotal;
-
-
-  /* DISPLAY INCOME */
-
-  document.getElementById("totalIncome").textContent =
-    income.toFixed(2);
-
-
-  /* DISPLAY EXPENSES */
-
-  document.getElementById("totalExpenses").textContent =
-    expenseTotal.toFixed(2);
-
-
-  /* DISPLAY PROFIT */
-
-  document.getElementById("netProfit").textContent =
-    profit.toFixed(2);
-
-}
-
-
-/* =========================
-   REFRESH WHEN RETURNING
-========================= */
-
-window.addEventListener("pageshow", function() {
-
-  if (hasPin()) {
-
-    updateDashboardTotals();
-
-  }
-
-});
-
-
-/* =========================
-   REFRESH WHEN PAGE GETS FOCUS
-========================= */
-
-window.addEventListener("focus", function() {
-
-  if (hasPin()) {
-
-    updateDashboardTotals();
-
-  }
-
-});
-
-
-/* =========================
-   SERVICE WORKER
-========================= */
-
-if ("serviceWorker" in navigator) {
-
-  window.addEventListener("load", function() {
-
-    navigator.serviceWorker.register("./sw.js", {
-      scope: "./"
-    })
-
-    .then(function(registration) {
-
-      console.log(
-        "Kanbulo service worker registered:",
-        registration.scope
-      );
-
-    })
-
-    .catch(function(error) {
-
-      console.error(
-        "Service worker registration failed:",
-        error
-      );
-
-    });
-
-  });
+  );
 
 }
 
@@ -956,5 +938,11 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+```
+
+**What changed:** the dashboard now reads `kanbulo_quick_daily_totals`, so your Cash + Card + Bank Transfer totals are counted as income. Your existing `kanbulo_expenses` are still used for expenses, and profit is calculated from those two totals.
+
+After you replace it on GitHub, open the dashboard. **The first time, it will ask you to create a 4-digit PIN.** Keep that PIN somewhere safe.
+
 
 
