@@ -188,7 +188,7 @@
 
     .report-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
       gap: 12px;
       margin-bottom: 20px;
     }
@@ -209,6 +209,11 @@
 
     .save-btn {
       background: #3b2415;
+      color: white;
+    }
+
+    .monthly-save-btn {
+      background: #287a3e;
       color: white;
     }
 
@@ -318,8 +323,6 @@
       color: #7B1E2B;
       margin-top: 0;
     }
-
-    /* MONTH-BY-MONTH SUMMARY */
 
     .monthly-summary-grid {
       display: grid;
@@ -567,10 +570,7 @@
     <div class="quick-grid">
 
       <div class="quick-field">
-
-        <label for="quickCash">
-          💵 Cash
-        </label>
+        <label for="quickCash">💵 Cash</label>
 
         <input
           type="number"
@@ -580,14 +580,10 @@
           placeholder="0.00"
           oninput="updateQuickTotal()"
         >
-
       </div>
 
       <div class="quick-field">
-
-        <label for="quickCard">
-          💳 Card
-        </label>
+        <label for="quickCard">💳 Card</label>
 
         <input
           type="number"
@@ -597,14 +593,10 @@
           placeholder="0.00"
           oninput="updateQuickTotal()"
         >
-
       </div>
 
       <div class="quick-field">
-
-        <label for="quickTransfer">
-          🏦 Bank Transfer
-        </label>
+        <label for="quickTransfer">🏦 Bank Transfer</label>
 
         <input
           type="number"
@@ -614,14 +606,10 @@
           placeholder="0.00"
           oninput="updateQuickTotal()"
         >
-
       </div>
 
       <div class="quick-field">
-
-        <label for="quickExpenses">
-          💰 Daily Expenses
-        </label>
+        <label for="quickExpenses">💰 Daily Expenses</label>
 
         <input
           type="text"
@@ -629,14 +617,10 @@
           value="MVR 0.00"
           readonly
         >
-
       </div>
 
       <div class="quick-field">
-
-        <label for="quickNet">
-          📊 Daily Net
-        </label>
+        <label for="quickNet">📊 Daily Net</label>
 
         <input
           type="text"
@@ -644,7 +628,6 @@
           value="MVR 0.00"
           readonly
         >
-
       </div>
 
     </div>
@@ -700,7 +683,14 @@
       class="action-btn save-btn"
       onclick="saveReport()"
     >
-      💾 Save Report
+      💾 Save Daily Report
+    </button>
+
+    <button
+      class="action-btn monthly-save-btn"
+      onclick="saveMonthlyReport()"
+    >
+      📆 Save Monthly Report
     </button>
 
   </div>
@@ -742,6 +732,7 @@
 
     <div class="card payment-card">
       <h3>💵 Cash Sales</h3>
+
       <div class="value">
         MVR <span id="cashTotal">0.00</span>
       </div>
@@ -749,6 +740,7 @@
 
     <div class="card payment-card">
       <h3>💳 Card Sales</h3>
+
       <div class="value">
         MVR <span id="cardTotal">0.00</span>
       </div>
@@ -756,6 +748,7 @@
 
     <div class="card payment-card">
       <h3>🏦 Bank Transfer</h3>
+
       <div class="value">
         MVR <span id="transferTotal">0.00</span>
       </div>
@@ -763,6 +756,7 @@
 
     <div class="card payment-card">
       <h3>❓ Previous / Unspecified</h3>
+
       <div class="value">
         MVR <span id="otherTotal">0.00</span>
       </div>
@@ -771,7 +765,7 @@
   </div>
 
 
-  <!-- MONTHLY REPORT -->
+  <!-- MONTHLY SALES -->
 
   <div class="section">
 
@@ -783,6 +777,7 @@
 
       <div class="summary-item">
         💰 Monthly Sales
+
         <strong>
           MVR <span id="monthlySales">0.00</span>
         </strong>
@@ -790,11 +785,13 @@
 
       <div class="summary-item">
         🧾 Number of Sales
+
         <strong id="monthlyCount">0</strong>
       </div>
 
       <div class="summary-item">
         🍞 Products Sold
+
         <strong id="monthlyProducts">0</strong>
       </div>
 
@@ -930,7 +927,7 @@ const QUICK_TOTALS_KEY = "kanbulo_quick_daily_totals";
 
 
 /*
-  GET LOCAL STORAGE DATA
+  GET DATA
 */
 
 function getData(key) {
@@ -938,9 +935,13 @@ function getData(key) {
   try {
 
     const data =
-      JSON.parse(localStorage.getItem(key));
+      JSON.parse(
+        localStorage.getItem(key)
+      );
 
-    return Array.isArray(data) ? data : [];
+    return Array.isArray(data)
+      ? data
+      : [];
 
   } catch (error) {
 
@@ -952,7 +953,7 @@ function getData(key) {
 
 
 /*
-  SAVE LOCAL STORAGE DATA
+  SAVE DATA
 */
 
 function saveData(key, data) {
@@ -966,7 +967,7 @@ function saveData(key, data) {
 
 
 /*
-  CONVERT DATE TO YYYY-MM-DD
+  DATE KEY
 */
 
 function dateKey(date) {
@@ -975,12 +976,14 @@ function dateKey(date) {
     date.getFullYear();
 
   const month =
-    String(date.getMonth() + 1)
-      .padStart(2, "0");
+    String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
 
   const day =
-    String(date.getDate())
-      .padStart(2, "0");
+    String(
+      date.getDate()
+    ).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
 
@@ -995,10 +998,25 @@ function saleDateKey(dateString) {
 
   if (!dateString) return "";
 
-  const date =
-    new Date(dateString);
+  const value =
+    String(dateString).trim();
 
-  if (isNaN(date.getTime())) return "";
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ) {
+
+    return value;
+
+  }
+
+  const date =
+    new Date(value);
+
+  if (isNaN(date.getTime())) {
+
+    return "";
+
+  }
 
   return dateKey(date);
 
@@ -1007,26 +1025,63 @@ function saleDateKey(dateString) {
 
 /*
   EXPENSE DATE KEY
+
+  Supports:
+  YYYY-MM-DD
+  DD/MM/YYYY
 */
 
 function expenseDateKey(dateString) {
 
   if (!dateString) return "";
 
+  const value =
+    String(dateString).trim();
+
+
   if (
-    /^\d{4}-\d{2}-\d{2}$/.test(
-      String(dateString)
-    )
+    /^\d{4}-\d{2}-\d{2}$/.test(value)
   ) {
 
-    return String(dateString);
+    return value;
 
   }
 
-  const date =
-    new Date(dateString);
 
-  if (isNaN(date.getTime())) return "";
+  const slashMatch =
+    value.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/
+    );
+
+
+  if (slashMatch) {
+
+    const day =
+      String(
+        slashMatch[1]
+      ).padStart(2, "0");
+
+    const month =
+      String(
+        slashMatch[2]
+      ).padStart(2, "0");
+
+    const year =
+      slashMatch[3];
+
+    return `${year}-${month}-${day}`;
+
+  }
+
+
+  const date =
+    new Date(value);
+
+  if (isNaN(date.getTime())) {
+
+    return "";
+
+  }
 
   return dateKey(date);
 
@@ -1034,7 +1089,7 @@ function expenseDateKey(dateString) {
 
 
 /*
-  GET DAILY EXPENSE TOTAL
+  DAILY EXPENSE TOTAL
 */
 
 function getExpenseTotalForDate(
@@ -1044,13 +1099,16 @@ function getExpenseTotalForDate(
 
   return expenses
     .filter(expense =>
-      expenseDateKey(expense.date)
-      === selectedDate
+      expenseDateKey(
+        expense.date
+      ) === selectedDate
     )
     .reduce(
       (total, expense) =>
         total +
-        Number(expense.amount || 0),
+        Number(
+          expense.amount || 0
+        ),
       0
     );
 
@@ -1058,7 +1116,7 @@ function getExpenseTotalForDate(
 
 
 /*
-  GET SELECTED DATE
+  SELECTED DATE
 */
 
 function getSelectedDate() {
@@ -1071,7 +1129,7 @@ function getSelectedDate() {
 
 
 /*
-  GET PAYMENT TOTALS
+  PAYMENT TOTALS
 */
 
 function getPaymentTotals(sales) {
@@ -1087,13 +1145,19 @@ function getPaymentTotals(sales) {
     if (sale.isQuickTotal) {
 
       cash +=
-        Number(sale.cash || 0);
+        Number(
+          sale.cash || 0
+        );
 
       card +=
-        Number(sale.card || 0);
+        Number(
+          sale.card || 0
+        );
 
       transfer +=
-        Number(sale.transfer || 0);
+        Number(
+          sale.transfer || 0
+        );
 
       return;
 
@@ -1101,7 +1165,10 @@ function getPaymentTotals(sales) {
 
 
     const amount =
-      Number(sale.total || 0);
+      Number(
+        sale.total || 0
+      );
+
 
     const method =
       String(
@@ -1144,7 +1211,7 @@ function getPaymentTotals(sales) {
 
 
 /*
-  GET QUICK TOTALS
+  QUICK TOTALS
 */
 
 function getQuickTotals() {
@@ -1157,13 +1224,14 @@ function getQuickTotals() {
 
 
 /*
-  FIND QUICK TOTAL FOR DATE
+  QUICK TOTAL FOR DATE
 */
 
 function getQuickTotalForDate(date) {
 
   const totals =
     getQuickTotals();
+
 
   return totals.find(
     item =>
@@ -1174,7 +1242,7 @@ function getQuickTotalForDate(date) {
 
 
 /*
-  GET ENTERED QUICK AMOUNTS
+  ENTERED QUICK AMOUNTS
 */
 
 function getEnteredQuickAmounts() {
@@ -1186,12 +1254,14 @@ function getEnteredQuickAmounts() {
       ).value || 0
     );
 
+
   const card =
     Number(
       document.getElementById(
         "quickCard"
       ).value || 0
     );
+
 
   const transfer =
     Number(
@@ -1256,6 +1326,7 @@ function loadQuickDailyTotal() {
   const selectedDate =
     getSelectedDate();
 
+
   const saved =
     getQuickTotalForDate(
       selectedDate
@@ -1290,10 +1361,12 @@ function loadQuickDailyTotal() {
         saved.cash || 0
       ).toFixed(2);
 
+
     cardInput.value =
       Number(
         saved.card || 0
       ).toFixed(2);
+
 
     transferInput.value =
       Number(
@@ -1499,6 +1572,7 @@ function getReportSales() {
   const sales =
     getData(SALES_KEY);
 
+
   const quickTotals =
     getQuickTotals();
 
@@ -1519,6 +1593,7 @@ function getReportSales() {
         saleDateKey(
           sale.date
         );
+
 
       return !quickDates.has(
         date
@@ -1599,10 +1674,6 @@ function displayMonthByMonthSummary(
   const months = {};
 
 
-  /*
-    COLLECT SALES BY MONTH
-  */
-
   sales.forEach(sale => {
 
     const date =
@@ -1610,10 +1681,15 @@ function displayMonthByMonthSummary(
         sale.date
       );
 
+
     if (!date) return;
 
+
     const month =
-      date.substring(0, 7);
+      date.substring(
+        0,
+        7
+      );
 
 
     if (!months[month]) {
@@ -1633,10 +1709,6 @@ function displayMonthByMonthSummary(
   });
 
 
-  /*
-    COLLECT EXPENSES BY MONTH
-  */
-
   expenses.forEach(expense => {
 
     const date =
@@ -1644,10 +1716,15 @@ function displayMonthByMonthSummary(
         expense.date
       );
 
+
     if (!date) return;
 
+
     const month =
-      date.substring(0, 7);
+      date.substring(
+        0,
+        7
+      );
 
 
     if (!months[month]) {
@@ -1673,7 +1750,9 @@ function displayMonthByMonthSummary(
       .reverse();
 
 
-  if (monthKeys.length === 0) {
+  if (
+    monthKeys.length === 0
+  ) {
 
     container.innerHTML =
       '<div class="empty">No sales or expenses recorded yet.</div>';
@@ -1686,238 +1765,216 @@ function displayMonthByMonthSummary(
   let html = "";
 
 
-  monthKeys.forEach(monthKey => {
+  monthKeys.forEach(
+    monthKey => {
 
-    const monthData =
-      months[monthKey];
-
-
-    /*
-      MONTH SALES
-    */
-
-    let salesTotal = 0;
-    let productsTotal = 0;
+      const monthData =
+        months[monthKey];
 
 
-    monthData.sales.forEach(sale => {
-
-      salesTotal +=
-        Number(
-          sale.total || 0
-        );
+      let salesTotal = 0;
+      let productsTotal = 0;
 
 
-      if (
-        Array.isArray(
-          sale.items
-        )
-      ) {
+      monthData.sales.forEach(
+        sale => {
 
-        sale.items.forEach(item => {
-
-          productsTotal +=
+          salesTotal +=
             Number(
-              item.quantity || 0
+              sale.total || 0
             );
 
-        });
 
-      }
+          if (
+            Array.isArray(
+              sale.items
+            )
+          ) {
 
-    });
+            sale.items.forEach(
+              item => {
 
+                productsTotal +=
+                  Number(
+                    item.quantity || 0
+                  );
 
-    /*
-      MONTH EXPENSES
-    */
+              }
+            );
 
-    let expensesTotal = 0;
+          }
 
-
-    monthData.expenses.forEach(
-      expense => {
-
-        expensesTotal +=
-          Number(
-            expense.amount || 0
-          );
-
-      }
-    );
-
-
-    /*
-      NET
-    */
-
-    const net =
-      salesTotal -
-      expensesTotal;
-
-
-    /*
-      MONTH NAME
-    */
-
-    const monthDate =
-      new Date(
-        monthKey +
-        "-01T00:00:00"
-      );
-
-
-    const monthName =
-      monthDate.toLocaleDateString(
-        undefined,
-        {
-          month: "long",
-          year: "numeric"
         }
       );
 
 
-    /*
-      SALES COUNT
-    */
-
-    const salesCount =
-      monthData.sales.length;
+      let expensesTotal = 0;
 
 
-    /*
-      ACTIVE DAYS
-    */
+      monthData.expenses.forEach(
+        expense => {
 
-    const activeDates =
-      new Set();
+          expensesTotal +=
+            Number(
+              expense.amount || 0
+            );
+
+        }
+      );
 
 
-    monthData.sales.forEach(sale => {
+      const net =
+        salesTotal -
+        expensesTotal;
 
-      const date =
-        saleDateKey(
-          sale.date
+
+      const monthDate =
+        new Date(
+          monthKey +
+          "-01T00:00:00"
         );
 
-      if (date) {
-        activeDates.add(date);
-      }
 
-    });
+      const monthName =
+        monthDate.toLocaleDateString(
+          undefined,
+          {
+            month: "long",
+            year: "numeric"
+          }
+        );
 
 
-    monthData.expenses.forEach(
-      expense => {
+      const salesCount =
+        monthData.sales.length;
 
-        const date =
-          expenseDateKey(
-            expense.date
-          );
 
-        if (date) {
-          activeDates.add(date);
+      const activeDates =
+        new Set();
+
+
+      monthData.sales.forEach(
+        sale => {
+
+          const date =
+            saleDateKey(
+              sale.date
+            );
+
+          if (date) {
+            activeDates.add(date);
+          }
+
         }
-
-      }
-    );
+      );
 
 
-    const activeDays =
-      activeDates.size;
+      monthData.expenses.forEach(
+        expense => {
+
+          const date =
+            expenseDateKey(
+              expense.date
+            );
+
+          if (date) {
+            activeDates.add(date);
+          }
+
+        }
+      );
 
 
-    html += `
-
-      <div class="month-card">
-
-        <h4>
-          📅 ${escapeHTML(monthName)}
-        </h4>
+      const activeDays =
+        activeDates.size;
 
 
-        <div class="month-card-row">
+      html += `
 
-          <span>
-            💰 Sales
-          </span>
+        <div class="month-card">
 
-          <strong>
-            MVR ${salesTotal.toFixed(2)}
-          </strong>
+          <h4>
+            📅 ${escapeHTML(monthName)}
+          </h4>
+
+          <div class="month-card-row">
+
+            <span>
+              💰 Sales
+            </span>
+
+            <strong>
+              MVR ${salesTotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          <div class="month-card-row expense">
+
+            <span>
+              💸 Expenses
+            </span>
+
+            <strong>
+              MVR ${expensesTotal.toFixed(2)}
+            </strong>
+
+          </div>
+
+          <div class="month-card-row net">
+
+            <span>
+              📊 Net
+            </span>
+
+            <strong>
+              MVR ${net.toFixed(2)}
+            </strong>
+
+          </div>
+
+          <div class="month-card-row">
+
+            <span>
+              🧾 Sales / Daily Totals
+            </span>
+
+            <strong>
+              ${salesCount}
+            </strong>
+
+          </div>
+
+          <div class="month-card-row">
+
+            <span>
+              🍞 Products Sold
+            </span>
+
+            <strong>
+              ${productsTotal}
+            </strong>
+
+          </div>
+
+          <div class="month-card-row days">
+
+            <span>
+              📅 Active Days
+            </span>
+
+            <strong>
+              ${activeDays}
+            </strong>
+
+          </div>
 
         </div>
 
+      `;
 
-        <div class="month-card-row expense">
-
-          <span>
-            💸 Expenses
-          </span>
-
-          <strong>
-            MVR ${expensesTotal.toFixed(2)}
-          </strong>
-
-        </div>
-
-
-        <div class="month-card-row net">
-
-          <span>
-            📊 Net
-          </span>
-
-          <strong>
-            MVR ${net.toFixed(2)}
-          </strong>
-
-        </div>
-
-
-        <div class="month-card-row">
-
-          <span>
-            🧾 Sales
-          </span>
-
-          <strong>
-            ${salesCount}
-          </strong>
-
-        </div>
-
-
-        <div class="month-card-row">
-
-          <span>
-            🍞 Products Sold
-          </span>
-
-          <strong>
-            ${productsTotal}
-          </strong>
-
-        </div>
-
-
-        <div class="month-card-row days">
-
-          <span>
-            📅 Active Days
-          </span>
-
-          <strong>
-            ${activeDays}
-          </strong>
-
-        </div>
-
-      </div>
-
-    `;
-
-  });
+    }
+  );
 
 
   container.innerHTML =
@@ -1946,8 +2003,10 @@ function displayDailyBreakdown(
     sales.filter(sale =>
       saleDateKey(
         sale.date
-      ).substring(0, 7)
-      === selectedMonth
+      ).substring(
+        0,
+        7
+      ) === selectedMonth
     );
 
 
@@ -1955,8 +2014,10 @@ function displayDailyBreakdown(
     expenses.filter(expense =>
       expenseDateKey(
         expense.date
-      ).substring(0, 7)
-      === selectedMonth
+      ).substring(
+        0,
+        7
+      ) === selectedMonth
     );
 
 
@@ -1967,7 +2028,10 @@ function displayDailyBreakdown(
 
     tbody.innerHTML = `
       <tr>
-        <td colspan="10" class="empty">
+        <td
+          colspan="10"
+          class="empty"
+        >
           No sales or expenses recorded for this month.
         </td>
       </tr>
@@ -1981,64 +2045,69 @@ function displayDailyBreakdown(
   const days = {};
 
 
-  monthlySales.forEach(sale => {
+  monthlySales.forEach(
+    sale => {
 
-    const day =
-      saleDateKey(
-        sale.date
+      const day =
+        saleDateKey(
+          sale.date
+        );
+
+
+      if (!day) return;
+
+
+      if (!days[day]) {
+
+        days[day] = {
+          sales: [],
+          expenses: []
+        };
+
+      }
+
+
+      days[day].sales.push(
+        sale
       );
 
-
-    if (!day) return;
-
-
-    if (!days[day]) {
-
-      days[day] = {
-        sales: [],
-        expenses: []
-      };
-
     }
+  );
 
 
-    days[day].sales.push(
-      sale
-    );
+  monthlyExpenses.forEach(
+    expense => {
 
-  });
+      const day =
+        expenseDateKey(
+          expense.date
+        );
 
 
-  monthlyExpenses.forEach(expense => {
+      if (!day) return;
 
-    const day =
-      expenseDateKey(
-        expense.date
+
+      if (!days[day]) {
+
+        days[day] = {
+          sales: [],
+          expenses: []
+        };
+
+      }
+
+
+      days[day].expenses.push(
+        expense
       );
 
-
-    if (!day) return;
-
-
-    if (!days[day]) {
-
-      days[day] = {
-        sales: [],
-        expenses: []
-      };
-
     }
-
-
-    days[day].expenses.push(
-      expense
-    );
-
-  });
+  );
 
 
   const dates =
-    Object.keys(days).sort();
+    Object.keys(days)
+      .sort();
 
 
   let grandSales = 0;
@@ -2054,176 +2123,173 @@ function displayDailyBreakdown(
   let rows = "";
 
 
-  dates.forEach(day => {
+  dates.forEach(
+    day => {
 
-    const daySales =
-      days[day].sales;
-
-    const dayExpenses =
-      days[day].expenses;
+      const daySales =
+        days[day].sales;
 
 
-    let total = 0;
-    let products = 0;
-    let hasQuickTotal = false;
+      const dayExpenses =
+        days[day].expenses;
 
 
-    daySales.forEach(sale => {
-
-      total +=
-        Number(
-          sale.total || 0
-        );
+      let total = 0;
+      let products = 0;
+      let hasQuickTotal = false;
 
 
-      if (sale.isQuickTotal) {
+      daySales.forEach(
+        sale => {
 
-        hasQuickTotal = true;
-
-      }
-
-
-      if (
-        Array.isArray(
-          sale.items
-        )
-      ) {
-
-        sale.items.forEach(item => {
-
-          products +=
+          total +=
             Number(
-              item.quantity || 0
+              sale.total || 0
             );
 
-        });
 
-      }
+          if (
+            sale.isQuickTotal
+          ) {
 
-    });
+            hasQuickTotal = true;
 
-
-    const payments =
-      getPaymentTotals(
-        daySales
-      );
+          }
 
 
-    const expensesTotal =
-      dayExpenses.reduce(
-        (sum, expense) =>
-          sum +
-          Number(
-            expense.amount || 0
-          ),
-        0
-      );
+          if (
+            Array.isArray(
+              sale.items
+            )
+          ) {
 
+            sale.items.forEach(
+              item => {
 
-    const net =
-      total -
-      expensesTotal;
+                products +=
+                  Number(
+                    item.quantity || 0
+                  );
 
+              }
+            );
 
-    grandSales +=
-      total;
+          }
 
-    grandProducts +=
-      products;
-
-    grandCash +=
-      payments.cash;
-
-    grandCard +=
-      payments.card;
-
-    grandTransfer +=
-      payments.transfer;
-
-    grandOther +=
-      payments.other;
-
-    grandExpenses +=
-      expensesTotal;
-
-    grandNet +=
-      net;
-
-
-    const date =
-      new Date(
-        day +
-        "T00:00:00"
-      );
-
-
-    const formattedDate =
-      date.toLocaleDateString(
-        undefined,
-        {
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
         }
       );
 
 
-    const salesLabel =
-      hasQuickTotal
-        ? "Quick"
-        : daySales.length;
+      const payments =
+        getPaymentTotals(
+          daySales
+        );
 
 
-    rows += `
-      <tr>
+      const expensesTotal =
+        dayExpenses.reduce(
+          (sum, expense) =>
+            sum +
+            Number(
+              expense.amount || 0
+            ),
+          0
+        );
 
-        <td class="date-cell">
-          ${formattedDate}
-        </td>
 
-        <td>
-          ${salesLabel}
-        </td>
+      const net =
+        total -
+        expensesTotal;
 
-        <td>
-          ${products}
-        </td>
 
-        <td class="total-cell">
-          MVR ${total.toFixed(2)}
-        </td>
+      grandSales += total;
+      grandProducts += products;
+      grandCash += payments.cash;
+      grandCard += payments.card;
+      grandTransfer += payments.transfer;
+      grandOther += payments.other;
+      grandExpenses += expensesTotal;
+      grandNet += net;
 
-        <td>
-          MVR ${payments.cash.toFixed(2)}
-        </td>
 
-        <td>
-          MVR ${payments.card.toFixed(2)}
-        </td>
+      const date =
+        new Date(
+          day +
+          "T00:00:00"
+        );
 
-        <td>
-          MVR ${payments.transfer.toFixed(2)}
-        </td>
 
-        <td>
-          MVR ${payments.other.toFixed(2)}
-        </td>
+      const formattedDate =
+        date.toLocaleDateString(
+          undefined,
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        );
 
-        <td class="expense-cell">
-          MVR ${expensesTotal.toFixed(2)}
-        </td>
 
-        <td class="net-cell">
-          MVR ${net.toFixed(2)}
-        </td>
+      const salesLabel =
+        hasQuickTotal
+          ? "Quick"
+          : daySales.length;
 
-      </tr>
-    `;
 
-  });
+      rows += `
+
+        <tr>
+
+          <td class="date-cell">
+            ${formattedDate}
+          </td>
+
+          <td>
+            ${salesLabel}
+          </td>
+
+          <td>
+            ${products}
+          </td>
+
+          <td class="total-cell">
+            MVR ${total.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${payments.cash.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${payments.card.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${payments.transfer.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${payments.other.toFixed(2)}
+          </td>
+
+          <td class="expense-cell">
+            MVR ${expensesTotal.toFixed(2)}
+          </td>
+
+          <td class="net-cell">
+            MVR ${net.toFixed(2)}
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
 
 
   rows += `
+
     <tr class="total-row">
 
       <td class="date-cell">
@@ -2267,6 +2333,7 @@ function displayDailyBreakdown(
       </td>
 
     </tr>
+
   `;
 
 
@@ -2285,16 +2352,16 @@ function loadReports() {
   const sales =
     getReportSales();
 
+
   const expenses =
-    getData(EXPENSES_KEY);
+    getData(
+      EXPENSES_KEY
+    );
+
 
   const selectedDate =
     getSelectedDate();
 
-
-  /*
-    LOAD QUICK TOTAL
-  */
 
   loadQuickDailyTotal();
 
@@ -2315,32 +2382,36 @@ function loadReports() {
   let dailyProducts = 0;
 
 
-  dailySalesList.forEach(sale => {
+  dailySalesList.forEach(
+    sale => {
 
-    dailySales +=
-      Number(
-        sale.total || 0
-      );
+      dailySales +=
+        Number(
+          sale.total || 0
+        );
 
 
-    if (
-      Array.isArray(
-        sale.items
-      )
-    ) {
+      if (
+        Array.isArray(
+          sale.items
+        )
+      ) {
 
-      sale.items.forEach(item => {
+        sale.items.forEach(
+          item => {
 
-        dailyProducts +=
-          Number(
-            item.quantity || 0
-          );
+            dailyProducts +=
+              Number(
+                item.quantity || 0
+              );
 
-      });
+          }
+        );
+
+      }
 
     }
-
-  });
+  );
 
 
   document.getElementById(
@@ -2448,8 +2519,10 @@ function loadReports() {
     sales.filter(sale =>
       saleDateKey(
         sale.date
-      ).substring(0, 7)
-      === selectedMonth
+      ).substring(
+        0,
+        7
+      ) === selectedMonth
     );
 
 
@@ -2457,32 +2530,36 @@ function loadReports() {
   let monthlyProducts = 0;
 
 
-  monthlySalesList.forEach(sale => {
+  monthlySalesList.forEach(
+    sale => {
 
-    monthlySales +=
-      Number(
-        sale.total || 0
-      );
+      monthlySales +=
+        Number(
+          sale.total || 0
+        );
 
 
-    if (
-      Array.isArray(
-        sale.items
-      )
-    ) {
+      if (
+        Array.isArray(
+          sale.items
+        )
+      ) {
 
-      sale.items.forEach(item => {
+        sale.items.forEach(
+          item => {
 
-        monthlyProducts +=
-          Number(
-            item.quantity || 0
-          );
+            monthlyProducts +=
+              Number(
+                item.quantity || 0
+              );
 
-      });
+          }
+        );
+
+      }
 
     }
-
-  });
+  );
 
 
   document.getElementById(
@@ -2504,7 +2581,7 @@ function loadReports() {
 
 
   /*
-    MONTH-BY-MONTH SUMMARY
+    MONTH-BY-MONTH
   */
 
   displayMonthByMonthSummary(
@@ -2532,24 +2609,28 @@ function loadReports() {
   let expenseTotal = 0;
 
 
-  sales.forEach(sale => {
+  sales.forEach(
+    sale => {
 
-    salesTotal +=
-      Number(
-        sale.total || 0
-      );
+      salesTotal +=
+        Number(
+          sale.total || 0
+        );
 
-  });
+    }
+  );
 
 
-  expenses.forEach(expense => {
+  expenses.forEach(
+    expense => {
 
-    expenseTotal +=
-      Number(
-        expense.amount || 0
-      );
+      expenseTotal +=
+        Number(
+          expense.amount || 0
+        );
 
-  });
+    }
+  );
 
 
   const profit =
@@ -2575,18 +2656,10 @@ function loadReports() {
     profit.toFixed(2);
 
 
-  /*
-    DISPLAY SELECTED DATE SALES
-  */
-
   displaySales(
     dailySalesList
   );
 
-
-  /*
-    DISPLAY EXPENSES
-  */
 
   displayExpenses(
     expenses
@@ -2623,21 +2696,121 @@ function displaySales(sales) {
     sales
       .slice()
       .reverse()
-      .map(sale => {
+      .map(
+        sale => {
 
-        const date =
-          sale.date
-            ? new Date(
-                sale.date
-              ).toLocaleString()
-            : "";
+          const date =
+            sale.date
+              ? new Date(
+                  sale.date
+                ).toLocaleString()
+              : "";
 
 
-        if (
-          sale.isQuickTotal
-        ) {
+          if (
+            sale.isQuickTotal
+          ) {
+
+            return `
+
+              <div class="sale-row">
+
+                <strong>
+                  MVR ${Number(
+                    sale.total || 0
+                  ).toFixed(2)}
+                </strong>
+
+                <br>
+
+                <span class="payment-badge manual-badge">
+                  ⚡ Quick Daily Total
+                </span>
+
+                <br>
+
+                <small>
+                  ${escapeHTML(date)}
+                </small>
+
+                <br><br>
+
+                💵 Cash:
+                <strong>
+                  MVR ${Number(
+                    sale.cash || 0
+                  ).toFixed(2)}
+                </strong>
+
+                <br>
+
+                💳 Card:
+                <strong>
+                  MVR ${Number(
+                    sale.card || 0
+                  ).toFixed(2)}
+                </strong>
+
+                <br>
+
+                🏦 Bank Transfer:
+                <strong>
+                  MVR ${Number(
+                    sale.transfer || 0
+                  ).toFixed(2)}
+                </strong>
+
+              </div>
+
+            `;
+
+          }
+
+
+          let itemsText = "";
+
+
+          if (
+            Array.isArray(
+              sale.items
+            )
+          ) {
+
+            itemsText =
+              sale.items
+                .map(
+                  item => {
+
+                    return (
+                      escapeHTML(
+                        item.name
+                      ) +
+                      " × " +
+                      Number(
+                        item.quantity || 0
+                      ) +
+                      " — MVR " +
+                      Number(
+                        item.total || 0
+                      ).toFixed(2)
+                    );
+
+                  }
+                )
+                .join(
+                  "<br>"
+                );
+
+          }
+
+
+          const method =
+            sale.paymentMethod ||
+            "Previous / Unspecified";
+
 
           return `
+
             <div class="sale-row">
 
               <strong>
@@ -2648,8 +2821,8 @@ function displaySales(sales) {
 
               <br>
 
-              <span class="payment-badge manual-badge">
-                ⚡ Quick Daily Total
+              <span class="payment-badge">
+                ${escapeHTML(method)}
               </span>
 
               <br>
@@ -2660,104 +2833,14 @@ function displaySales(sales) {
 
               <br><br>
 
-              💵 Cash:
-              <strong>
-                MVR ${Number(
-                  sale.cash || 0
-                ).toFixed(2)}
-              </strong>
-
-              <br>
-
-              💳 Card:
-              <strong>
-                MVR ${Number(
-                  sale.card || 0
-                ).toFixed(2)}
-              </strong>
-
-              <br>
-
-              🏦 Bank Transfer:
-              <strong>
-                MVR ${Number(
-                  sale.transfer || 0
-                ).toFixed(2)}
-              </strong>
+              ${itemsText}
 
             </div>
+
           `;
 
         }
-
-
-        let itemsText = "";
-
-
-        if (
-          Array.isArray(
-            sale.items
-          )
-        ) {
-
-          itemsText =
-            sale.items
-              .map(item => {
-
-                return (
-                  escapeHTML(
-                    item.name
-                  ) +
-                  " × " +
-                  Number(
-                    item.quantity || 0
-                  ) +
-                  " — MVR " +
-                  Number(
-                    item.total || 0
-                  ).toFixed(2)
-                );
-
-              })
-              .join("<br>");
-
-        }
-
-
-        const method =
-          sale.paymentMethod ||
-          "Previous / Unspecified";
-
-
-        return `
-          <div class="sale-row">
-
-            <strong>
-              MVR ${Number(
-                sale.total || 0
-              ).toFixed(2)}
-            </strong>
-
-            <br>
-
-            <span class="payment-badge">
-              ${escapeHTML(method)}
-            </span>
-
-            <br>
-
-            <small>
-              ${escapeHTML(date)}
-            </small>
-
-            <br><br>
-
-            ${itemsText}
-
-          </div>
-        `;
-
-      })
+      )
       .join("");
 
 }
@@ -2791,35 +2874,39 @@ function displayExpenses(expenses) {
     expenses
       .slice()
       .reverse()
-      .map(expense => {
+      .map(
+        expense => {
 
-        return `
-          <div class="expense-row">
+          return `
 
-            <strong>
+            <div class="expense-row">
+
+              <strong>
+                ${escapeHTML(
+                  expense.name
+                )}
+              </strong>
+
+              <br>
+
               ${escapeHTML(
-                expense.name
+                expense.date || ""
               )}
-            </strong>
 
-            <br>
+              <br>
 
-            ${escapeHTML(
-              expense.date || ""
-            )}
+              <strong>
+                MVR ${Number(
+                  expense.amount || 0
+                ).toFixed(2)}
+              </strong>
 
-            <br>
+            </div>
 
-            <strong>
-              MVR ${Number(
-                expense.amount || 0
-              ).toFixed(2)}
-            </strong>
+          `;
 
-          </div>
-        `;
-
-      })
+        }
+      )
       .join("");
 
 }
@@ -2850,12 +2937,9 @@ function escapeHTML(value) {
 
 function setToday() {
 
-  const input =
-    document.getElementById(
-      "reportDate"
-    );
-
-  input.value =
+  document.getElementById(
+    "reportDate"
+  ).value =
     dateKey(
       new Date()
     );
@@ -2875,7 +2959,7 @@ function printReport() {
 
 
 /*
-  SAVE REPORT
+  SAVE DAILY REPORT
 */
 
 function saveReport() {
@@ -2884,13 +2968,25 @@ function saveReport() {
     getSelectedDate();
 
 
+  if (!reportDate) {
+
+    alert(
+      "Please select a date first."
+    );
+
+    return;
+
+  }
+
+
   const filename =
-    "Kanbulo-Bakery-Report-" +
+    "Kanbulo-Bakery-Daily-Report-" +
     reportDate +
     ".html";
 
 
   const reportHTML = `
+
 <!DOCTYPE html>
 
 <html>
@@ -2900,7 +2996,7 @@ function saveReport() {
 <meta charset="UTF-8">
 
 <title>
-Kanbulo Bakery Report - ${reportDate}
+Kanbulo Bakery Daily Report - ${reportDate}
 </title>
 
 <style>
@@ -2914,7 +3010,6 @@ body {
 
 h1 {
   color: #7B1E2B;
-  margin-bottom: 5px;
 }
 
 h2 {
@@ -2963,6 +3058,19 @@ td {
   text-align: center;
 }
 
+.month-card {
+  background: white;
+  border: 1px solid #ddd;
+  border-left: 5px solid #7B1E2B;
+  padding: 15px;
+  margin: 12px 0;
+  border-radius: 10px;
+}
+
+.month-card h3 {
+  color: #7B1E2B;
+}
+
 .footer {
   margin-top: 30px;
   padding-top: 15px;
@@ -2979,9 +3087,7 @@ td {
 <h1>🥐 KANBULO BAKERY</h1>
 
 <p>
-<strong>
-Freshly baked with love
-</strong>
+<strong>Freshly baked with love</strong>
 </p>
 
 <p>
@@ -2992,10 +3098,10 @@ Daisymaage, N. Velidhoo
 Phone: +960 7653140
 </p>
 
-<h2>📊 Business Report</h2>
+<h2>📊 Daily Business Report</h2>
 
 <p>
-<strong>Selected Date:</strong>
+<strong>Date:</strong>
 ${escapeHTML(reportDate)}
 </p>
 
@@ -3005,7 +3111,6 @@ ${escapeHTML(reportDate)}
 <div class="summary">
 
 <div class="box">
-
 Total Sales
 
 <strong>
@@ -3015,12 +3120,9 @@ MVR ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Number of Sales
 
 <strong>
@@ -3030,12 +3132,9 @@ ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Products Sold
 
 <strong>
@@ -3045,7 +3144,6 @@ ${
   ).textContent
 }
 </strong>
-
 </div>
 
 </div>
@@ -3107,10 +3205,10 @@ MVR ${
 <tr>
 <td>💰 Daily Expenses</td>
 <td>
-MVR ${
+${
   document.getElementById(
     "quickExpenses"
-  ).value.replace("MVR ", "")
+  ).value
 }
 </td>
 </tr>
@@ -3118,10 +3216,10 @@ MVR ${
 <tr>
 <td>📊 Daily Net</td>
 <td>
-MVR ${
+${
   document.getElementById(
     "quickNet"
-  ).value.replace("MVR ", "")
+  ).value
 }
 </td>
 </tr>
@@ -3134,7 +3232,6 @@ MVR ${
 <div class="summary">
 
 <div class="box">
-
 Monthly Sales
 
 <strong>
@@ -3144,12 +3241,9 @@ MVR ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Number of Sales
 
 <strong>
@@ -3159,12 +3253,9 @@ ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Products Sold
 
 <strong>
@@ -3174,7 +3265,6 @@ ${
   ).textContent
 }
 </strong>
-
 </div>
 
 </div>
@@ -3192,7 +3282,6 @@ ${document.querySelector(
 <div class="summary">
 
 <div class="box">
-
 Total Sales
 
 <strong>
@@ -3202,12 +3291,9 @@ MVR ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Total Expenses
 
 <strong>
@@ -3217,12 +3303,9 @@ MVR ${
   ).textContent
 }
 </strong>
-
 </div>
 
-
 <div class="box">
-
 Profit / Loss
 
 <strong>
@@ -3232,7 +3315,6 @@ MVR ${
   ).textContent
 }
 </strong>
-
 </div>
 
 </div>
@@ -3240,13 +3322,854 @@ MVR ${
 
 <div class="footer">
 
-<strong>
-KANBULO BAKERY
-</strong>
+<strong>KANBULO BAKERY</strong>
+
+<br>
+Freshly baked with love
+
+<br>
+Daisymaage, N. Velidhoo
+
+<br>
++960 7653140
+
+</div>
+
+</body>
+
+</html>
+
+`;
+
+
+  downloadHTMLFile(
+    reportHTML,
+    filename
+  );
+
+}
+
+
+/*
+  SAVE MONTHLY REPORT
+*/
+
+function saveMonthlyReport() {
+
+  const selectedDate =
+    getSelectedDate();
+
+
+  if (!selectedDate) {
+
+    alert(
+      "Please select a date first."
+    );
+
+    return;
+
+  }
+
+
+  const selectedMonth =
+    selectedDate.substring(
+      0,
+      7
+    );
+
+
+  const sales =
+    getReportSales();
+
+
+  const expenses =
+    getData(
+      EXPENSES_KEY
+    );
+
+
+  const monthlySales =
+    sales.filter(sale =>
+      saleDateKey(
+        sale.date
+      ).substring(
+        0,
+        7
+      ) === selectedMonth
+    );
+
+
+  const monthlyExpenses =
+    expenses.filter(expense =>
+      expenseDateKey(
+        expense.date
+      ).substring(
+        0,
+        7
+      ) === selectedMonth
+    );
+
+
+  let salesTotal = 0;
+  let productsTotal = 0;
+
+
+  monthlySales.forEach(
+    sale => {
+
+      salesTotal +=
+        Number(
+          sale.total || 0
+        );
+
+
+      if (
+        Array.isArray(
+          sale.items
+        )
+      ) {
+
+        sale.items.forEach(
+          item => {
+
+            productsTotal +=
+              Number(
+                item.quantity || 0
+              );
+
+          }
+        );
+
+      }
+
+    }
+  );
+
+
+  let expensesTotal = 0;
+
+
+  monthlyExpenses.forEach(
+    expense => {
+
+      expensesTotal +=
+        Number(
+          expense.amount || 0
+        );
+
+    }
+  );
+
+
+  const net =
+    salesTotal -
+    expensesTotal;
+
+
+  const payments =
+    getPaymentTotals(
+      monthlySales
+    );
+
+
+  const monthDate =
+    new Date(
+      selectedMonth +
+      "-01T00:00:00"
+    );
+
+
+  const monthName =
+    monthDate.toLocaleDateString(
+      undefined,
+      {
+        month: "long",
+        year: "numeric"
+      }
+    );
+
+
+  /*
+    BUILD DAY-BY-DAY DATA
+  */
+
+  const days = {};
+
+
+  monthlySales.forEach(
+    sale => {
+
+      const day =
+        saleDateKey(
+          sale.date
+        );
+
+
+      if (!day) return;
+
+
+      if (!days[day]) {
+
+        days[day] = {
+          sales: [],
+          expenses: []
+        };
+
+      }
+
+
+      days[day].sales.push(
+        sale
+      );
+
+    }
+  );
+
+
+  monthlyExpenses.forEach(
+    expense => {
+
+      const day =
+        expenseDateKey(
+          expense.date
+        );
+
+
+      if (!day) return;
+
+
+      if (!days[day]) {
+
+        days[day] = {
+          sales: [],
+          expenses: []
+        };
+
+      }
+
+
+      days[day].expenses.push(
+        expense
+      );
+
+    }
+  );
+
+
+  const dates =
+    Object.keys(days)
+      .sort();
+
+
+  let dailyRows = "";
+
+
+  dates.forEach(
+    day => {
+
+      const daySales =
+        days[day].sales;
+
+
+      const dayExpenses =
+        days[day].expenses;
+
+
+      let dayTotal = 0;
+      let dayProducts = 0;
+
+
+      daySales.forEach(
+        sale => {
+
+          dayTotal +=
+            Number(
+              sale.total || 0
+            );
+
+
+          if (
+            Array.isArray(
+              sale.items
+            )
+          ) {
+
+            sale.items.forEach(
+              item => {
+
+                dayProducts +=
+                  Number(
+                    item.quantity || 0
+                  );
+
+              }
+            );
+
+          }
+
+        }
+      );
+
+
+      const dayPayments =
+        getPaymentTotals(
+          daySales
+        );
+
+
+      const dayExpenseTotal =
+        dayExpenses.reduce(
+          (sum, expense) =>
+            sum +
+            Number(
+              expense.amount || 0
+            ),
+          0
+        );
+
+
+      const dayNet =
+        dayTotal -
+        dayExpenseTotal;
+
+
+      const date =
+        new Date(
+          day +
+          "T00:00:00"
+        );
+
+
+      const formattedDate =
+        date.toLocaleDateString(
+          undefined,
+          {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+          }
+        );
+
+
+      const quick =
+        daySales.some(
+          sale =>
+            sale.isQuickTotal
+        );
+
+
+      dailyRows += `
+
+        <tr>
+
+          <td>
+            ${formattedDate}
+          </td>
+
+          <td>
+            ${quick ? "Quick" : daySales.length}
+          </td>
+
+          <td>
+            ${dayProducts}
+          </td>
+
+          <td>
+            MVR ${dayTotal.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayPayments.cash.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayPayments.card.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayPayments.transfer.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayPayments.other.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayExpenseTotal.toFixed(2)}
+          </td>
+
+          <td>
+            MVR ${dayNet.toFixed(2)}
+          </td>
+
+        </tr>
+
+      `;
+
+    }
+  );
+
+
+  /*
+    EXPENSE LIST
+  */
+
+  let expenseRows = "";
+
+
+  monthlyExpenses
+    .slice()
+    .sort(
+      (a, b) =>
+        expenseDateKey(b.date)
+          .localeCompare(
+            expenseDateKey(a.date)
+          )
+    )
+    .forEach(
+      expense => {
+
+        expenseRows += `
+
+          <tr>
+
+            <td>
+              ${escapeHTML(
+                expense.name
+              )}
+            </td>
+
+            <td>
+              ${escapeHTML(
+                expense.date || ""
+              )}
+            </td>
+
+            <td>
+              MVR ${Number(
+                expense.amount || 0
+              ).toFixed(2)}
+            </td>
+
+          </tr>
+
+        `;
+
+      }
+    );
+
+
+  const reportHTML = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Kanbulo Bakery - ${escapeHTML(monthName)}
+</title>
+
+<style>
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fff8f0;
+  color: #3b2415;
+  padding: 30px;
+}
+
+h1 {
+  color: #7B1E2B;
+  margin-bottom: 5px;
+}
+
+h2 {
+  color: #7B1E2B;
+  border-bottom: 2px solid #7B1E2B;
+  padding-bottom: 8px;
+  margin-top: 30px;
+}
+
+.subtitle {
+  color: #777;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin: 15px 0;
+}
+
+.box {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.box strong {
+  display: block;
+  font-size: 23px;
+  color: #7B1E2B;
+  margin-top: 8px;
+}
+
+.net {
+  border-left: 5px solid #287a3e;
+}
+
+.net strong {
+  color: #287a3e;
+}
+
+.expense-box {
+  border-left: 5px solid #b03a2e;
+}
+
+.expense-box strong {
+  color: #b03a2e;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: white;
+}
+
+th {
+  background: #7B1E2B;
+  color: white;
+  padding: 10px 8px;
+  font-size: 13px;
+}
+
+td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+  font-size: 13px;
+}
+
+.total-row td {
+  font-weight: bold;
+  background: #fff8f0;
+  border-top: 2px solid #7B1E2B;
+}
+
+.footer {
+  margin-top: 35px;
+  padding-top: 15px;
+  border-top: 2px solid #7B1E2B;
+  font-size: 13px;
+}
+
+@media print {
+
+  body {
+    padding: 10px;
+  }
+
+  .box {
+    break-inside: avoid;
+  }
+
+  table {
+    break-inside: auto;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>🥐 KANBULO BAKERY</h1>
+
+<p>
+<strong>Freshly baked with love ❤️</strong>
+</p>
+
+<p>
+Daisymaage, N. Velidhoo
+</p>
+
+<p>
+Phone: +960 7653140
+</p>
+
+
+<h2>📆 Monthly Business Report</h2>
+
+<p class="subtitle">
+<strong>${escapeHTML(monthName)}</strong>
+</p>
+
+
+<h2>📊 Monthly Performance</h2>
+
+<div class="summary">
+
+  <div class="box">
+
+    💰 Total Sales
+
+    <strong>
+      MVR ${salesTotal.toFixed(2)}
+    </strong>
+
+  </div>
+
+
+  <div class="box expense-box">
+
+    💸 Total Expenses
+
+    <strong>
+      MVR ${expensesTotal.toFixed(2)}
+    </strong>
+
+  </div>
+
+
+  <div class="box net">
+
+    📊 Profit / Loss
+
+    <strong>
+      MVR ${net.toFixed(2)}
+    </strong>
+
+  </div>
+
+</div>
+
+
+<h2>💳 Payment Breakdown</h2>
+
+<table>
+
+<tr>
+<th>Payment Method</th>
+<th>Amount</th>
+</tr>
+
+<tr>
+<td>💵 Cash</td>
+<td>
+MVR ${payments.cash.toFixed(2)}
+</td>
+</tr>
+
+<tr>
+<td>💳 Card</td>
+<td>
+MVR ${payments.card.toFixed(2)}
+</td>
+</tr>
+
+<tr>
+<td>🏦 Bank Transfer</td>
+<td>
+MVR ${payments.transfer.toFixed(2)}
+</td>
+</tr>
+
+<tr>
+<td>❓ Previous / Unspecified</td>
+<td>
+MVR ${payments.other.toFixed(2)}
+</td>
+</tr>
+
+</table>
+
+
+<h2>📈 Monthly Statistics</h2>
+
+<div class="summary">
+
+  <div class="box">
+
+    🧾 Sales / Daily Totals
+
+    <strong>
+      ${monthlySales.length}
+    </strong>
+
+  </div>
+
+
+  <div class="box">
+
+    🍞 Products Sold
+
+    <strong>
+      ${productsTotal}
+    </strong>
+
+  </div>
+
+
+  <div class="box">
+
+    📅 Active Days
+
+    <strong>
+      ${dates.length}
+    </strong>
+
+  </div>
+
+</div>
+
+
+<h2>📊 Day-by-Day Breakdown</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Date</th>
+<th>Sales</th>
+<th>Products</th>
+<th>Total</th>
+<th>Cash</th>
+<th>Card</th>
+<th>Bank</th>
+<th>Other</th>
+<th>Expenses</th>
+<th>Net</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+${dailyRows}
+
+<tr class="total-row">
+
+<td>MONTH TOTAL</td>
+<td>${dates.length} days</td>
+<td>${productsTotal}</td>
+<td>MVR ${salesTotal.toFixed(2)}</td>
+<td>MVR ${payments.cash.toFixed(2)}</td>
+<td>MVR ${payments.card.toFixed(2)}</td>
+<td>MVR ${payments.transfer.toFixed(2)}</td>
+<td>MVR ${payments.other.toFixed(2)}</td>
+<td>MVR ${expensesTotal.toFixed(2)}</td>
+<td>MVR ${net.toFixed(2)}</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+
+<h2>💰 Monthly Expenses</h2>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Expense</th>
+<th>Date</th>
+<th>Amount</th>
+</tr>
+
+</thead>
+
+<tbody>
+
+${
+  expenseRows ||
+  `
+  <tr>
+    <td colspan="3">
+      No expenses recorded this month.
+    </td>
+  </tr>
+  `
+}
+
+<tr class="total-row">
+
+<td colspan="2">
+TOTAL EXPENSES
+</td>
+
+<td>
+MVR ${expensesTotal.toFixed(2)}
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+
+<h2>📌 Final Result</h2>
+
+<div class="summary">
+
+  <div class="box">
+
+    Total Sales
+
+    <strong>
+      MVR ${salesTotal.toFixed(2)}
+    </strong>
+
+  </div>
+
+
+  <div class="box expense-box">
+
+    Total Expenses
+
+    <strong>
+      MVR ${expensesTotal.toFixed(2)}
+    </strong>
+
+  </div>
+
+
+  <div class="box net">
+
+    ${net >= 0 ? "📈 Profit" : "📉 Loss"}
+
+    <strong>
+      MVR ${Math.abs(net).toFixed(2)}
+    </strong>
+
+  </div>
+
+</div>
+
+
+<div class="footer">
+
+<strong>KANBULO BAKERY</strong>
 
 <br>
 
-Freshly baked with love
+Freshly baked with love ❤️
 
 <br>
 
@@ -3256,17 +4179,46 @@ Daisymaage, N. Velidhoo
 
 +960 7653140
 
+<br><br>
+
+Report generated:
+${new Date().toLocaleString()}
+
 </div>
 
 </body>
 
 </html>
+
 `;
 
 
+  const filename =
+    "Kanbulo-Bakery-" +
+    selectedMonth +
+    "-Monthly-Report.html";
+
+
+  downloadHTMLFile(
+    reportHTML,
+    filename
+  );
+
+}
+
+
+/*
+  DOWNLOAD HTML FILE
+*/
+
+function downloadHTMLFile(
+  html,
+  filename
+) {
+
   const blob =
     new Blob(
-      [reportHTML],
+      [html],
       {
         type: "text/html"
       }
@@ -3288,6 +4240,7 @@ Daisymaage, N. Velidhoo
   link.href =
     url;
 
+
   link.download =
     filename;
 
@@ -3296,15 +4249,22 @@ Daisymaage, N. Velidhoo
     link
   );
 
+
   link.click();
+
 
   document.body.removeChild(
     link
   );
 
 
-  URL.revokeObjectURL(
-    url
+  setTimeout(
+    () => {
+      URL.revokeObjectURL(
+        url
+      );
+    },
+    1000
   );
 
 }
