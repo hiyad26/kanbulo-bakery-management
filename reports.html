@@ -319,6 +319,59 @@
       margin-top: 0;
     }
 
+    /* MONTH-BY-MONTH SUMMARY */
+
+    .monthly-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .month-card {
+      background: #fff8f0;
+      border-radius: 12px;
+      padding: 18px;
+      border-left: 5px solid #7B1E2B;
+    }
+
+    .month-card h4 {
+      margin: 0 0 15px;
+      color: #7B1E2B;
+      font-size: 19px;
+    }
+
+    .month-card-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #eadfd7;
+      font-size: 14px;
+    }
+
+    .month-card-row:last-child {
+      border-bottom: none;
+    }
+
+    .month-card-row strong {
+      color: #7B1E2B;
+    }
+
+    .month-card-row.expense strong {
+      color: #b03a2e;
+    }
+
+    .month-card-row.net strong {
+      color: #287a3e;
+      font-size: 16px;
+    }
+
+    .month-card-row.days {
+      color: #777;
+    }
+
     .table-wrapper {
       overflow-x: auto;
       margin-top: 15px;
@@ -399,6 +452,10 @@
         grid-template-columns: 1fr;
       }
 
+      .monthly-summary-grid {
+        grid-template-columns: 1fr;
+      }
+
       main {
         padding: 15px;
       }
@@ -455,7 +512,8 @@
       }
 
       .sale-row,
-      .expense-row {
+      .expense-row,
+      .month-card {
         break-inside: avoid;
       }
     }
@@ -525,7 +583,6 @@
 
       </div>
 
-
       <div class="quick-field">
 
         <label for="quickCard">
@@ -542,7 +599,6 @@
         >
 
       </div>
-
 
       <div class="quick-field">
 
@@ -561,7 +617,6 @@
 
       </div>
 
-
       <div class="quick-field">
 
         <label for="quickExpenses">
@@ -576,7 +631,6 @@
         >
 
       </div>
-
 
       <div class="quick-field">
 
@@ -595,7 +649,6 @@
 
     </div>
 
-
     <div class="quick-total-display">
 
       <span>Daily Total</span>
@@ -605,7 +658,6 @@
       </strong>
 
     </div>
-
 
     <div class="quick-actions">
 
@@ -624,7 +676,6 @@
       </button>
 
     </div>
-
 
     <div
       class="quick-status"
@@ -748,6 +799,26 @@
       </div>
 
     </div>
+
+  </div>
+
+
+  <!-- MONTH-BY-MONTH SUMMARY -->
+
+  <div class="section">
+
+    <h3 class="month-title">
+      📆 Month-by-Month Summary
+    </h3>
+
+    <div class="quick-help">
+      Your complete monthly performance, automatically separated by month.
+    </div>
+
+    <div
+      id="monthByMonthSummary"
+      class="monthly-summary-grid"
+    ></div>
 
   </div>
 
@@ -942,10 +1013,6 @@ function expenseDateKey(dateString) {
 
   if (!dateString) return "";
 
-  /*
-    New expense records use YYYY-MM-DD
-  */
-
   if (
     /^\d{4}-\d{2}-\d{2}$/.test(
       String(dateString)
@@ -955,11 +1022,6 @@ function expenseDateKey(dateString) {
     return String(dateString);
 
   }
-
-
-  /*
-    Support older saved expense dates
-  */
 
   const date =
     new Date(dateString);
@@ -1021,10 +1083,6 @@ function getPaymentTotals(sales) {
 
 
   sales.forEach(sale => {
-
-    /*
-      QUICK DAILY TOTAL
-    */
 
     if (sale.isQuickTotal) {
 
@@ -1519,6 +1577,351 @@ function getReportSales() {
   return normalSales.concat(
     quickSales
   );
+
+}
+
+
+/*
+  MONTH-BY-MONTH SUMMARY
+*/
+
+function displayMonthByMonthSummary(
+  sales,
+  expenses
+) {
+
+  const container =
+    document.getElementById(
+      "monthByMonthSummary"
+    );
+
+
+  const months = {};
+
+
+  /*
+    COLLECT SALES BY MONTH
+  */
+
+  sales.forEach(sale => {
+
+    const date =
+      saleDateKey(
+        sale.date
+      );
+
+    if (!date) return;
+
+    const month =
+      date.substring(0, 7);
+
+
+    if (!months[month]) {
+
+      months[month] = {
+        sales: [],
+        expenses: []
+      };
+
+    }
+
+
+    months[month].sales.push(
+      sale
+    );
+
+  });
+
+
+  /*
+    COLLECT EXPENSES BY MONTH
+  */
+
+  expenses.forEach(expense => {
+
+    const date =
+      expenseDateKey(
+        expense.date
+      );
+
+    if (!date) return;
+
+    const month =
+      date.substring(0, 7);
+
+
+    if (!months[month]) {
+
+      months[month] = {
+        sales: [],
+        expenses: []
+      };
+
+    }
+
+
+    months[month].expenses.push(
+      expense
+    );
+
+  });
+
+
+  const monthKeys =
+    Object.keys(months)
+      .sort()
+      .reverse();
+
+
+  if (monthKeys.length === 0) {
+
+    container.innerHTML =
+      '<div class="empty">No sales or expenses recorded yet.</div>';
+
+    return;
+
+  }
+
+
+  let html = "";
+
+
+  monthKeys.forEach(monthKey => {
+
+    const monthData =
+      months[monthKey];
+
+
+    /*
+      MONTH SALES
+    */
+
+    let salesTotal = 0;
+    let productsTotal = 0;
+
+
+    monthData.sales.forEach(sale => {
+
+      salesTotal +=
+        Number(
+          sale.total || 0
+        );
+
+
+      if (
+        Array.isArray(
+          sale.items
+        )
+      ) {
+
+        sale.items.forEach(item => {
+
+          productsTotal +=
+            Number(
+              item.quantity || 0
+            );
+
+        });
+
+      }
+
+    });
+
+
+    /*
+      MONTH EXPENSES
+    */
+
+    let expensesTotal = 0;
+
+
+    monthData.expenses.forEach(
+      expense => {
+
+        expensesTotal +=
+          Number(
+            expense.amount || 0
+          );
+
+      }
+    );
+
+
+    /*
+      NET
+    */
+
+    const net =
+      salesTotal -
+      expensesTotal;
+
+
+    /*
+      MONTH NAME
+    */
+
+    const monthDate =
+      new Date(
+        monthKey +
+        "-01T00:00:00"
+      );
+
+
+    const monthName =
+      monthDate.toLocaleDateString(
+        undefined,
+        {
+          month: "long",
+          year: "numeric"
+        }
+      );
+
+
+    /*
+      SALES COUNT
+    */
+
+    const salesCount =
+      monthData.sales.length;
+
+
+    /*
+      ACTIVE DAYS
+    */
+
+    const activeDates =
+      new Set();
+
+
+    monthData.sales.forEach(sale => {
+
+      const date =
+        saleDateKey(
+          sale.date
+        );
+
+      if (date) {
+        activeDates.add(date);
+      }
+
+    });
+
+
+    monthData.expenses.forEach(
+      expense => {
+
+        const date =
+          expenseDateKey(
+            expense.date
+          );
+
+        if (date) {
+          activeDates.add(date);
+        }
+
+      }
+    );
+
+
+    const activeDays =
+      activeDates.size;
+
+
+    html += `
+
+      <div class="month-card">
+
+        <h4>
+          📅 ${escapeHTML(monthName)}
+        </h4>
+
+
+        <div class="month-card-row">
+
+          <span>
+            💰 Sales
+          </span>
+
+          <strong>
+            MVR ${salesTotal.toFixed(2)}
+          </strong>
+
+        </div>
+
+
+        <div class="month-card-row expense">
+
+          <span>
+            💸 Expenses
+          </span>
+
+          <strong>
+            MVR ${expensesTotal.toFixed(2)}
+          </strong>
+
+        </div>
+
+
+        <div class="month-card-row net">
+
+          <span>
+            📊 Net
+          </span>
+
+          <strong>
+            MVR ${net.toFixed(2)}
+          </strong>
+
+        </div>
+
+
+        <div class="month-card-row">
+
+          <span>
+            🧾 Sales
+          </span>
+
+          <strong>
+            ${salesCount}
+          </strong>
+
+        </div>
+
+
+        <div class="month-card-row">
+
+          <span>
+            🍞 Products Sold
+          </span>
+
+          <strong>
+            ${productsTotal}
+          </strong>
+
+        </div>
+
+
+        <div class="month-card-row days">
+
+          <span>
+            📅 Active Days
+          </span>
+
+          <strong>
+            ${activeDays}
+          </strong>
+
+        </div>
+
+      </div>
+
+    `;
+
+  });
+
+
+  container.innerHTML =
+    html;
 
 }
 
@@ -2101,6 +2504,16 @@ function loadReports() {
 
 
   /*
+    MONTH-BY-MONTH SUMMARY
+  */
+
+  displayMonthByMonthSummary(
+    sales,
+    expenses
+  );
+
+
+  /*
     DAY-BY-DAY
   */
 
@@ -2220,10 +2633,6 @@ function displaySales(sales) {
             : "";
 
 
-        /*
-          QUICK TOTAL
-        */
-
         if (
           sale.isQuickTotal
         ) {
@@ -2281,10 +2690,6 @@ function displaySales(sales) {
 
         }
 
-
-        /*
-          NORMAL SALE
-        */
 
         let itemsText = "";
 
