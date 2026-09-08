@@ -1,11 +1,18 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#7B1E2B">
+
   <title>Kanbulo Bakery - Expenses</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: Arial, sans-serif;
       background: #fff8f0;
@@ -15,23 +22,25 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 650px;
       margin: auto;
     }
 
     h1 {
       margin-bottom: 5px;
+      color: #7B1E2B;
     }
 
     .top {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 10px;
       margin-bottom: 20px;
     }
 
     button {
-      background: #8b4513;
+      background: #7B1E2B;
       color: white;
       border: none;
       padding: 12px 16px;
@@ -54,9 +63,14 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
 
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
     input {
       width: 100%;
-      box-sizing: border-box;
       padding: 12px;
       margin: 7px 0 12px;
       border: 1px solid #ccc;
@@ -79,25 +93,81 @@
 
     .amount {
       font-weight: bold;
-      color: #8b4513;
+      color: #7B1E2B;
+      font-size: 17px;
+    }
+
+    .expense-date {
+      color: #777;
+      font-size: 14px;
+    }
+
+    .edit {
+      background: #3b2415;
+      padding: 8px 12px;
+      margin-top: 9px;
+      margin-right: 6px;
     }
 
     .delete {
       background: #c0392b;
       padding: 8px 12px;
-      margin-top: 8px;
+      margin-top: 9px;
+    }
+
+    .cancel {
+      background: #ddd;
+      color: #333;
+      padding: 12px 16px;
+      margin-left: 6px;
     }
 
     .total {
       font-size: 20px;
       font-weight: bold;
       text-align: right;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 2px solid #7B1E2B;
     }
 
     .empty {
       text-align: center;
       color: #777;
       padding: 20px;
+    }
+
+    .form-title {
+      color: #7B1E2B;
+      margin-top: 0;
+    }
+
+    .form-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 15px;
+      }
+
+      .top {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .top button {
+        width: 100%;
+      }
+
+      .form-buttons {
+        flex-direction: column;
+      }
+
+      .cancel {
+        margin-left: 0;
+      }
     }
   </style>
 </head>
@@ -106,7 +176,7 @@
 
 <div class="container">
 
-  <h1>Kanbulo Bakery</h1>
+  <h1>🥐 Kanbulo Bakery</h1>
 
   <div class="top">
     <h2>Expenses</h2>
@@ -117,19 +187,69 @@
     ← Dashboard
   </button>
 
+
+  <!-- EXPENSE FORM -->
+
   <div id="form" class="card" style="display:none;">
 
-    <h3>New Expense</h3>
+    <h3 id="formTitle" class="form-title">
+      New Expense
+    </h3>
 
-    <label>Expense Name</label>
-    <input id="name" type="text" placeholder="Example: Flour">
+    <label for="name">
+      Expense Name
+    </label>
 
-    <label>Amount (MVR)</label>
-    <input id="amount" type="number" step="0.01" placeholder="Example: 500">
+    <input
+      id="name"
+      type="text"
+      placeholder="Example: Flour"
+    >
 
-    <button onclick="addExpense()">Save Expense</button>
+
+    <label for="amount">
+      Amount (MVR)
+    </label>
+
+    <input
+      id="amount"
+      type="number"
+      min="0"
+      step="0.01"
+      placeholder="Example: 500"
+    >
+
+
+    <label for="expenseDate">
+      📅 Date
+    </label>
+
+    <input
+      id="expenseDate"
+      type="date"
+    >
+
+
+    <div class="form-buttons">
+
+      <button onclick="saveExpense()">
+        💾 Save Expense
+      </button>
+
+      <button
+        id="cancelButton"
+        class="cancel"
+        onclick="cancelEdit()"
+      >
+        Cancel
+      </button>
+
+    </div>
 
   </div>
+
+
+  <!-- EXPENSE LIST -->
 
   <div class="card">
 
@@ -138,123 +258,664 @@
     <div id="expenseList"></div>
 
     <div class="total">
-      Total Expenses: MVR <span id="total">0.00</span>
+      Total Expenses:
+      MVR <span id="total">0.00</span>
     </div>
 
   </div>
 
 </div>
 
+
 <script>
 
 const STORAGE_KEY = "kanbulo_expenses";
 
+let editingId = null;
+
+
+/*
+  GET EXPENSES
+*/
+
 function getExpenses() {
+
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    const data =
+      JSON.parse(
+        localStorage.getItem(STORAGE_KEY) || "[]"
+      );
+
+    return Array.isArray(data)
+      ? data
+      : [];
+
   } catch (error) {
+
     return [];
+
   }
+
 }
+
+
+/*
+  SAVE EXPENSES
+*/
 
 function saveExpenses(expenses) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+
+  localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(expenses)
+  );
+
 }
+
+
+/*
+  TODAY AS YYYY-MM-DD
+*/
+
+function todayKey() {
+
+  const date = new Date();
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(date.getMonth() + 1)
+      .padStart(2, "0");
+
+  const day =
+    String(date.getDate())
+      .padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+
+}
+
+
+/*
+  SHOW ADD FORM
+*/
 
 function showForm() {
-  document.getElementById("form").style.display = "block";
-  document.getElementById("name").focus();
+
+  editingId = null;
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "New Expense";
+
+  document.getElementById(
+    "name"
+  ).value = "";
+
+  document.getElementById(
+    "amount"
+  ).value = "";
+
+  document.getElementById(
+    "expenseDate"
+  ).value =
+    todayKey();
+
+  document.getElementById(
+    "form"
+  ).style.display =
+    "block";
+
+  document.getElementById(
+    "name"
+  ).focus();
+
 }
 
-function addExpense() {
 
-  const name = document.getElementById("name").value.trim();
-  const amount = Number(document.getElementById("amount").value);
+/*
+  SAVE NEW OR EDITED EXPENSE
+*/
+
+function saveExpense() {
+
+  const name =
+    document.getElementById(
+      "name"
+    ).value.trim();
+
+  const amount =
+    Number(
+      document.getElementById(
+        "amount"
+      ).value
+    );
+
+  const date =
+    document.getElementById(
+      "expenseDate"
+    ).value;
+
 
   if (!name) {
-    alert("Please enter the expense name.");
+
+    alert(
+      "Please enter the expense name."
+    );
+
     return;
+
   }
+
 
   if (!amount || amount <= 0) {
-    alert("Please enter a valid amount.");
+
+    alert(
+      "Please enter a valid amount."
+    );
+
     return;
+
   }
 
-  const expenses = getExpenses();
 
-  expenses.push({
-    id: Date.now(),
-    name: name,
-    amount: amount,
-    date: new Date().toLocaleDateString()
-  });
+  if (!date) {
 
-  saveExpenses(expenses);
+    alert(
+      "Please select the expense date."
+    );
 
-  document.getElementById("name").value = "";
-  document.getElementById("amount").value = "";
-  document.getElementById("form").style.display = "none";
+    return;
+
+  }
+
+
+  const expenses =
+    getExpenses();
+
+
+  /*
+    EDIT EXISTING
+  */
+
+  if (editingId !== null) {
+
+    const index =
+      expenses.findIndex(
+        expense =>
+          String(expense.id)
+          === String(editingId)
+      );
+
+
+    if (index !== -1) {
+
+      expenses[index].name =
+        name;
+
+      expenses[index].amount =
+        amount;
+
+      expenses[index].date =
+        date;
+
+    }
+
+  }
+
+  /*
+    ADD NEW
+  */
+
+  else {
+
+    expenses.push({
+
+      id:
+        Date.now(),
+
+      name:
+        name,
+
+      amount:
+        amount,
+
+      date:
+        date
+
+    });
+
+  }
+
+
+  saveExpenses(
+    expenses
+  );
+
+
+  cancelEdit();
 
   displayExpenses();
+
 }
+
+
+/*
+  EDIT EXPENSE
+*/
+
+function editExpense(id) {
+
+  const expenses =
+    getExpenses();
+
+
+  const expense =
+    expenses.find(
+      item =>
+        String(item.id)
+        === String(id)
+    );
+
+
+  if (!expense) {
+
+    alert(
+      "Expense not found."
+    );
+
+    return;
+
+  }
+
+
+  editingId =
+    id;
+
+
+  document.getElementById(
+    "formTitle"
+  ).textContent =
+    "Edit Expense";
+
+
+  document.getElementById(
+    "name"
+  ).value =
+    expense.name || "";
+
+
+  document.getElementById(
+    "amount"
+  ).value =
+    Number(
+      expense.amount || 0
+    );
+
+
+  document.getElementById(
+    "expenseDate"
+  ).value =
+    normalizeExpenseDate(
+      expense.date
+    );
+
+
+  document.getElementById(
+    "form"
+  ).style.display =
+    "block";
+
+
+  document.getElementById(
+    "name"
+  ).focus();
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
+}
+
+
+/*
+  DELETE EXPENSE
+*/
 
 function deleteExpense(id) {
 
-  if (!confirm("Delete this expense?")) {
-    return;
-  }
+  const expenses =
+    getExpenses();
 
-  const expenses = getExpenses().filter(expense => expense.id !== id);
 
-  saveExpenses(expenses);
+  const expense =
+    expenses.find(
+      item =>
+        String(item.id)
+        === String(id)
+    );
+
+
+  if (!expense) return;
+
+
+  const confirmed =
+    confirm(
+      "Delete this expense?\n\n" +
+      expense.name +
+      " — MVR " +
+      Number(
+        expense.amount || 0
+      ).toFixed(2)
+    );
+
+
+  if (!confirmed) return;
+
+
+  const filtered =
+    expenses.filter(
+      item =>
+        String(item.id)
+        !== String(id)
+    );
+
+
+  saveExpenses(
+    filtered
+  );
+
 
   displayExpenses();
+
 }
+
+
+/*
+  CANCEL FORM
+*/
+
+function cancelEdit() {
+
+  editingId = null;
+
+  document.getElementById(
+    "form"
+  ).style.display =
+    "none";
+
+  document.getElementById(
+    "name"
+  ).value = "";
+
+  document.getElementById(
+    "amount"
+  ).value = "";
+
+  document.getElementById(
+    "expenseDate"
+  ).value =
+    todayKey();
+
+}
+
+
+/*
+  NORMALIZE OLD / NEW DATES
+*/
+
+function normalizeExpenseDate(value) {
+
+  if (!value) {
+    return todayKey();
+  }
+
+
+  /*
+    Already YYYY-MM-DD
+  */
+
+  if (
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      String(value)
+    )
+  ) {
+
+    return String(value);
+
+  }
+
+
+  /*
+    Try normal Date parsing
+  */
+
+  const parsed =
+    new Date(value);
+
+
+  if (
+    !isNaN(
+      parsed.getTime()
+    )
+  ) {
+
+    const year =
+      parsed.getFullYear();
+
+    const month =
+      String(
+        parsed.getMonth() + 1
+      ).padStart(2, "0");
+
+    const day =
+      String(
+        parsed.getDate()
+      ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+
+  }
+
+
+  return todayKey();
+
+}
+
+
+/*
+  DISPLAY-FRIENDLY DATE
+*/
+
+function displayDate(value) {
+
+  const normalized =
+    normalizeExpenseDate(
+      value
+    );
+
+
+  const date =
+    new Date(
+      normalized + "T00:00:00"
+    );
+
+
+  if (
+    isNaN(
+      date.getTime()
+    )
+  ) {
+
+    return escapeHtml(
+      String(value || "")
+    );
+
+  }
+
+
+  return date.toLocaleDateString(
+    undefined,
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+
+}
+
+
+/*
+  DISPLAY EXPENSES
+*/
 
 function displayExpenses() {
 
-  const expenses = getExpenses();
-  const list = document.getElementById("expenseList");
+  const expenses =
+    getExpenses();
 
-  if (expenses.length === 0) {
-    list.innerHTML = '<div class="empty">No expenses recorded yet.</div>';
-    document.getElementById("total").textContent = "0.00";
+
+  const list =
+    document.getElementById(
+      "expenseList"
+    );
+
+
+  if (
+    expenses.length === 0
+  ) {
+
+    list.innerHTML =
+      '<div class="empty">No expenses recorded yet.</div>';
+
+    document.getElementById(
+      "total"
+    ).textContent =
+      "0.00";
+
     return;
+
   }
+
 
   let total = 0;
 
-  list.innerHTML = expenses.slice().reverse().map(expense => {
 
-    total += Number(expense.amount);
+  expenses.forEach(
+    expense => {
 
-    return `
-      <div class="expense">
-        <strong>${escapeHtml(expense.name)}</strong>
-        <br>
-        <small>${expense.date}</small>
-        <br>
-        <span class="amount">
-          MVR ${Number(expense.amount).toFixed(2)}
-        </span>
-        <br>
-        <button class="delete" onclick="deleteExpense(${expense.id})">
-          Delete
-        </button>
-      </div>
-    `;
+      total +=
+        Number(
+          expense.amount || 0
+        );
 
-  }).join("");
+    }
+  );
 
-  document.getElementById("total").textContent = total.toFixed(2);
+
+  list.innerHTML =
+    expenses
+      .slice()
+      .reverse()
+      .map(
+        expense => {
+
+          return `
+
+            <div class="expense">
+
+              <strong>
+                ${escapeHtml(
+                  expense.name || ""
+                )}
+              </strong>
+
+              <br>
+
+              <span class="expense-date">
+                📅 ${displayDate(
+                  expense.date
+                )}
+              </span>
+
+              <br>
+
+              <span class="amount">
+                MVR ${Number(
+                  expense.amount || 0
+                ).toFixed(2)}
+              </span>
+
+              <br>
+
+              <button
+                class="edit"
+                onclick="editExpense('${String(
+                  expense.id
+                ).replace(/'/g, "\\'")}')"
+              >
+                ✏️ Edit
+              </button>
+
+              <button
+                class="delete"
+                onclick="deleteExpense('${String(
+                  expense.id
+                ).replace(/'/g, "\\'")}')"
+              >
+                🗑️ Delete
+              </button>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+
+  document.getElementById(
+    "total"
+  ).textContent =
+    total.toFixed(2);
+
 }
+
+
+/*
+  ESCAPE HTML
+*/
 
 function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
+
+  const div =
+    document.createElement(
+      "div"
+    );
+
+  div.textContent =
+    String(text);
+
   return div.innerHTML;
+
 }
+
+
+/*
+  START
+*/
+
+document.getElementById(
+  "expenseDate"
+).value =
+  todayKey();
 
 displayExpenses();
 
@@ -262,3 +923,5 @@ displayExpenses();
 
 </body>
 </html>
+```
+
