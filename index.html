@@ -30,6 +30,104 @@
       color: #3b2416;
     }
 
+    /* =========================
+       APP LOCK
+    ========================= */
+
+    #lockScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: linear-gradient(135deg, #7B1E2B, #9b3040);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .lock-box {
+      width: 100%;
+      max-width: 380px;
+      background: white;
+      border-radius: 24px;
+      padding: 30px 24px;
+      text-align: center;
+      box-shadow: 0 10px 35px rgba(0,0,0,0.25);
+    }
+
+    .lock-icon {
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    .lock-box h1 {
+      margin: 0 0 8px;
+      color: #7B1E2B;
+      font-size: 25px;
+    }
+
+    .lock-box p {
+      margin: 0 0 22px;
+      color: #777;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .pin-input {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #eadbd2;
+      border-radius: 12px;
+      font-size: 25px;
+      text-align: center;
+      letter-spacing: 8px;
+      outline: none;
+    }
+
+    .pin-input:focus {
+      border-color: #7B1E2B;
+    }
+
+    .lock-button {
+      width: 100%;
+      margin-top: 14px;
+      padding: 15px;
+      border: none;
+      border-radius: 12px;
+      background: #7B1E2B;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .lock-button:active {
+      transform: scale(0.98);
+    }
+
+    .lock-error {
+      min-height: 20px;
+      margin-top: 12px;
+      color: #c0392b;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .lock-note {
+      margin-top: 18px !important;
+      margin-bottom: 0 !important;
+      font-size: 11px !important;
+      color: #999 !important;
+    }
+
+    /* =========================
+       MAIN APP
+    ========================= */
+
+    #app {
+      display: none;
+    }
+
     .container {
       max-width: 1000px;
       margin: auto;
@@ -47,6 +145,7 @@
       border-radius: 20px;
       margin-bottom: 22px;
       box-shadow: 0 5px 18px rgba(123, 30, 43, 0.25);
+      position: relative;
     }
 
     .header h1 {
@@ -59,6 +158,25 @@
       margin: 7px 0 0;
       opacity: 0.9;
       font-size: 15px;
+    }
+
+    /* LOCK BUTTON */
+
+    .lock-app-button {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      border: none;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .lock-app-button:active {
+      transform: scale(0.96);
     }
 
     /* =========================
@@ -216,6 +334,7 @@
 
       .header h1 {
         font-size: 25px;
+        padding-right: 75px;
       }
 
       .live-totals {
@@ -239,6 +358,11 @@
       .card {
         padding: 19px;
       }
+
+      .lock-app-button {
+        right: 12px;
+        top: 12px;
+      }
     }
 
   </style>
@@ -246,11 +370,70 @@
 
 <body>
 
+<!-- =========================
+     LOCK SCREEN
+========================= -->
+
+<div id="lockScreen">
+
+  <div class="lock-box">
+
+    <div class="lock-icon">🔐</div>
+
+    <h1>Kanbulo Bakery</h1>
+
+    <p id="lockMessage">
+      Enter your 4-digit PIN to access Management.
+    </p>
+
+    <input
+      id="pinInput"
+      class="pin-input"
+      type="password"
+      inputmode="numeric"
+      maxlength="4"
+      autocomplete="off"
+      placeholder="••••"
+    >
+
+    <button
+      class="lock-button"
+      id="lockButton"
+      onclick="handlePin()">
+      Unlock Management
+    </button>
+
+    <div
+      class="lock-error"
+      id="lockError">
+    </div>
+
+    <p class="lock-note">
+      🔒 Your bakery data stays on this device.
+    </p>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     MAIN APP
+========================= -->
+
+<div id="app">
+
 <div class="container">
 
   <!-- HEADER -->
 
   <div class="header">
+
+    <button
+      class="lock-app-button"
+      onclick="lockApp()">
+      🔒 Lock App
+    </button>
 
     <h1>🥐 Kanbulo Bakery</h1>
 
@@ -442,11 +625,168 @@
 
 </div>
 
+</div>
+
 
 <script>
 
 const SALES_KEY = "kanbulo_sales";
 const EXPENSES_KEY = "kanbulo_expenses";
+
+/* APP LOCK KEY */
+
+const PIN_KEY = "kanbulo_management_pin";
+
+
+/* =========================
+   APP LOCK
+========================= */
+
+function hasPin() {
+
+  return !!localStorage.getItem(PIN_KEY);
+
+}
+
+
+function showLockScreen() {
+
+  document.getElementById("lockScreen").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+
+  const input = document.getElementById("pinInput");
+
+  input.value = "";
+  input.focus();
+
+  if (hasPin()) {
+
+    document.getElementById("lockMessage").textContent =
+      "Enter your 4-digit PIN to access Management.";
+
+    document.getElementById("lockButton").textContent =
+      "Unlock Management";
+
+  } else {
+
+    document.getElementById("lockMessage").textContent =
+      "Create a 4-digit PIN to protect your Management app.";
+
+    document.getElementById("lockButton").textContent =
+      "Create PIN";
+
+  }
+
+}
+
+
+function handlePin() {
+
+  const input =
+    document.getElementById("pinInput");
+
+  const error =
+    document.getElementById("lockError");
+
+  const pin = input.value.trim();
+
+  error.textContent = "";
+
+
+  /* CHECK PIN LENGTH */
+
+  if (!/^\d{4}$/.test(pin)) {
+
+    error.textContent =
+      "Please enter exactly 4 numbers.";
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  /* FIRST TIME SETUP */
+
+  if (!hasPin()) {
+
+    localStorage.setItem(PIN_KEY, pin);
+
+    unlockApp();
+
+    return;
+
+  }
+
+
+  /* CHECK EXISTING PIN */
+
+  const savedPin =
+    localStorage.getItem(PIN_KEY);
+
+  if (pin === savedPin) {
+
+    unlockApp();
+
+  } else {
+
+    error.textContent =
+      "❌ Incorrect PIN. Try again.";
+
+    input.value = "";
+
+    input.focus();
+
+  }
+
+}
+
+
+function unlockApp() {
+
+  document.getElementById("lockScreen").style.display =
+    "none";
+
+  document.getElementById("app").style.display =
+    "block";
+
+  document.getElementById("lockError").textContent = "";
+
+  updateDashboardTotals();
+
+}
+
+
+function lockApp() {
+
+  document.getElementById("app").style.display =
+    "none";
+
+  showLockScreen();
+
+}
+
+
+/* PRESS ENTER TO UNLOCK */
+
+document.getElementById("pinInput")
+  .addEventListener("keydown", function(event) {
+
+    if (event.key === "Enter") {
+
+      handlePin();
+
+    }
+
+  });
+
+
+/* =========================
+   START LOCK
+========================= */
+
+showLockScreen();
 
 
 /* =========================
@@ -549,31 +889,31 @@ function updateDashboardTotals() {
 
 
 /* =========================
-   INITIAL UPDATE
-========================= */
-
-updateDashboardTotals();
-
-
-/* =========================
    REFRESH WHEN RETURNING
 ========================= */
 
 window.addEventListener("pageshow", function() {
 
-  updateDashboardTotals();
+  if (hasPin()) {
+
+    updateDashboardTotals();
+
+  }
 
 });
 
 
 /* =========================
-   REFRESH WHEN PAGE
-   GETS FOCUS
+   REFRESH WHEN PAGE GETS FOCUS
 ========================= */
 
 window.addEventListener("focus", function() {
 
-  updateDashboardTotals();
+  if (hasPin()) {
+
+    updateDashboardTotals();
+
+  }
 
 });
 
