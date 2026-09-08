@@ -122,6 +122,13 @@
       font-size: 17px;
     }
 
+    #quickExpenses,
+    #quickNet {
+      font-weight: bold;
+      background: #fff8f0;
+      color: #7B1E2B;
+    }
+
     .quick-total-display {
       margin-top: 18px;
       background: #fff8f0;
@@ -242,14 +249,6 @@
       border-top: 4px solid #7B1E2B;
     }
 
-    .expense-card {
-      border-top: 4px solid #3b2415;
-    }
-
-    .daily-net-card {
-      border-top: 4px solid #7B1E2B;
-    }
-
     .section {
       background: white;
       border-radius: 15px;
@@ -328,7 +327,7 @@
     .daily-table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 950px;
+      min-width: 980px;
     }
 
     .daily-table th {
@@ -359,13 +358,13 @@
     }
 
     .daily-table .expense-cell {
+      color: #b03a2e;
       font-weight: bold;
-      color: #3b2415;
     }
 
     .daily-table .net-cell {
+      color: #287a3e;
       font-weight: bold;
-      color: #7B1E2B;
     }
 
     .daily-table .total-row td {
@@ -562,6 +561,38 @@
 
       </div>
 
+
+      <div class="quick-field">
+
+        <label for="quickExpenses">
+          💰 Daily Expenses
+        </label>
+
+        <input
+          type="text"
+          id="quickExpenses"
+          value="MVR 0.00"
+          readonly
+        >
+
+      </div>
+
+
+      <div class="quick-field">
+
+        <label for="quickNet">
+          📊 Daily Net
+        </label>
+
+        <input
+          type="text"
+          id="quickNet"
+          value="MVR 0.00"
+          readonly
+        >
+
+      </div>
+
     </div>
 
 
@@ -654,7 +685,7 @@
   </div>
 
 
-  <!-- PAYMENT METHODS + DAILY EXPENSES -->
+  <!-- PAYMENT METHODS -->
 
   <div class="cards">
 
@@ -683,24 +714,6 @@
       <h3>❓ Previous / Unspecified</h3>
       <div class="value">
         MVR <span id="otherTotal">0.00</span>
-      </div>
-    </div>
-
-    <!-- NEW DAILY EXPENSE -->
-
-    <div class="card expense-card">
-      <h3>💰 Daily Expenses</h3>
-      <div class="value">
-        MVR <span id="dailyExpenseTotal">0.00</span>
-      </div>
-    </div>
-
-    <!-- NEW DAILY NET -->
-
-    <div class="card daily-net-card">
-      <h3>📈 Daily Net</h3>
-      <div class="value">
-        MVR <span id="dailyNetTotal">0.00</span>
       </div>
     </div>
 
@@ -845,7 +858,9 @@ const EXPENSES_KEY = "kanbulo_expenses";
 const QUICK_TOTALS_KEY = "kanbulo_quick_daily_totals";
 
 
-/* GET LOCAL STORAGE DATA */
+/*
+  GET LOCAL STORAGE DATA
+*/
 
 function getData(key) {
 
@@ -865,7 +880,9 @@ function getData(key) {
 }
 
 
-/* SAVE LOCAL STORAGE DATA */
+/*
+  SAVE LOCAL STORAGE DATA
+*/
 
 function saveData(key, data) {
 
@@ -877,7 +894,9 @@ function saveData(key, data) {
 }
 
 
-/* DATE KEY */
+/*
+  CONVERT DATE TO YYYY-MM-DD
+*/
 
 function dateKey(date) {
 
@@ -897,7 +916,9 @@ function dateKey(date) {
 }
 
 
-/* SALE DATE KEY */
+/*
+  SALE DATE KEY
+*/
 
 function saleDateKey(dateString) {
 
@@ -915,44 +936,68 @@ function saleDateKey(dateString) {
 
 /*
   EXPENSE DATE KEY
-
-  New expenses use YYYY-MM-DD.
-  This also tries to handle older
-  expense records.
 */
 
-function expenseDateKey(value) {
+function expenseDateKey(dateString) {
 
-  if (!value) return "";
+  if (!dateString) return "";
 
-  const text =
-    String(value).trim();
+  /*
+    New expense records use YYYY-MM-DD
+  */
 
   if (
-    /^\d{4}-\d{2}-\d{2}$/.test(text)
+    /^\d{4}-\d{2}-\d{2}$/.test(
+      String(dateString)
+    )
   ) {
 
-    return text;
+    return String(dateString);
 
   }
 
-  const parsed =
-    new Date(text);
 
-  if (
-    !isNaN(parsed.getTime())
-  ) {
+  /*
+    Support older saved expense dates
+  */
 
-    return dateKey(parsed);
+  const date =
+    new Date(dateString);
 
-  }
+  if (isNaN(date.getTime())) return "";
 
-  return "";
+  return dateKey(date);
 
 }
 
 
-/* GET SELECTED DATE */
+/*
+  GET DAILY EXPENSE TOTAL
+*/
+
+function getExpenseTotalForDate(
+  expenses,
+  selectedDate
+) {
+
+  return expenses
+    .filter(expense =>
+      expenseDateKey(expense.date)
+      === selectedDate
+    )
+    .reduce(
+      (total, expense) =>
+        total +
+        Number(expense.amount || 0),
+      0
+    );
+
+}
+
+
+/*
+  GET SELECTED DATE
+*/
 
 function getSelectedDate() {
 
@@ -963,7 +1008,9 @@ function getSelectedDate() {
 }
 
 
-/* GET PAYMENT TOTALS */
+/*
+  GET PAYMENT TOTALS
+*/
 
 function getPaymentTotals(sales) {
 
@@ -1038,7 +1085,9 @@ function getPaymentTotals(sales) {
 }
 
 
-/* GET QUICK TOTALS */
+/*
+  GET QUICK TOTALS
+*/
 
 function getQuickTotals() {
 
@@ -1049,7 +1098,9 @@ function getQuickTotals() {
 }
 
 
-/* FIND QUICK TOTAL FOR DATE */
+/*
+  FIND QUICK TOTAL FOR DATE
+*/
 
 function getQuickTotalForDate(date) {
 
@@ -1057,13 +1108,16 @@ function getQuickTotalForDate(date) {
     getQuickTotals();
 
   return totals.find(
-    item => item.date === date
+    item =>
+      item.date === date
   ) || null;
 
 }
 
 
-/* GET ENTERED QUICK AMOUNTS */
+/*
+  GET ENTERED QUICK AMOUNTS
+*/
 
 function getEnteredQuickAmounts() {
 
@@ -1092,20 +1146,28 @@ function getEnteredQuickAmounts() {
   return {
 
     cash:
-      cash >= 0 ? cash : 0,
+      cash >= 0
+        ? cash
+        : 0,
 
     card:
-      card >= 0 ? card : 0,
+      card >= 0
+        ? card
+        : 0,
 
     transfer:
-      transfer >= 0 ? transfer : 0
+      transfer >= 0
+        ? transfer
+        : 0
 
   };
 
 }
 
 
-/* UPDATE QUICK TOTAL */
+/*
+  UPDATE QUICK TOTAL
+*/
 
 function updateQuickTotal() {
 
@@ -1127,7 +1189,9 @@ function updateQuickTotal() {
 }
 
 
-/* LOAD QUICK DAILY TOTAL */
+/*
+  LOAD QUICK TOTAL
+*/
 
 function loadQuickDailyTotal() {
 
@@ -1199,7 +1263,9 @@ function loadQuickDailyTotal() {
 }
 
 
-/* SAVE QUICK DAILY TOTAL */
+/*
+  SAVE QUICK DAILY TOTAL
+*/
 
 function saveQuickDailyTotal() {
 
@@ -1252,15 +1318,20 @@ function saveQuickDailyTotal() {
 
   const record = {
 
-    date: selectedDate,
+    date:
+      selectedDate,
 
-    cash: amounts.cash,
+    cash:
+      amounts.cash,
 
-    card: amounts.card,
+    card:
+      amounts.card,
 
-    transfer: amounts.transfer,
+    transfer:
+      amounts.transfer,
 
-    total: total,
+    total:
+      total,
 
     savedAt:
       new Date().toISOString()
@@ -1297,7 +1368,9 @@ function saveQuickDailyTotal() {
 }
 
 
-/* CLEAR QUICK DAILY TOTAL */
+/*
+  CLEAR QUICK DAILY TOTAL
+*/
 
 function clearQuickDailyTotal() {
 
@@ -1360,10 +1433,7 @@ function clearQuickDailyTotal() {
 
 
 /*
-  GET REPORT SALES
-
-  Quick totals replace detailed sales
-  for the same date.
+  BUILD REPORT SALES
 */
 
 function getReportSales() {
@@ -1378,7 +1448,8 @@ function getReportSales() {
   const quickDates =
     new Set(
       quickTotals.map(
-        item => item.date
+        item =>
+          item.date
       )
     );
 
@@ -1391,7 +1462,9 @@ function getReportSales() {
           sale.date
         );
 
-      return !quickDates.has(date);
+      return !quickDates.has(
+        date
+      );
 
     });
 
@@ -1402,13 +1475,32 @@ function getReportSales() {
       return {
 
         id:
-          "quick-" + item.date,
+          "quick-" +
+          item.date,
 
         date:
-          item.date + "T23:59:59",
+          item.date +
+          "T23:59:59",
 
         total:
-          Number(item.total || 0),
+          Number(
+            item.total || 0
+          ),
+
+        cash:
+          Number(
+            item.cash || 0
+          ),
+
+        card:
+          Number(
+            item.card || 0
+          ),
+
+        transfer:
+          Number(
+            item.transfer || 0
+          ),
 
         paymentMethod:
           "Quick Daily Total",
@@ -1416,16 +1508,8 @@ function getReportSales() {
         isQuickTotal:
           true,
 
-        cash:
-          Number(item.cash || 0),
-
-        card:
-          Number(item.card || 0),
-
-        transfer:
-          Number(item.transfer || 0),
-
-        items: []
+        items:
+          []
 
       };
 
@@ -1440,56 +1524,13 @@ function getReportSales() {
 
 
 /*
-  GET EXPENSES FOR DATE
-*/
-
-function getExpensesForDate(
-  expenses,
-  selectedDate
-) {
-
-  return expenses.filter(
-    expense =>
-      expenseDateKey(
-        expense.date
-      ) === selectedDate
-  );
-
-}
-
-
-/*
-  GET EXPENSE TOTAL FOR DATE
-*/
-
-function getExpenseTotalForDate(
-  expenses,
-  selectedDate
-) {
-
-  return getExpensesForDate(
-    expenses,
-    selectedDate
-  ).reduce(
-    (total, expense) =>
-      total +
-      Number(
-        expense.amount || 0
-      ),
-    0
-  );
-
-}
-
-
-/*
   DAY-BY-DAY BREAKDOWN
 */
 
 function displayDailyBreakdown(
   sales,
-  selectedMonth,
-  expenses
+  expenses,
+  selectedMonth
 ) {
 
   const tbody =
@@ -1500,54 +1541,25 @@ function displayDailyBreakdown(
 
   const monthlySales =
     sales.filter(sale =>
-      saleDateKey(sale.date)
-        .substring(0, 7)
+      saleDateKey(
+        sale.date
+      ).substring(0, 7)
       === selectedMonth
     );
 
 
   const monthlyExpenses =
     expenses.filter(expense =>
-      expenseDateKey(expense.date)
-        .substring(0, 7)
+      expenseDateKey(
+        expense.date
+      ).substring(0, 7)
       === selectedMonth
     );
 
 
-  const daySet =
-    new Set();
-
-
-  monthlySales.forEach(sale => {
-
-    const day =
-      saleDateKey(sale.date);
-
-    if (day) {
-      daySet.add(day);
-    }
-
-  });
-
-
-  monthlyExpenses.forEach(expense => {
-
-    const day =
-      expenseDateKey(expense.date);
-
-    if (day) {
-      daySet.add(day);
-    }
-
-  });
-
-
-  const dates =
-    Array.from(daySet).sort();
-
-
   if (
-    dates.length === 0
+    monthlySales.length === 0 &&
+    monthlyExpenses.length === 0
   ) {
 
     tbody.innerHTML = `
@@ -1563,21 +1575,67 @@ function displayDailyBreakdown(
   }
 
 
-  const salesByDay = {};
+  const days = {};
 
 
   monthlySales.forEach(sale => {
 
     const day =
-      saleDateKey(sale.date);
+      saleDateKey(
+        sale.date
+      );
 
-    if (!salesByDay[day]) {
-      salesByDay[day] = [];
+
+    if (!day) return;
+
+
+    if (!days[day]) {
+
+      days[day] = {
+        sales: [],
+        expenses: []
+      };
+
     }
 
-    salesByDay[day].push(sale);
+
+    days[day].sales.push(
+      sale
+    );
 
   });
+
+
+  monthlyExpenses.forEach(expense => {
+
+    const day =
+      expenseDateKey(
+        expense.date
+      );
+
+
+    if (!day) return;
+
+
+    if (!days[day]) {
+
+      days[day] = {
+        sales: [],
+        expenses: []
+      };
+
+    }
+
+
+    days[day].expenses.push(
+      expense
+    );
+
+  });
+
+
+  const dates =
+    Object.keys(days).sort();
 
 
   let grandSales = 0;
@@ -1596,7 +1654,10 @@ function displayDailyBreakdown(
   dates.forEach(day => {
 
     const daySales =
-      salesByDay[day] || [];
+      days[day].sales;
+
+    const dayExpenses =
+      days[day].expenses;
 
 
     let total = 0;
@@ -1645,31 +1706,51 @@ function displayDailyBreakdown(
       );
 
 
-    const dayExpenses =
-      getExpenseTotalForDate(
-        expenses,
-        day
+    const expensesTotal =
+      dayExpenses.reduce(
+        (sum, expense) =>
+          sum +
+          Number(
+            expense.amount || 0
+          ),
+        0
       );
 
 
     const net =
       total -
-      dayExpenses;
+      expensesTotal;
 
 
-    grandSales += total;
-    grandProducts += products;
-    grandCash += payments.cash;
-    grandCard += payments.card;
-    grandTransfer += payments.transfer;
-    grandOther += payments.other;
-    grandExpenses += dayExpenses;
-    grandNet += net;
+    grandSales +=
+      total;
+
+    grandProducts +=
+      products;
+
+    grandCash +=
+      payments.cash;
+
+    grandCard +=
+      payments.card;
+
+    grandTransfer +=
+      payments.transfer;
+
+    grandOther +=
+      payments.other;
+
+    grandExpenses +=
+      expensesTotal;
+
+    grandNet +=
+      net;
 
 
     const date =
       new Date(
-        day + "T00:00:00"
+        day +
+        "T00:00:00"
       );
 
 
@@ -1726,7 +1807,7 @@ function displayDailyBreakdown(
         </td>
 
         <td class="expense-cell">
-          MVR ${dayExpenses.toFixed(2)}
+          MVR ${expensesTotal.toFixed(2)}
         </td>
 
         <td class="net-cell">
@@ -1801,12 +1882,8 @@ function loadReports() {
   const sales =
     getReportSales();
 
-
   const expenses =
-    getData(
-      EXPENSES_KEY
-    );
-
+    getData(EXPENSES_KEY);
 
   const selectedDate =
     getSelectedDate();
@@ -1890,11 +1967,37 @@ function loadReports() {
 
 
   /*
-    DAILY PAYMENT METHODS
+    DAILY EXPENSES
+  */
 
-    If a quick total exists,
-    use its Cash/Card/Transfer
-    values directly.
+  const dailyExpenseTotal =
+    getExpenseTotalForDate(
+      expenses,
+      selectedDate
+    );
+
+
+  const dailyNetTotal =
+    dailySales -
+    dailyExpenseTotal;
+
+
+  document.getElementById(
+    "quickExpenses"
+  ).value =
+    "MVR " +
+    dailyExpenseTotal.toFixed(2);
+
+
+  document.getElementById(
+    "quickNet"
+  ).value =
+    "MVR " +
+    dailyNetTotal.toFixed(2);
+
+
+  /*
+    PAYMENT METHODS
   */
 
   const paymentTotals =
@@ -1928,45 +2031,21 @@ function loadReports() {
 
 
   /*
-    DAILY EXPENSES
-  */
-
-  const dailyExpenseTotal =
-    getExpenseTotalForDate(
-      expenses,
-      selectedDate
-    );
-
-
-  const dailyNet =
-    dailySales -
-    dailyExpenseTotal;
-
-
-  document.getElementById(
-    "dailyExpenseTotal"
-  ).textContent =
-    dailyExpenseTotal.toFixed(2);
-
-
-  document.getElementById(
-    "dailyNetTotal"
-  ).textContent =
-    dailyNet.toFixed(2);
-
-
-  /*
     MONTHLY SALES
   */
 
   const selectedMonth =
-    selectedDate.substring(0, 7);
+    selectedDate.substring(
+      0,
+      7
+    );
 
 
   const monthlySalesList =
     sales.filter(sale =>
-      saleDateKey(sale.date)
-        .substring(0, 7)
+      saleDateKey(
+        sale.date
+      ).substring(0, 7)
       === selectedMonth
     );
 
@@ -2027,8 +2106,8 @@ function loadReports() {
 
   displayDailyBreakdown(
     sales,
-    selectedMonth,
-    expenses
+    expenses,
+    selectedMonth
   );
 
 
@@ -2084,7 +2163,7 @@ function loadReports() {
 
 
   /*
-    SELECTED DATE SALES
+    DISPLAY SELECTED DATE SALES
   */
 
   displaySales(
@@ -2093,7 +2172,7 @@ function loadReports() {
 
 
   /*
-    ALL EXPENSES
+    DISPLAY EXPENSES
   */
 
   displayExpenses(
@@ -2140,6 +2219,10 @@ function displaySales(sales) {
               ).toLocaleString()
             : "";
 
+
+        /*
+          QUICK TOTAL
+        */
 
         if (
           sale.isQuickTotal
@@ -2198,6 +2281,10 @@ function displaySales(sales) {
 
         }
 
+
+        /*
+          NORMAL SALE
+        */
 
         let itemsText = "";
 
@@ -2301,50 +2388,6 @@ function displayExpenses(expenses) {
       .reverse()
       .map(expense => {
 
-        const rawDate =
-          expense.date || "";
-
-
-        let displayDate =
-          rawDate;
-
-
-        const dateKeyValue =
-          expenseDateKey(
-            rawDate
-          );
-
-
-        if (dateKeyValue) {
-
-          const parsed =
-            new Date(
-              dateKeyValue +
-              "T00:00:00"
-            );
-
-
-          if (
-            !isNaN(
-              parsed.getTime()
-            )
-          ) {
-
-            displayDate =
-              parsed.toLocaleDateString(
-                undefined,
-                {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric"
-                }
-              );
-
-          }
-
-        }
-
-
         return `
           <div class="expense-row">
 
@@ -2356,8 +2399,8 @@ function displayExpenses(expenses) {
 
             <br>
 
-            📅 ${escapeHTML(
-              displayDate
+            ${escapeHTML(
+              expense.date || ""
             )}
 
             <br>
@@ -2406,7 +2449,6 @@ function setToday() {
     document.getElementById(
       "reportDate"
     );
-
 
   input.value =
     dateKey(
@@ -2658,28 +2700,24 @@ MVR ${
 </tr>
 
 <tr>
-<td><strong>💰 Daily Expenses</strong></td>
+<td>💰 Daily Expenses</td>
 <td>
-<strong>
 MVR ${
   document.getElementById(
-    "dailyExpenseTotal"
-  ).textContent
+    "quickExpenses"
+  ).value.replace("MVR ", "")
 }
-</strong>
 </td>
 </tr>
 
 <tr>
-<td><strong>📈 Daily Net</strong></td>
+<td>📊 Daily Net</td>
 <td>
-<strong>
 MVR ${
   document.getElementById(
-    "dailyNetTotal"
-  ).textContent
+    "quickNet"
+  ).value.replace("MVR ", "")
 }
-</strong>
 </td>
 </tr>
 
@@ -2842,7 +2880,8 @@ Daisymaage, N. Velidhoo
     );
 
 
-  link.href = url;
+  link.href =
+    url;
 
   link.download =
     filename;
